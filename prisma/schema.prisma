@@ -1,0 +1,91 @@
+datasource db {
+  provider = "postgresql"
+  url      = env(DATABASE_URL)
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model SalesOrder {
+  salesorder_id   Int      @id @default(autoincrement())
+  salesorder_no   String
+  user_id         Int
+  product         String
+  order_status    String
+  customer_name   String
+  shipping_cost   Float
+  sub_total       Float
+  is_verified     Boolean
+  user            User     @relation(fields: [user_id], references: [user_id])
+  details         SalesOrderDetail[]
+}
+
+model SalesOrderDetail {
+  salesorder_detail_id Int      @id @default(autoincrement())
+  salesorder_id       Int
+  item_id             Int
+  item_price          Float
+  quantity            Int
+  salesOrder          SalesOrder @relation(fields: [salesorder_id], references: [salesorder_id])
+  item                Item      @relation(fields: [item_id], references: [item_id])
+}
+
+model User {
+  user_id    Int     @id @default(autoincrement())
+  username   String
+  email      String
+  password   String
+  address    String
+  full_name  String
+  phone      String
+  role       String
+  salesOrder SalesOrder[]
+}
+
+model Item {
+  item_id        Int        @id @default(autoincrement())
+  feedback_id    Int
+  item_name      String
+  price          Float
+  description    String
+  color          String
+  package_weight Int
+  stock_item     Int
+  feedback       Feedback   @relation(fields: [feedback_id], references: [feedback_id])
+  salesOrderDetails SalesOrderDetail[]
+  images         ItemImage[]
+  warehouses     Warehouse[]
+}
+
+model Feedback {
+  feedback_id Int     @id @default(autoincrement())
+  item_id     Int
+  rating      Int
+  description String
+  item        Item    @relation(fields: [item_id], references: [item_id])
+}
+
+model ItemImage {
+  item_image_id Int    @id @default(autoincrement())
+  item_id       Int
+  image_url     String
+  item          Item   @relation(fields: [item_id], references: [item_id])
+}
+
+model Warehouse {
+  warehouse_id Int    @id @default(autoincrement())
+  item_id      Int
+  city         String
+  province     String
+  item         Item    @relation(fields: [item_id], references: [item_id])
+  warehouseItems WarehouseItem[]
+}
+
+model WarehouseItem {
+  warehouse_id Int     @id
+  item_id      Int     @id
+  warehouse    Warehouse @relation(fields: [warehouse_id], references: [warehouse_id])
+  item         Item      @relation(fields: [item_id], references: [item_id])
+}
