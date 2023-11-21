@@ -18,6 +18,7 @@ model SalesOrder {
   shipping_cost   Float
   sub_total       Float
   is_verified     Boolean
+  image_payment   String
   user            User     @relation(fields: [user_id], references: [user_id])
   details         SalesOrderDetail[]
 }

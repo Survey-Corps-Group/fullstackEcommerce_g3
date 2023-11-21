@@ -7,7 +7,8 @@ CREATE TABLE salesorder (
     customer_name VARCHAR,
     shipping_cost DECIMAL(10, 2),
     sub_total DECIMAL(10, 2),
-    is_verified BOOLEAN
+    is_verified BOOLEAN,
+    image_payment varchar
 );
 
 CREATE TABLE salesorder_detail (
