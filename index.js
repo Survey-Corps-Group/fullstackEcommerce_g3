@@ -25,16 +25,18 @@ function authenticateTokenMiddleware(req, res, next) {
   next();
 }
 
-function authorizeAdmin(req, res, next) {
-  if (req.role !== "admin") {
+// mengecek apakah user sudah login atau belum
+function authorizeUser(req, res, next) {
+  if (req.role !== "customer") {
     return res.status(403).json({
       success: false,
-      message: "Access denied. Admins only.",
+      message: "Access denied. Customers only.",
     });
   }
   next();
 }
 
+// middleware admin setelah login
 function authorizeAdmin(req, res, next) {
   if (req.role !== "admin") {
     return res.status(403).json({
@@ -74,10 +76,12 @@ const upload = multer({
   limits: { fileSize: 10000000 }, // 10MB limit
 });
 
+// testing route
 app.get("/", (_, res) => {
   res.status(200).json({ message: "Hello world!" });
 });
 
+// register
 app.post("/api/users/register", async (req, res) => {
   const {
     username,
@@ -88,6 +92,7 @@ app.post("/api/users/register", async (req, res) => {
     phone,
     role,
   } = req.body;
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // pengecekan existing user
@@ -131,6 +136,7 @@ app.post("/api/users/register", async (req, res) => {
   }
 });
 
+// login
 app.post("/api/users/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -165,6 +171,147 @@ app.post("/api/users/login", async (req, res) => {
   }
 });
 
+// Get User
+app.get("/api/users", async (_, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        user_id: true,
+        username: true,
+        email: true,
+        address: true,
+        full_name: true,
+        phone: true,
+        role: true,
+      },
+    });
+
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+// Get User By Id
+app.get("/api/users/:id", async (req, res) => {
+  const userId = parseInt(req.params.id);
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        user_id: userId,
+      },
+      select: {
+        username: true,
+        email: true,
+        password: true,
+        address: true,
+        full_name: true,
+        phone: true,
+        role: true,
+      },
+    });
+
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+// Update User
+app.put("/api/users/:id", async (req, res) => {
+  const userId = parseInt(req.params.id);
+  const {
+    username,
+    email,
+    password,
+    address,
+    full_name,
+    phone,
+    role,
+  } = req.body;
+
+  try {
+    let updateData = {};
+    if (username) updateData.username = username;
+    if (email) updateData.email = email;
+    if (password) updateData.password = await bcrypt.hash(password, 10); // Hash password jika ada
+    if (address) updateData.address = address;
+    if (full_name) updateData.full_name = full_name;
+    if (phone) updateData.phone = phone;
+    if (role) updateData.role = role;
+
+    const updatedUser = await prisma.user.update({
+      where: { user_id: userId },
+      data: updateData,
+    });
+
+    res.json({
+      success: true,
+      message: "User updated successfully",
+      user: {
+        user_id: updatedUser.user_id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        address: updatedUser.address,
+        full_name: updatedUser.full_name,
+        phone: updatedUser.phone,
+        role: updatedUser.role,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+// Delete User
+app.delete("/api/users/:id", async (req, res) => {
+  const userId = parseInt(req.params.id);
+
+  try {
+    const deletedUser = await prisma.user.delete({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "User deleted successfully",
+      deletedUserId: deletedUser.user_id,
+    });
+  } catch (err) {
+    if (err.code === "P2025") {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: `Server error: ${err.message}`,
+      });
+    }
+  }
+});
+
+// Filter Produk
 function calculateSummaryRating(feedbacks) {
   if (!feedbacks.length) return 0;
   const totalRating = feedbacks.reduce((acc, fb) => acc + fb.rating, 0);
