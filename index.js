@@ -218,8 +218,8 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-//activity 7,8,9 (bagian mukti)
-/* note :
+//BAGIAN MUKTI (ACTIVITY 7, 8, 9)
+/* note/DOKUMENTASI PENGGUNAAN DATA :
 1. api dashboard home admin (menampilkan list product)
 get /product
 select item_name, price, city from item join warehouse
@@ -263,244 +263,377 @@ from salesorder
 */
 
 //api dashboard home login as admin (menampilkan list product)
-app.get("/products", async (req, res) => {
+app.get("/admin/products", async (req, res) => {
   try {
-    const productList = await prisma.item.findMany({
+    const adminProducts = await prisma.item.findMany({
       select: {
         item_name: true,
         price: true,
-        warehouses: {
+        description: true,
+        color: true,
+        package_weight: true,
+        stock_item: true,
+        feedbacks: {
           select: {
-            city: true,
+            feedback_id: true,
+          },
+        },
+        images: {
+          select: {
+            image_url: true,
+          },
+        },
+        WarehouseItem: {
+          select: {
+            warehouse_id: true,
           },
         },
       },
     });
 
-    res.json(productList);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    const result = adminProducts.map((product) => ({
+      item_id: product.item_id,
+      item_name: product.item_name,
+      price: product.price,
+      description: product.description,
+      color: product.color,
+      package_weight: product.package_weight,
+      stock_item: product.stock_item,
+      feedback_id: product.feedbacks.map((fb) => fb.feedback_id),
+      summary_rating: calculateSummaryRating(product.feedbacks),
+      warehouse_id: product.WarehouseItem.map((wh) => wh.warehouse_id),
+      images: product.images.map((img) => img.image_url),
+    }));
+
+    res.json({ products: result });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
   }
 });
-
 //api admin add product
-app.post("/product", async (req, res) => {
+app.post("/admin/products", upload.array("images", 5), async (req, res) => {
   try {
     const {
-      productName,
+      item_name,
       price,
       description,
       color,
-      packageWeight,
-      stockItem,
-      warehouseId,
-      imageUrl,
+      package_weight,
+      stock_item,
     } = req.body;
 
-    //memungkinkan admin untuk menambahkan produk tanpa membuat gudang baru
-    // (menggunakan gudang yang sudah ada),
-    //Anda dapat menyediakan pilihan gudang yang sudah ada, di formulir penambahan produk.
-    // dokumentasi front end: https://chat.openai.com/c/85b88042-1135-4b2b-9cfb-621ca8bf67aa
+    // Check if the product with the same name already exists
+    const existingProduct = await prisma.item.findFirst({
+      where: {
+        item_name: item_name,
+      },
+    });
 
-    // Menambah produk tanpa membuat gudang baru(gudang tinggal pilih)
-    const newItem = await prisma.item.create({
+    if (existingProduct) {
+      return res.status(409).json({
+        success: false,
+        message: "Product with the same name already exists",
+      });
+    }
+
+    // Create the new product
+    const newProduct = await prisma.item.create({
       data: {
-        item_name: productName,
+        item_name,
+        price: parseFloat(price),
+        description,
+        color,
+        package_weight: parseInt(package_weight),
+        stock_item: parseInt(stock_item),
+      },
+    });
+
+    // If there are image files uploaded, save their information
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const image_url = file.path.replace("\\", "/"); // Fix path for Windows
+        await prisma.itemImage.create({
+          data: {
+            item_id: newProduct.item_id,
+            image_url,
+          },
+        });
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      product: newProduct,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+//api edit product
+app.put(
+  "/admin/products/:itemId",
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      const itemId = parseInt(req.params.itemId);
+      const {
+        item_name,
         price,
         description,
         color,
-        package_weight: packageWeight,
-        stock_item: stockItem,
-        warehouse_id: warehouseId, // Menggunakan gudang yang sudah ada
-        ItemImage: {
-          create: {
-            image_url: imageUrl,
+        package_weight,
+        stock_item,
+      } = req.body;
+
+      // Check if the product with the given ID exists
+      const existingProduct = await prisma.item.findUnique({
+        where: {
+          item_id: itemId,
+        },
+        include: {
+          images: {
+            select: {
+              item_image_id: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    res.json({ success: true, newItem });
-  } catch (error) {
-    console.error("Error adding product:", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
+      if (!existingProduct) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      // Delete existing images associated with the product
+      await prisma.itemImage.deleteMany({
+        where: {
+          item_id: itemId,
+        },
+      });
+
+      // Update the product information
+      const updatedProduct = await prisma.item.update({
+        where: {
+          item_id: itemId,
+        },
+        data: {
+          item_name,
+          price: parseFloat(price),
+          description,
+          color,
+          package_weight: parseInt(package_weight),
+          stock_item: parseInt(stock_item),
+          // You can include other fields as needed
+        },
+      });
+
+      // If new images are uploaded, save the image information
+      if (req.files) {
+        const images = req.files.map((file) => ({
+          item_id: itemId,
+          image_url: file.path.replace("\\", "/"), // Fix path for Windows
+        }));
+
+        await prisma.itemImage.createMany({
+          data: images,
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Product updated successfully",
+        product: updatedProduct,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        success: false,
+        message: `Server error: ${err.message}`,
+      });
+    }
   }
-});
-
-//api admin edit product by id
-app.put("/product/:itemId", async (req, res) => {
+);
+//api admin delete product by id
+app.delete("/admin/products/:id", async (req, res) => {
   try {
-    const itemId = parseInt(req.params.itemId);
-    const {
-      productName,
-      price,
-      description,
-      color,
-      packageWeight,
-      stockItem,
-      warehouseId,
-      imageUrl,
-    } = req.body;
+    const itemId = parseInt(req.params.id);
 
-    //Mengambil informasi produk yang akan diubah
-    //warehouse sudah ada tidak perlu ditambah
-    //warehouse tinggal milih aja
-    const existingItem = await prisma.item.findUnique({
-      where: { item_id: itemId },
-      include: {
-        Warehouse: true,
-        ItemImage: true,
+    // Check if the product with the given ID exists
+    const existingProduct = await prisma.item.findUnique({
+      where: {
+        item_id: itemId,
       },
     });
 
-    if (!existingItem) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Product not found" });
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
 
-    // Mengupdate informasi produk
-    const updatedItem = await prisma.item.update({
-      where: { item_id: itemId },
-      data: {
-        item_name: productName || existingItem.item_name,
-        price: price || existingItem.price,
-        description: description || existingItem.description,
-        color: color || existingItem.color,
-        package_weight: packageWeight || existingItem.package_weight,
-        stock_item: stockItem || existingItem.stock_item,
-        warehouse_id: warehouseId || existingItem.warehouse_id,
-        ItemImage: {
-          update: {
-            image_url: imageUrl || existingItem.ItemImage?.image_url,
-          },
-        },
+    // Delete the product and its related data
+    await prisma.itemImage.deleteMany({
+      where: {
+        item_id: itemId,
       },
     });
 
-    res.json({ success: true, updatedItem });
-  } catch (error) {
-    console.error("Error editing product:", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
-  }
-});
-
-//api admin delete product
-app.delete("/product/:id", async (req, res) => {
-  const productId = parseInt(req.params.id);
-
-  try {
-    // Menggunakan Prisma untuk menghapus produk berdasarkan ID
-    const deletedProduct = await prisma.item.delete({
-      where: { item_id: productId },
+    await prisma.item.delete({
+      where: {
+        item_id: itemId,
+      },
     });
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Product deleted successfully",
-      deletedProduct,
+      message: "Product and related data deleted successfully",
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
   }
 });
-
 //api admin lihat list order dari customer
-app.get("/orders", async (req, res) => {
+app.get("/admin/listorder", async (req, res) => {
   try {
     const orders = await prisma.salesOrder.findMany({
       select: {
         salesorder_id: true,
+        salesorder_no: true,
         sub_total: true,
         is_verified: true,
+      },
+    });
+
+    res.json({ success: true, orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+// API admin retrieve detailed information about a specific order
+app.get("/admin/orders/:id", async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    const orderDetails = await prisma.salesOrder.findUnique({
+      where: {
+        salesorder_id: orderId,
       },
       include: {
         details: {
           select: {
-            item_price: true,
             quantity: true,
+            item: {
+              select: {
+                item_name: true,
+                price: true,
+              },
+            },
           },
         },
-      },
-    });
-
-    res.json(orders);
-  } catch (error) {
-    console.error("Error retrieving orders:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-//api admin liat 1 order dari customer (order detail)
-//note : depend liat api pembelian
-app.get("/orders/:id", async (req, res) => {
-  const orderId = parseInt(req.params.id);
-
-  try {
-    const order = await prisma.salesOrder.findUnique({
-      where: { salesorder_id: orderId },
-      select: {
-        salesorder_id: true,
-        salesorder_no: true,
-        user_id: true,
-        product: true,
-        order_status: true,
-        customer_name: true,
-        shipping_cost: true,
-        sub_total: true,
-        is_verified: true,
-        image_payment: true,
-        details: {
+        user: {
           select: {
-            item_id: true,
-            item_price: true,
-            quantity: true,
+            full_name: true,
+            address: true,
           },
         },
       },
     });
 
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+    if (!orderDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
     }
 
-    // Jika is_verified adalah null, setel nilainya ke false
-    order.is_verified = order.is_verified ?? false;
+    const selectedFields = {
+      salesorder_id: true,
+      user_id: true,
+      order_status: true,
+      shipping_cost: true,
+      sub_total: true,
+      is_verified: true,
+      image_payment: true,
+    };
 
-    res.json(order);
-  } catch (error) {
-    console.error("Error retrieving order details:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    // Include selected fields in the response
+    const response = {
+      success: true,
+      orderDetails: {
+        ...orderDetails,
+        ...selectedFields,
+      },
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
   }
 });
-
 //api untuk set isverified = true
-//seknario : admin mengklik accept di salah satu order customer (utk mengacc pembayaran)
-app.put("/orders/:id", async (req, res) => {
-  const orderId = parseInt(req.params.id);
-
+//sKENario : admin mengklik accept di salah satu order customer (utk mengacc pembayaran)
+app.put("/admin/orders/:id", async (req, res) => {
   try {
-    // Cek apakah SalesOrder dengan ID tertentu ada
+    const orderId = parseInt(req.params.id);
+
+    // Check if the order with the given ID exists
     const existingOrder = await prisma.salesOrder.findUnique({
-      where: { salesorder_id: orderId },
+      where: {
+        salesorder_id: orderId,
+      },
     });
 
     if (!existingOrder) {
-      return res.status(404).json({ error: "SalesOrder not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
     }
 
-    // Update isVerified menjadi true
+    // Update the is_verified status to true
     const updatedOrder = await prisma.salesOrder.update({
-      where: { salesorder_id: orderId },
-      data: { is_verified: true },
+      where: {
+        salesorder_id: orderId,
+      },
+      data: {
+        is_verified: true,
+      },
     });
 
-    res.json(updatedOrder);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.json({
+      success: true,
+      message: "Order status updated successfully",
+      updatedOrder,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
   }
 });
 
