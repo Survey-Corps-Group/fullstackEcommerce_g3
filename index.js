@@ -312,6 +312,8 @@ app.delete("/api/users/:id", async (req, res) => {
 });
 
 // Filter Produk
+
+// by page ok, by price ok, by rating ok, not about by most popular
 function calculateSummaryRating(feedbacks) {
   if (!feedbacks.length) return 0;
   const totalRating = feedbacks.reduce((acc, fb) => acc + fb.rating, 0);
@@ -319,7 +321,7 @@ function calculateSummaryRating(feedbacks) {
 }
 
 app.get("/api/products", async (req, res) => {
-  const { page, item_name, price, rating } = req.query;
+  const { page, item_name, price, rating, sort } = req.query;
   const limit = 10;
   const offset = page ? (page - 1) * limit : 0;
 
@@ -350,6 +352,10 @@ app.get("/api/products", async (req, res) => {
         (product) =>
           calculateSummaryRating(product.feedbacks) == ratingThreshold
       );
+    }
+
+    if (sort === "best-selling") {
+      filteredProducts.sort((a, b) => b.feedbacks.length - a.feedbacks.length);
     }
 
     const result = filteredProducts.map((product) => ({
