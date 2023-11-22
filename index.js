@@ -172,7 +172,7 @@ function calculateSummaryRating(feedbacks) {
 }
 
 app.get("/api/products", async (req, res) => {
-  const { page, item_name, price, summary_rating } = req.query;
+  const { page, item_name, price, rating } = req.query;
   const limit = 10;
   const offset = page ? (page - 1) * limit : 0;
 
@@ -195,7 +195,17 @@ app.get("/api/products", async (req, res) => {
       },
     });
 
-    const result = products.map((product) => ({
+    let filteredProducts = products;
+    console.log(rating);
+    if (rating) {
+      const ratingThreshold = parseFloat(rating);
+      filteredProducts = products.filter(
+        (product) =>
+          calculateSummaryRating(product.feedbacks) == ratingThreshold
+      );
+    }
+
+    const result = filteredProducts.map((product) => ({
       item_id: product.item_id,
       item_name: product.item_name,
       price: product.price,
