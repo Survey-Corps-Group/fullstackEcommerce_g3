@@ -794,6 +794,144 @@ app.put("/admin/orders/:id", async (req, res) => {
   }
 });
 
+// warehouse
+// Get Warehouse
+app.get("/api/warehouses", async (req, res) => {
+  try {
+    const warehouses = await prisma.warehouse.findMany({
+      select: {
+        warehouse_id: true,
+        city: true,
+        province: true,
+      },
+    });
+
+    res.json(warehouses);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+// Get Warehouse By Id
+app.get("/api/warehouses/:id", async (req, res) => {
+  const warehouseId = parseInt(req.params.id);
+
+  try {
+    const warehouse = await prisma.warehouse.findUnique({
+      where: {
+        warehouse_id: warehouseId,
+      },
+      select: {
+        warehouse_id: true,
+        city: true,
+        province: true,
+      },
+    });
+
+    if (warehouse) {
+      res.json(warehouse);
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Warehouse not found",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+// create warehouse
+app.post("/api/warehouses", async (req, res) => {
+  const { city, province } = req.body;
+
+  try {
+    const newWarehouse = await prisma.warehouse.create({
+      data: {
+        city: city,
+        province: province,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Warehouse created successfully",
+      warehouse: newWarehouse,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+app.put("/api/warehouses/:id", async (req, res) => {
+  const warehouseId = parseInt(req.params.id);
+  const { city, province } = req.body;
+
+  try {
+    let updateData = {};
+    if (city) updateData.city = city;
+    if (province) updateData.province = province;
+
+    const updatedWarehouse = await prisma.warehouse.update({
+      where: {
+        warehouse_id: warehouseId,
+      },
+      data: updateData,
+    });
+
+    res.json({
+      success: true,
+      message: "Warehouse updated successfully",
+      warehouse: updatedWarehouse,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+// delete warehouse
+app.delete("/api/warehouses/:id", async (req, res) => {
+  const warehouseId = parseInt(req.params.id);
+
+  try {
+    const deletedWarehouse = await prisma.warehouse.delete({
+      where: {
+        warehouse_id: warehouseId,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Warehouse deleted successfully",
+      deletedWarehouseId: deletedWarehouse.warehouse_id,
+    });
+  } catch (err) {
+    if (err.code === "P2025") {
+      res.status(404).json({
+        success: false,
+        message: "Warehouse not found",
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: `Server error: ${err.message}`,
+      });
+    }
+  }
+});
+
 app.listen(8000, () => {
   console.log("Server started on port 8000");
 });
