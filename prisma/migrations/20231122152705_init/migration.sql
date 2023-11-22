@@ -88,6 +88,25 @@ CREATE TABLE "WarehouseItem" (
     CONSTRAINT "WarehouseItem_pkey" PRIMARY KEY ("warehouse_id","item_id")
 );
 
+-- CreateTable
+CREATE TABLE "Cart" (
+    "cartId" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "Cart_pkey" PRIMARY KEY ("cartId")
+);
+
+-- CreateTable
+CREATE TABLE "CartItem" (
+    "cartId" INTEGER NOT NULL,
+    "itemId" INTEGER NOT NULL,
+
+    CONSTRAINT "CartItem_pkey" PRIMARY KEY ("cartId","itemId")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
 -- AddForeignKey
 ALTER TABLE "SalesOrder" ADD CONSTRAINT "SalesOrder_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -108,3 +127,12 @@ ALTER TABLE "WarehouseItem" ADD CONSTRAINT "WarehouseItem_warehouse_id_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "WarehouseItem" ADD CONSTRAINT "WarehouseItem_item_id_fkey" FOREIGN KEY ("item_id") REFERENCES "Item"("item_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("cartId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("item_id") ON DELETE RESTRICT ON UPDATE CASCADE;

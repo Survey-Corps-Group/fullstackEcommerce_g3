@@ -42,6 +42,7 @@ model User {
   phone     String
   role      String
   orders    SalesOrder[]
+  Cart      Cart[]
 }
 
 model Warehouse {
@@ -63,6 +64,7 @@ model Item {
   images         ItemImage[]
   orderDetails   SalesOrderDetail[]
   WarehouseItem  WarehouseItem[]
+  CartItem       CartItem[]
 }
 
 model Feedback {
@@ -87,4 +89,20 @@ model WarehouseItem {
   item         Item      @relation(fields: [item_id], references: [item_id])
 
   @@id([warehouse_id, item_id])
+}
+
+model Cart {
+  cartId Int        @id @default(autoincrement())
+  userId Int
+  user   User       @relation(fields: [userId], references: [user_id])
+  items  CartItem[]
+}
+
+model CartItem {
+  cartId Int
+  itemId Int
+  cart   Cart @relation(fields: [cartId], references: [cartId])
+  item   Item @relation(fields: [itemId], references: [item_id])
+
+  @@id([cartId, itemId])
 }
