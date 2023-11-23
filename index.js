@@ -8,7 +8,12 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const axios = require("axios");
 const app = express();
+
+// raja ongkir
+const RAJA_ONGKIR_KEY = process.env.RAJA_ONGKIR_KEY;
+const RAJA_ONGKIR_URL = process.env.RAJA_ONGKIR_URL;
 
 function authenticateTokenMiddleware(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -935,6 +940,78 @@ app.delete("/api/warehouses/:id", async (req, res) => {
         message: `Server error: ${err.message}`,
       });
     }
+  }
+});
+
+// integrasi raja ongkir
+app.get("/api/province", async (req, res) => {
+  try {
+    const response = await axios.get(`${RAJA_ONGKIR_URL}/province`, {
+      params: { key: RAJA_ONGKIR_KEY },
+    });
+    res.json(response.data.rajaongkir.results);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+app.get("/api/city", async (req, res) => {
+  const provinceId = req.query.province;
+  if (!provinceId) {
+    return res.status(400).json({
+      success: false,
+      message: "Province ID is required",
+    });
+  }
+
+  try {
+    const response = await axios.get(`${RAJA_ONGKIR_URL}/city`, {
+      params: { province: provinceId, key: RAJA_ONGKIR_KEY },
+    });
+    res.json(response.data.rajaongkir.results);
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
+app.post("/api/cost", async (req, res) => {
+  const { origin, destination, weight, courier } = req.body;
+
+  console.log(res.body);
+
+  if (!origin || !destination || !weight || !courier) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Missing required parameter: origin, destination, weight, or courier",
+    });
+  }
+
+  try {
+    const response = await axios.post(
+      `${RAJA_ONGKIR_URL}/cost`,
+      {
+        origin,
+        destination,
+        weight,
+        courier,
+      },
+      {
+        headers: { key: RAJA_ONGKIR_KEY },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: "Error calculating shipping cost",
+    });
   }
 });
 
