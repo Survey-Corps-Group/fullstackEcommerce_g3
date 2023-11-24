@@ -1019,6 +1019,148 @@ app.post("/api/cost", async (req, res) => {
   }
 });
 
+// Search Product name
+app.get('/api/products/search/:name', async (req, res) => {
+  const product_name = req.params.name
+  console.log(product_name)
+  try {
+    const productByName = await prisma.item.findMany({
+      where: { 
+        item_name: { 
+          contains: product_name,
+          mode: 'insensitive'
+        }},
+    });
+
+    if (productByName) {
+      res.json({ productByName });
+    } else {
+      res.status(404).json({ message: 'Product not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+})
+
+// find product by id
+app.get('/api/products/:id', async (req, res) => {
+  const id = req.params.id
+
+  console.log(id)
+  try {
+    const productById = await prisma.item.findUnique({
+      where: { item_id: Number(id) },
+    });
+
+    if (productById) {
+      res.json({ productById });
+    } else {
+      res.status(404).json({ message: 'Product not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+})
+
+// create feedback
+app.post('/api/products/:id/feedback', async (req, res) => {
+  const id = req.params.id
+
+  const {rating, description} = req.body
+  try{
+    const createFeedback = await prisma.feedback.create({
+      data: {
+      item_id: Number(id),
+      rating,
+      description
+      }
+    })
+    res.json({ createFeedback });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+})
+
+// upload payment 
+app.put('/api/payment_proof/:salesorder_id', upload.single('image'), async (req, res) => {
+  const salesorder_id = req.params.salesorder_id
+
+  try{
+    const updateImagePayment = await prisma.salesOrder.update({
+      where: {
+        salesorder_id: Number(salesorder_id)
+      },
+      data: {
+        image_payment: req.file.path 
+      }
+    })
+    res.json({ updateImagePayment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+})
+
+// status recieved
+app.put('/api/product/recieved/:salesorder_id', async (req, res) => {
+    const salesorder_id = req.params.salesorder_id
+
+    const recievedProduct = await prisma.salesOrder.update({
+      where: 
+      {
+        salesorder_id: Number(salesorder_id)
+      }, data : {
+        order_status: 'recieved'
+      }
+    })
+
+    res.json({recievedProduct})
+})
+
+// create order
+app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req, res) => {
+  const {salesorder_no,  product, order_status, customer_name, shipping_cost, sub_total} = req.body
+  console.log(req.body)
+  const orderDetails = req.body.orderDetails;
+  try{
+  const createOrder = await prisma.SalesOrder.create({
+    data: { 
+      salesorder_no, 
+      user_id: req.userId,  
+      product, 
+      order_status, 
+      customer_name, 
+      shipping_cost, 
+      sub_total, 
+      is_verified: false, 
+      image_payment:""
+    }
+  })
+  
+  const salesOrderId = createOrder.salesorder_id;
+  const createdOrderDetails = await Promise.all(orderDetails.map(async orderDetail => {
+    return prisma.SalesOrderDetail.create({
+      data: {
+        salesorder_id: salesOrderId,
+        item_id: orderDetail.item_id,
+        item_price: orderDetail.item_price,
+        quantity: orderDetail.quantity
+      }
+    });
+  }));
+
+  res.json({ createOrder, createdOrderDetails });
+  console.log(createOrder, createdOrderDetails)
+  } catch (error){
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+})
+
+
 app.listen(8000, () => {
   console.log("Server started on port 8000");
 });
