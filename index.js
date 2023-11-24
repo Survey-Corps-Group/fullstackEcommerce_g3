@@ -10,6 +10,10 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const axios = require("axios");
 const app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 // raja ongkir
 const RAJA_ONGKIR_KEY = process.env.RAJA_ONGKIR_KEY;
