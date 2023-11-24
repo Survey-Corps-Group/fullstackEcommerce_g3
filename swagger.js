@@ -226,13 +226,12 @@ module.exports = swaggerSpec;
 
 /**
  * @swagger
- * /api/admin/products:
+ * /admin/products:
  *   get:
  *     summary: Get all products (Admin)
  *     description: Retrieve a list of all products for admin purposes.
  *     tags:
  *       - Admin
- *       - Products
  *     responses:
  *       200:
  *         description: List of products
@@ -242,13 +241,12 @@ module.exports = swaggerSpec;
 
 /**
  * @swagger
- * /api/admin/products:
+ * /admin/products:
  *   post:
  *     summary: Create a new product (Admin)
  *     description: Create a new product with the provided details for admin purposes.
  *     tags:
  *       - Admin
- *       - Products
  *     requestBody:
  *       required: true
  *       content:
@@ -277,13 +275,12 @@ module.exports = swaggerSpec;
 
 /**
  * @swagger
- * /api/admin/products/{id}:
+ * /admin/products/{id}:
  *   put:
  *     summary: Update product by ID (Admin)
  *     description: Update product details based on the provided product ID for admin purposes.
  *     tags:
  *       - Admin
- *       - Products
  *     parameters:
  *       - name: id
  *         in: path
@@ -319,13 +316,12 @@ module.exports = swaggerSpec;
 
 /**
  * @swagger
- * /api/admin/products/{id}:
+ * /admin/products/{id}:
  *   delete:
  *     summary: Delete product by ID (Admin)
  *     description: Delete product based on the provided product ID for admin purposes.
  *     tags:
  *       - Admin
- *       - Products
  *     parameters:
  *       - name: id
  *         in: path
@@ -342,3 +338,266 @@ module.exports = swaggerSpec;
  *         description: Internal server error
  */
 
+/**
+ * @swagger
+ * /admin/listorder:
+ *   get:
+ *     summary: Get a list of orders (Admin)
+ *     description: Retrieve a list of orders with basic information for admin purposes.
+ *     tags:
+ *       - Order
+ *     responses:
+ *       200:
+ *         description: List of orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 orders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       salesorder_id:
+ *                         type: integer
+ *                       salesorder_no:
+ *                         type: string
+ *                       sub_total:
+ *                         type: number
+ *                       is_verified:
+ *                         type: boolean
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /admin/orders/{id}:
+ *   get:
+ *     summary: Get detailed information about a specific order (Admin)
+ *     description: Retrieve detailed information about a specific order for admin purposes.
+ *     tags:
+ *       - Order
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Order ID
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Detailed order information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 orderDetails:
+ *                   type: object
+ *                   properties:
+ *                     salesorder_id:
+ *                       type: integer
+ *                     user_id:
+ *                       type: integer
+ *                     order_status:
+ *                       type: string
+ *                     shipping_cost:
+ *                       type: number
+ *                     sub_total:
+ *                       type: number
+ *                     is_verified:
+ *                       type: boolean
+ *                     image_payment:
+ *                       type: string
+ *                     details:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           quantity:
+ *                             type: integer
+ *                           item:
+ *                             type: object
+ *                             properties:
+ *                               item_name:
+ *                                 type: string
+ *                               price:
+ *                                 type: number
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         full_name:
+ *                           type: string
+ *                         address:
+ *                           type: string
+ *       404:
+ *         description: Order not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /admin/orders/{id}:
+ *   put:
+ *     summary: Update order status by ID (Admin)
+ *     description: Update the verification status of an order based on the provided order ID for admin purposes.
+ *     tags:
+ *       - Order
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Order ID
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Order status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 updatedOrder:
+ *                   type: object
+ *                   properties:
+ *                     salesorder_id:
+ *                       type: integer
+ *                     is_verified:
+ *                       type: boolean
+ *       404:
+ *         description: Order not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/province:
+ *   get:
+ *     summary: Get list of provinces
+ *     description: Retrieve a list of provinces from RajaOngkir.
+ *     tags:
+ *       - Shipment Cost
+ *     responses:
+ *       200:
+ *         description: List of provinces
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   province_id:
+ *                     type: string
+ *                   province:
+ *                     type: string
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/city:
+ *   get:
+ *     summary: Get list of cities by province
+ *     description: Retrieve a list of cities in a specific province from RajaOngkir.
+ *     tags:
+ *       - Shipment Cost
+ *     parameters:
+ *       - name: province
+ *         in: query
+ *         description: Province ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of cities in the specified province
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   city_id:
+ *                     type: string
+ *                   city_name:
+ *                     type: string
+ *       400:
+ *         description: Bad request, missing province ID
+ *       404:
+ *         description: Province not found or server error
+ */
+
+/**
+ * @swagger
+ * /api/cost:
+ *   post:
+ *     summary: Calculate shipment cost
+ *     description: Calculate the shipment cost using RajaOngkir API.
+ *     tags:
+ *       - Shipment Cost
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               origin:
+ *                 type: string
+ *               destination:
+ *                 type: string
+ *               weight:
+ *                 type: number
+ *               courier:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Shipment cost calculation result
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       service:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       cost:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             value:
+ *                               type: number
+ *                             etd:
+ *                               type: string
+ *                             note:
+ *                               type: string
+ *       400:
+ *         description: Bad request, missing required parameters
+ *       404:
+ *         description: Error calculating shipping cost or server error
+ */
