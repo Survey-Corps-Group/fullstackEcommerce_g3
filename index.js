@@ -87,8 +87,7 @@ app.post("/api/users/register", async (req, res) => {
     password,
     address,
     full_name,
-    phone,
-    role,
+    phone
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -117,7 +116,7 @@ app.post("/api/users/register", async (req, res) => {
         address,
         full_name,
         phone,
-        role,
+        role : 'customer',
       },
     });
 
@@ -238,6 +237,7 @@ app.get("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
 
 // Update User
 app.put("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
+  const userId = parseInt(req.params.id);
 
   if (req.userId !== userId && req.role !== "admin") {
     return res.status(403).json({
@@ -246,7 +246,6 @@ app.put("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
     });
   }
 
-  const userId = parseInt(req.params.id);
   const {
     username,
     email,
@@ -321,6 +320,59 @@ app.delete("/api/users/:id", authenticateTokenMiddleware, authorizeAdmin, async 
         message: `Server error: ${err.message}`,
       });
     }
+  }
+});
+
+app.post("/api/users/admin/register", async (req, res) => {
+  const {
+    username,
+    email,
+    password,
+    address,
+    full_name,
+    phone
+  } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // pengecekan existing user
+  try {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: email }, { username: username }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(403).json({
+        success: false,
+        message: "Email or username already exists",
+      });
+    }
+
+    // Jika tidak ada user dengan email atau username yang sama
+    await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        address,
+        full_name,
+        phone,
+        role : 'admin',
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Admin registered successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      success: false,
+      message: `Error registering user: ${err.message}`,
+    });
   }
 });
 
@@ -1014,7 +1066,7 @@ app.post("/api/cost", async (req, res) => {
         headers: { key: RAJA_ONGKIR_KEY },
       }
     );
-    res.json(response.data);
+    res.json(response.data.rajaongkir.results);
   } catch (error) {
     res.status(404).json({
       success: false,
@@ -1166,7 +1218,9 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
 })
 
 app.post('/api/cart', async (req, res) => {
-  const { userId, items } = req.body;
+  const { items } = req.body;
+
+  const userId = req.userId;
 
   try {
     let cart = await prisma.cart.findFirst({
