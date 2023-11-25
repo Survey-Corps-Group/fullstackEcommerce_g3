@@ -29,14 +29,14 @@ function authenticateTokenMiddleware(req, res, next) {
     });
 
   const user = jwt.verify(token, process.env.JWT_SECRET);
-  req.userId = user.userId;
+  req.userId = user.user_id;
   req.role = user.role;
   next();
 }
 
 // mengecek apakah user sudah login atau belum
 function authorizeUser(req, res, next) {
-  if (req.role !== "customer") {
+  if (req.role !== "customer" || req.role !== "admin") {
     return res.status(403).json({
       success: false,
       message: "Access denied. Customers only.",
@@ -98,8 +98,7 @@ app.post("/api/users/register", async (req, res) => {
     password,
     address,
     full_name,
-    phone,
-    role,
+    phone
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -128,7 +127,7 @@ app.post("/api/users/register", async (req, res) => {
         address,
         full_name,
         phone,
-        role,
+        role : 'customer',
       },
     });
 
@@ -181,7 +180,7 @@ app.post("/api/users/login", async (req, res) => {
 });
 
 // Get User
-app.get("/api/users", async (_, res) => {
+app.get("/api/users", authenticateTokenMiddleware, authorizeAdmin, async (_, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -205,7 +204,7 @@ app.get("/api/users", async (_, res) => {
 });
 
 // Get User By Id
-app.get("/api/users/:id", async (req, res) => {
+app.get("/api/users/:id", authenticateTokenMiddleware, authorizeUser, async (req, res) => {
   const userId = parseInt(req.params.id);
 
   try {
@@ -219,8 +218,7 @@ app.get("/api/users/:id", async (req, res) => {
         password: true,
         address: true,
         full_name: true,
-        phone: true,
-        role: true,
+        phone: true
       },
     });
 
@@ -241,7 +239,7 @@ app.get("/api/users/:id", async (req, res) => {
 });
 
 // Update User
-app.put("/api/users/:id", async (req, res) => {
+app.put("/api/users/:id",  authenticateTokenMiddleware, authorizeUser, async (req, res) => {
   const userId = parseInt(req.params.id);
   const {
     username,
@@ -250,7 +248,6 @@ app.put("/api/users/:id", async (req, res) => {
     address,
     full_name,
     phone,
-    role,
   } = req.body;
 
   try {
@@ -261,7 +258,6 @@ app.put("/api/users/:id", async (req, res) => {
     if (address) updateData.address = address;
     if (full_name) updateData.full_name = full_name;
     if (phone) updateData.phone = phone;
-    if (role) updateData.role = role;
 
     const updatedUser = await prisma.user.update({
       where: { user_id: userId },
@@ -277,8 +273,7 @@ app.put("/api/users/:id", async (req, res) => {
         email: updatedUser.email,
         address: updatedUser.address,
         full_name: updatedUser.full_name,
-        phone: updatedUser.phone,
-        role: updatedUser.role,
+        phone: updatedUser.phone
       },
     });
   } catch (err) {
@@ -290,7 +285,7 @@ app.put("/api/users/:id", async (req, res) => {
 });
 
 // Delete User
-app.delete("/api/users/:id", async (req, res) => {
+app.delete("/api/users/:id",  authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   const userId = parseInt(req.params.id);
 
   try {
@@ -320,8 +315,60 @@ app.delete("/api/users/:id", async (req, res) => {
   }
 });
 
-// Filter Produk
+app.post("/api/admin/register",  authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
+  const {
+    username,
+    email,
+    password,
+    address,
+    full_name,
+    phone
+  } = req.body;
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // pengecekan existing user
+  try {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: email }, { username: username }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(403).json({
+        success: false,
+        message: "Email or username already exists",
+      });
+    }
+
+    // Jika tidak ada user dengan email atau username yang sama
+    await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        address,
+        full_name,
+        phone,
+        role : 'admin',
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Admin registered successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      success: false,
+      message: `Error registering user: ${err.message}`,
+    });
+  }
+});
+
+// Filter Produk
 // by page ok, by price ok, by rating ok, not about by most popular
 function calculateSummaryRating(feedbacks) {
   if (!feedbacks.length) return 0;
