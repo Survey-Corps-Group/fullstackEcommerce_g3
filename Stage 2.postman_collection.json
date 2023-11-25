@@ -1,0 +1,1225 @@
+{
+	"info": {
+		"_postman_id": "4e3a2dae-23d1-4640-9bb1-ae1c584aeb9f",
+		"name": "Stage 2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27335461",
+		"_collection_link": "https://www.postman.com/planetary-equinox-145045/workspace/test/collection/27335461-4e3a2dae-23d1-4640-9bb1-ae1c584aeb9f?action=share&source=collection_link&creator=27335461"
+	},
+	"item": [
+		{
+			"name": "Provinsi Rajaongkir",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/province",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"province"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "City Rajaongkir",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/city?province=2",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"city"
+					],
+					"query": [
+						{
+							"key": "province",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Harga Raja Ongkir",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "key",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "f00ea84c411c80874d91a3e3fe26d8c8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origin\": 27,\r\n    \"destination\" : 28, //id_kota\r\n    \"weight\" : 1000, //dalam gram\r\n    \"courier\" : \"jne\" //jenis kurir\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/cost",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"cost"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/users/register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - success and message\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData).to.have.property('success');\r",
+							"  pm.expect(responseData).to.have.property('message');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Success is a boolean value\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.success).to.be.a('boolean');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Message is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"\r",
+							"  pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response time is in an acceptable range\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"pengguna_baru\",\n    \"email\": \"pengguna_baru@contoh.com\",\n    \"password\": \"password_rahasia\",\n    \"address\": \"Alamat lengkap\",\n    \"full_name\": \"Nama Lengkap\",\n    \"phone\": \"08123456789\",\n    \"role\": \"user\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/users/register",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"register"
+					]
+				},
+				"description": "User mendaftarkan akun\n"
+			},
+			"response": []
+		},
+		{
+			"name": "api/users/admin/register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the 'success' field\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.have.property('success');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"The 'success' field is a boolean\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.success).to.be.a('boolean');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has 'message' field\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"\r",
+							"  pm.expect(responseData.message).to.exist;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"The 'message' field is a string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData.message).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"adminganteng12\",\n    \"email\": \"adminganteng12@contoh.com\",\n    \"password\": \"password_rahasia\",\n    \"address\": \"Alamat lengkap\",\n    \"full_name\": \"Nama Lengkap\",\n    \"phone\": \"08123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/users/admin/register",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"admin",
+						"register"
+					]
+				},
+				"description": "User mendaftarkan akun\n"
+			},
+			"response": []
+		},
+		{
+			"name": "api/users/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 403\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - success and message\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('success');\r",
+							"    pm.expect(responseData).to.have.property('message');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"The value of the success field is true\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Value of message field is empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.message).to.equal(\"\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response time is in an acceptable range\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"password_rahasia\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/users/login",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"login"
+					]
+				},
+				"description": "User login"
+			},
+			"response": []
+		},
+		{
+			"name": "api/users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{port}}/api/users",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "Get List Of Users"
+			},
+			"response": []
+		},
+		{
+			"name": "api/users/:id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{port}}/api/users/3",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"3"
+					]
+				},
+				"description": "User Detail"
+			},
+			"response": []
+		},
+		{
+			"name": "api/users/:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"full_name\": \"Michael\",\n    \"phone\": \"081122223333\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/users/3",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"3"
+					]
+				},
+				"description": "Update User"
+			},
+			"response": []
+		},
+		{
+			"name": "api/users/:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{port}}/api/users/3",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"3"
+					]
+				},
+				"description": "Delete User"
+			},
+			"response": []
+		},
+		{
+			"name": "api/warehouses",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{port}}/api/warehouses",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"warehouses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/warehouses",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"city\": \"Medan City\",\r\n    \"province\": \"North Sumatera Province\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/warehouses",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"warehouses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/warehouses/:id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{port}}/api/warehouses/1",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"warehouses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/warehouses/:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"city\": \"Binjai City\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/warehouses/3",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"warehouses",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/warehouses/:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"city\": \"Binjai City\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/warehouses/3",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"warehouses",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/products",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{port}}/api/products?page=1&rating=5&sort=best-selling",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "item_name",
+							"value": "udin",
+							"disabled": true
+						},
+						{
+							"key": "price",
+							"value": "19.99",
+							"disabled": true
+						},
+						{
+							"key": "rating",
+							"value": "5"
+						},
+						{
+							"key": "sort",
+							"value": "best-selling"
+						}
+					]
+				},
+				"description": "Get list of products"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/products/:id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/products/1",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/products/search/:name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/products/search/sample",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products",
+						"search",
+						"sample"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "item_name",
+							"value": "Panci",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "50000",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Ini panci berkualitas",
+							"type": "text"
+						},
+						{
+							"key": "color",
+							"value": "pink",
+							"type": "text"
+						},
+						{
+							"key": "package_weight",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "stock_item",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "images",
+							"type": "file",
+							"src": "/C:/Users/Imran Nas/Downloads/image-002.png"
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{port}}/api/products",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products"
+					]
+				},
+				"description": "Get list of products"
+			},
+			"response": []
+		},
+		{
+			"name": "api/products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "item_name",
+							"value": "Panci Edit",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "50000",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Ini panci berkualitas",
+							"type": "text"
+						},
+						{
+							"key": "color",
+							"value": "pink",
+							"type": "text"
+						},
+						{
+							"key": "package_weight",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "stock_item",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "images",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{port}}/api/products/4",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products",
+						"4"
+					]
+				},
+				"description": "Get list of products"
+			},
+			"response": []
+		},
+		{
+			"name": "api/products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDg5NzM5NX0.cqYPJVt51qfmgqNMxAtPNIJ0GVN-CIKqfm9lbcUTw1w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "item_name",
+							"value": "Panci Edit",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "50000",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Ini panci berkualitas",
+							"type": "text"
+						},
+						{
+							"key": "color",
+							"value": "pink",
+							"type": "text"
+						},
+						{
+							"key": "package_weight",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "stock_item",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "images",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "image_url",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{port}}/api/products/4",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products",
+						"4"
+					]
+				},
+				"description": "Get list of products"
+			},
+			"response": []
+		},
+		{
+			"name": "api/products/:id/feedback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rating\": 5,\r\n    \"description\": \"Mantapskuyyyy\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/products/1/feedback",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"products",
+						"1",
+						"feedback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/payment_proof/:salesorder_id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/C:/Users/Imran Nas/Downloads/image-002.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{port}}/api/payment_proof/1",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"payment_proof",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin/listorder",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/admin/listorder",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"listorder"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/admin/orders/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/admin/orders/1",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"orders",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/admin/orders/1",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/admin/orders/1",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"orders",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/order/recieved/1",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{port}}/api/order/recieved/1",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"recieved",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/order/checkout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcwMDkxNDQzMSwiZXhwIjoxNzAwOTE4MDMxfQ.N0ebbeWyg7z9xDT-fQdP-w8HIv81voYNxDAnG_sKjI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"salesorder_no\" : \"1\",\r\n    \"product\" : \"Testing\", \r\n    \"order_status\" : \"Testing\", \r\n    \"customer_name\" : \"Testing\", \r\n    \"shipping_cost\" : 12.00, \r\n    \"sub_total\" : 50.00,\r\n    \"orderDetails\" : \r\n        [{\r\n            \"item_id\": 1,\r\n            \"item_price\": 20,\r\n            \"quantity\": 1\r\n        }]\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/order/checkout",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"checkout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/cart",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"items\": [\r\n    {\"itemId\": 1, \"quantity\": 1}\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/cart",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/cart/:id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": 3, \r\n  \"items\": [\r\n    {\"itemId\": 1, \"quantity\": 10}\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{port}}/api/cart/3",
+					"host": [
+						"{{port}}"
+					],
+					"path": [
+						"api",
+						"cart",
+						"3"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
