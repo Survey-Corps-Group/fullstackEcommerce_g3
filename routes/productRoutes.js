@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const upload = require('../config/multer')
 const productController = require('../controllers/productController')
-const { authenticateTokenMiddleware, authorizeAdmin, authorizeUser } = require('../config/middleware')
+const { authenticateTokenMiddleware, authorizeAdmin } = require('../config/middleware')
 
 router.get('/', productController.getProducts)
 router.get('/:id', productController.getProductById)

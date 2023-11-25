@@ -37,9 +37,9 @@ app.use('/api', rajaOngkirRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/warehouses', warehouseRoutes)
 app.use('/api/products', productRoutes)
-app.use('/api', feedbackRoutes)
-app.use('/api', salesOrderRoutes)
-app.use('/api', cartRoutes);
+app.use('/api/feedback', feedbackRoutes)
+app.use('/api/order', salesOrderRoutes)
+app.use('/api/cart', cartRoutes);
 
 // Start Server
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`))

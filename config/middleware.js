@@ -15,17 +15,6 @@ function authenticateTokenMiddleware(req, res, next) {
     next();
 }
 
-// mengecek apakah user sudah login atau belum
-function authorizeUser(req, res, next) {
-    if (req.role !== "customer" && req.role !== "admin") {
-        return res.status(403).json({
-            success: false,
-            message: "Access denied. Customers only.",
-        });
-    }
-    next();
-}
-
 // middleware admin setelah login
 function authorizeAdmin(req, res, next) {
     if (req.role !== "admin") {
@@ -37,4 +26,4 @@ function authorizeAdmin(req, res, next) {
     next();
 }
 
-module.exports = { authenticateTokenMiddleware, authorizeUser, authorizeAdmin };
+module.exports = { authenticateTokenMiddleware, authorizeAdmin };
