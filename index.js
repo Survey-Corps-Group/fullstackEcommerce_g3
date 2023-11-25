@@ -1179,7 +1179,7 @@ app.put('/api/product/recieved/:salesorder_id', async (req, res) => {
 
 // create order
 app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req, res) => {
-  const { salesorder_no, product, order_status, customer_name, shipping_cost, sub_total } = req.body
+  const { salesorder_no, order_status, customer_name, shipping_cost, sub_total } = req.body
   console.log(req.body)
   const orderDetails = req.body.orderDetails;
   try {
@@ -1187,7 +1187,7 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
       data: {
         salesorder_no,
         user_id: req.userId,
-        product,
+        product: "",
         order_status,
         customer_name,
         shipping_cost,
