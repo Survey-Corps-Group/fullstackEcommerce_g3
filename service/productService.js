@@ -10,12 +10,21 @@ class ProductService {
     }
 
     async addProduct(productData, imageFiles) {
+        const { price, package_weight, stock_item } = productData
         const existingProduct = await productRepository.findProductByFirstItemName(productData.item_name);
         if (existingProduct) {
             throw new Error("Product with the same name already exists");
         }
 
-        const imagePaths = imageFiles.map(file => file.path);
+        productData = {
+            ...productData,
+            price: parseFloat(price),
+            package_weight: parseInt(package_weight),
+            stock_item: parseInt(stock_item)
+        }
+
+        const imagePaths = imageFiles.map(file => file.path)
+
         return await productRepository.createProduct(productData, imagePaths);
     }
 
@@ -28,7 +37,7 @@ class ProductService {
         if (rating) {
             const ratingThreshold = parseFloat(rating);
             filteredProducts = filteredProducts.filter(
-                product => calculateSummaryRating(product.feedbacks) >= ratingThreshold
+                product => this.calculateSummaryRating(product.feedbacks) >= ratingThreshold
             );
         }
 
@@ -47,7 +56,7 @@ class ProductService {
             package_weight: product.package_weight,
             stock_item: product.stock_item,
             feedback_id: product.feedbacks.map(fb => fb.feedback_id),
-            summary_rating: calculateSummaryRating(product.feedbacks),
+            summary_rating: this.calculateSummaryRating(product.feedbacks),
             warehouse_id: product.WarehouseItem.map(wh => wh.warehouse_id),
             images: product.images.map(img => img.image_url),
         }));
@@ -62,6 +71,14 @@ class ProductService {
     }
 
     async editProduct(itemId, productData, imageFiles) {
+        const { price, package_weight, stock_item } = productData
+        productData = {
+            ...productData,
+            price: parseFloat(price),
+            package_weight: parseInt(package_weight),
+            stock_item: parseInt(stock_item)
+        }
+
         const imagePaths = imageFiles ? imageFiles.map(file => file.path) : [];
         return await productRepository.updateProduct(itemId, productData, imagePaths);
     }

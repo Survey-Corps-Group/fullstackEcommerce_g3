@@ -44,7 +44,6 @@ class ProductRepository {
 
     async createProduct(data, imagePaths) {
         const newProduct = await prisma.item.create({ data });
-
         if (imagePaths && imagePaths.length > 0) {
             await Promise.all(imagePaths.map(async imagePath => {
                 await prisma.itemImage.create({

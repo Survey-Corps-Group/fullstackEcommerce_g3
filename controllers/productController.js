@@ -4,7 +4,6 @@ class ProductController {
 
     async addProduct(req, res) {
         const productData = req.body;
-
         try {
             const newProduct = await productService.addProduct(productData, req.files);
             res.status(201).json({
