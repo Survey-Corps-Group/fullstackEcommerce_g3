@@ -34,17 +34,6 @@ function authenticateTokenMiddleware(req, res, next) {
   next();
 }
 
-// mengecek apakah user sudah login atau belum
-function authorizeUser(req, res, next) {
-  if (req.role !== "customer") {
-    return res.status(403).json({
-      success: false,
-      message: "Access denied. Customers only.",
-    });
-  }
-  next();
-}
-
 // middleware admin setelah login
 function authorizeAdmin(req, res, next) {
   if (req.role !== "admin") {
@@ -164,7 +153,7 @@ app.post("/api/users/login", async (req, res) => {
       });
     }
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.user_id, role: user.role },
       process.env.JWT_SECRET
     );
     res.json({
@@ -181,7 +170,7 @@ app.post("/api/users/login", async (req, res) => {
 });
 
 // Get User
-app.get("/api/users", async (_, res) => {
+app.get("/api/users", authenticateTokenMiddleware, authorizeAdmin, async (_, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -205,8 +194,15 @@ app.get("/api/users", async (_, res) => {
 });
 
 // Get User By Id
-app.get("/api/users/:id", async (req, res) => {
+app.get("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
   const userId = parseInt(req.params.id);
+
+  if (req.userId !== userId && req.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied.",
+    });
+  }
 
   try {
     const user = await prisma.user.findUnique({
@@ -241,7 +237,15 @@ app.get("/api/users/:id", async (req, res) => {
 });
 
 // Update User
-app.put("/api/users/:id", async (req, res) => {
+app.put("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
+
+  if (req.userId !== userId && req.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied.",
+    });
+  }
+
   const userId = parseInt(req.params.id);
   const {
     username,
@@ -290,7 +294,7 @@ app.put("/api/users/:id", async (req, res) => {
 });
 
 // Delete User
-app.delete("/api/users/:id", async (req, res) => {
+app.delete("/api/users/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   const userId = parseInt(req.params.id);
 
   try {
@@ -1025,11 +1029,12 @@ app.get('/api/products/search/:name', async (req, res) => {
   console.log(product_name)
   try {
     const productByName = await prisma.item.findMany({
-      where: { 
-        item_name: { 
+      where: {
+        item_name: {
           contains: product_name,
           mode: 'insensitive'
-        }},
+        }
+      },
     });
 
     if (productByName) {
@@ -1068,13 +1073,13 @@ app.get('/api/products/:id', async (req, res) => {
 app.post('/api/products/:id/feedback', async (req, res) => {
   const id = req.params.id
 
-  const {rating, description} = req.body
-  try{
+  const { rating, description } = req.body
+  try {
     const createFeedback = await prisma.feedback.create({
       data: {
-      item_id: Number(id),
-      rating,
-      description
+        item_id: Number(id),
+        rating,
+        description
       }
     })
     res.json({ createFeedback });
@@ -1088,13 +1093,13 @@ app.post('/api/products/:id/feedback', async (req, res) => {
 app.put('/api/payment_proof/:salesorder_id', upload.single('image'), async (req, res) => {
   const salesorder_id = req.params.salesorder_id
 
-  try{
+  try {
     const updateImagePayment = await prisma.salesOrder.update({
       where: {
         salesorder_id: Number(salesorder_id)
       },
       data: {
-        image_payment: req.file.path 
+        image_payment: req.file.path
       }
     })
     res.json({ updateImagePayment });
@@ -1106,59 +1111,185 @@ app.put('/api/payment_proof/:salesorder_id', upload.single('image'), async (req,
 
 // status recieved
 app.put('/api/product/recieved/:salesorder_id', async (req, res) => {
-    const salesorder_id = req.params.salesorder_id
+  const salesorder_id = req.params.salesorder_id
 
-    const recievedProduct = await prisma.salesOrder.update({
-      where: 
-      {
-        salesorder_id: Number(salesorder_id)
-      }, data : {
-        order_status: 'recieved'
-      }
-    })
+  const recievedProduct = await prisma.salesOrder.update({
+    where:
+    {
+      salesorder_id: Number(salesorder_id)
+    }, data: {
+      order_status: 'recieved'
+    }
+  })
 
-    res.json({recievedProduct})
+  res.json({ recievedProduct })
 })
 
 // create order
 app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req, res) => {
-  const {salesorder_no,  product, order_status, customer_name, shipping_cost, sub_total} = req.body
+  const { salesorder_no, product, order_status, customer_name, shipping_cost, sub_total } = req.body
   console.log(req.body)
   const orderDetails = req.body.orderDetails;
-  try{
-  const createOrder = await prisma.SalesOrder.create({
-    data: { 
-      salesorder_no, 
-      user_id: req.userId,  
-      product, 
-      order_status, 
-      customer_name, 
-      shipping_cost, 
-      sub_total, 
-      is_verified: false, 
-      image_payment:""
-    }
-  })
-  
-  const salesOrderId = createOrder.salesorder_id;
-  const createdOrderDetails = await Promise.all(orderDetails.map(async orderDetail => {
-    return prisma.SalesOrderDetail.create({
+  try {
+    const createOrder = await prisma.SalesOrder.create({
       data: {
-        salesorder_id: salesOrderId,
-        item_id: orderDetail.item_id,
-        item_price: orderDetail.item_price,
-        quantity: orderDetail.quantity
+        salesorder_no,
+        user_id: req.userId,
+        product,
+        order_status,
+        customer_name,
+        shipping_cost,
+        sub_total,
+        is_verified: false,
+        image_payment: ""
       }
-    });
-  }));
+    })
 
-  res.json({ createOrder, createdOrderDetails });
-  console.log(createOrder, createdOrderDetails)
-  } catch (error){
+    const salesOrderId = createOrder.salesorder_id;
+    const createdOrderDetails = await Promise.all(orderDetails.map(async orderDetail => {
+      return prisma.SalesOrderDetail.create({
+        data: {
+          salesorder_id: salesOrderId,
+          item_id: orderDetail.item_id,
+          item_price: orderDetail.item_price,
+          quantity: orderDetail.quantity
+        }
+      });
+    }));
+
+    res.json({ createOrder, createdOrderDetails });
+    console.log(createOrder, createdOrderDetails)
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 })
+
+app.post('/api/cart', async (req, res) => {
+  const { userId, items } = req.body;
+
+  try {
+    let cart = await prisma.cart.findFirst({
+      where: { userId: userId }
+    });
+
+    if (!cart) {
+      cart = await prisma.cart.create({ data: { userId: userId } });
+    }
+
+    await Promise.all(items.map(async item => {
+      const itemData = await prisma.item.findUnique({
+        where: { item_id: item.itemId }
+      });
+
+      if (!itemData || item.quantity > itemData.stock_item) {
+        throw new Error(`Item ${item.itemId} is out of stock or does not exist.`);
+      }
+
+      const existingCartItem = await prisma.cartItem.findUnique({
+        where: {
+          cartId_itemId: {
+            cartId: cart.cartId,
+            itemId: item.itemId
+          }
+        }
+      });
+
+      if (existingCartItem) {
+        const newQuantity = item.quantity;
+        if (newQuantity === 0) {
+          await prisma.cartItem.delete({
+            where: {
+              cartId_itemId: {
+                cartId: cart.cartId,
+                itemId: item.itemId
+              }
+            }
+          });
+        } else if (newQuantity < 0) {
+          res.status(400).json({
+            success: false,
+            message: 'Invalid quantity value'
+          });
+        } else {
+          await prisma.cartItem.update({
+            where: {
+              cartId_itemId: {
+                cartId: cart.cartId,
+                itemId: item.itemId
+              }
+            },
+            data: { quantity: newQuantity, count_price: itemData.price * newQuantity }
+          });
+        }
+      } else if (item.quantity > 0) {
+        await prisma.cartItem.create({
+          data: {
+            cartId: cart.cartId,
+            itemId: item.itemId,
+            quantity: item.quantity,
+            count_price: itemData.price * item.quantity
+          }
+        });
+      }
+    }));
+
+    res.json({
+      success: true,
+      message: "Cart updated successfully"
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Error updating cart: ${err.message}`
+    });
+  }
+});
+
+
+app.get('/api/cart/:userId', async (req, res) => {
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const cart = await prisma.cart.findFirst({
+      where: { userId: userId },
+      include: {
+        items: {
+          include: {
+            item: true
+          }
+        }
+      }
+    });
+
+    if (cart) {
+      const cartDetails = cart.items.map(cartItem => ({
+        itemId: cartItem.itemId,
+        quantity: cartItem.quantity,
+        count_price: cartItem.count_price,
+        itemName: cartItem.item.item_name
+      }));
+
+      res.json({
+        success: true,
+        message: "Cart retrieved successfully",
+        cartId: cart.cartId,
+        cartDetails
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Cart not found"
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Error retrieving cart: ${err.message}`
+    });
+  }
+});
+
 
 
 app.listen(8000, () => {
