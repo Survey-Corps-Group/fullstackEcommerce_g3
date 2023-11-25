@@ -1,6 +1,9 @@
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 class SalesOrderDetailRepository {
     async createOrderDetail(data) {
-        return await this.prisma.SalesOrderDetail.create({
+        return await prisma.SalesOrderDetail.create({
             data: data
         });
     }

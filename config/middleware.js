@@ -10,7 +10,7 @@ function authenticateTokenMiddleware(req, res, next) {
         });
 
     const user = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = user.user_id;
+    req.userId = user.userId;
     req.role = user.role;
     next();
 }

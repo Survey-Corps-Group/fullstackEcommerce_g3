@@ -32,7 +32,7 @@ class SalesOrderRepository {
     }
 
     async findAllOrders() {
-        return await this.prisma.salesOrder.findMany({
+        return await prisma.salesOrder.findMany({
             select: {
                 salesorder_id: true,
                 salesorder_no: true,
@@ -44,7 +44,7 @@ class SalesOrderRepository {
     }
 
     async findOrderById(orderId) {
-        return await this.prisma.salesOrder.findUnique({
+        return await prisma.salesOrder.findUnique({
             where: {
                 salesorder_id: orderId,
             },
@@ -71,7 +71,7 @@ class SalesOrderRepository {
     }
 
     async updateOrderVerification(orderId, isVerified) {
-        return await this.prisma.salesOrder.update({
+        return await prisma.salesOrder.update({
             where: { salesorder_id: orderId },
             data: { is_verified: isVerified },
         });

@@ -29,11 +29,11 @@ class SalesOrderService {
     }
 
     async getOrderDetails(orderId) {
-        return await this.salesOrderRepository.findOrderById(orderId);
+        return await salesOrderRepository.findOrderById(orderId);
     }
 
     async verifyOrder(orderId) {
-        return await this.salesOrderRepository.updateOrderVerification(orderId, true);
+        return await salesOrderRepository.updateOrderVerification(orderId, true);
     }
 }
 

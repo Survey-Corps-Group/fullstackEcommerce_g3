@@ -61,7 +61,7 @@ class SalesOrderController {
         const orderId = parseInt(req.params.id);
 
         try {
-            const orderDetails = await this.salesOrderService.getOrderDetails(orderId);
+            const orderDetails = await salesOrderService.getOrderDetails(orderId);
             
             if (!orderDetails) {
                 return res.status(404).json({
@@ -81,7 +81,7 @@ class SalesOrderController {
         const orderId = parseInt(req.params.id);
 
         try {
-            const updatedOrder = await this.salesOrderService.verifyOrder(orderId);
+            const updatedOrder = await salesOrderService.verifyOrder(orderId);
             res.json({
                 success: true,
                 message: "Order status updated successfully",
