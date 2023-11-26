@@ -25,7 +25,7 @@ function authenticateTokenMiddleware(req, res, next) {
   if (token == null)
     return res.status(401).json({
       success: false,
-      message: "Forbidden",
+      message: "Unauthorized, Please login first",
     });
 
   const user = jwt.verify(token, process.env.JWT_SECRET);
@@ -87,7 +87,9 @@ app.post("/api/users/register", async (req, res) => {
     password,
     address,
     full_name,
-    phone
+    phone,
+    city_id,
+    province_id
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -117,6 +119,8 @@ app.post("/api/users/register", async (req, res) => {
         full_name,
         phone,
         role : 'customer',
+        city_id : parseInt(city_id),
+        province_id : parseInt(province_id)
       },
     });
 
@@ -148,19 +152,18 @@ app.post("/api/users/login", async (req, res) => {
     if (!passwordMatch) {
       return res.status(403).json({
         success: false,
-        message: "invalid credentials",
+        message: "username or password is wrong",
       });
     }
     const token = jwt.sign(
       { userId: user.user_id, role: user.role },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET , { expiresIn: "1h"}
     );
     res.json({
       success: true,
       token: token,
     });
   } catch (err) {
-    console.log(err);
     res.status(400).json({
       success: false,
       message: `Error registering user: ${err.message}`,
@@ -180,6 +183,8 @@ app.get("/api/users", authenticateTokenMiddleware, authorizeAdmin, async (_, res
         full_name: true,
         phone: true,
         role: true,
+        city_id: true,
+        province_id: true
       },
     });
 
@@ -211,11 +216,12 @@ app.get("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
       select: {
         username: true,
         email: true,
-        password: true,
         address: true,
         full_name: true,
         phone: true,
         role: true,
+        city_id: true,
+        province_id: true
       },
     });
 
@@ -253,7 +259,8 @@ app.put("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
     address,
     full_name,
     phone,
-    role,
+    city_id,
+    province_id
   } = req.body;
 
   try {
@@ -264,7 +271,8 @@ app.put("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
     if (address) updateData.address = address;
     if (full_name) updateData.full_name = full_name;
     if (phone) updateData.phone = phone;
-    if (role) updateData.role = role;
+    if (city_id) updateData.city_id = parseInt(city_id);
+    if (province_id) updateData.province_id = parseInt(province_id);
 
     const updatedUser = await prisma.user.update({
       where: { user_id: userId },
@@ -281,7 +289,8 @@ app.put("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
         address: updatedUser.address,
         full_name: updatedUser.full_name,
         phone: updatedUser.phone,
-        role: updatedUser.role,
+        city_id: updatedUser.city_id,
+        province_id: updatedUser.province_id
       },
     });
   } catch (err) {
@@ -330,7 +339,9 @@ app.post("/api/users/admin/register", async (req, res) => {
     password,
     address,
     full_name,
-    phone
+    phone,
+    province_id,
+    city_id
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -360,6 +371,8 @@ app.post("/api/users/admin/register", async (req, res) => {
         full_name,
         phone,
         role : 'admin',
+        city_id : parseInt(city_id),
+        province_id : parseInt(province_id)
       },
     });
 
@@ -391,6 +404,7 @@ app.get("/api/products", async (req, res) => {
   const offset = page ? (page - 1) * limit : 0;
 
   try {
+    // Langkah 1: Mengambil data produk
     const products = await prisma.item.findMany({
       skip: offset,
       take: limit,
@@ -404,23 +418,38 @@ app.get("/api/products", async (req, res) => {
             image_url: true,
           },
         },
-        feedbacks: true,
-        WarehouseItem: true,
+        WarehouseItem: {
+          include: {
+            warehouse: {
+              select: {
+                city: true,
+              }
+            }
+          }
+        },
       },
     });
 
+    // Langkah 2: Menghitung rata-rata rating untuk setiap produk
+    for (const product of products) {
+      const aggregateFeedback = await prisma.feedback.aggregate({
+        where: {
+          item_id: product.item_id,
+        },
+        _avg: {
+          rating: true,
+        },
+      });
+      product.summary_rating = aggregateFeedback._avg.rating;
+    }
+
     let filteredProducts = products;
-    console.log(rating);
     if (rating) {
       const ratingThreshold = parseFloat(rating);
       filteredProducts = products.filter(
         (product) =>
-          calculateSummaryRating(product.feedbacks) == ratingThreshold
+          product.summary_rating >= ratingThreshold
       );
-    }
-
-    if (sort === "best-selling") {
-      filteredProducts.sort((a, b) => b.feedbacks.length - a.feedbacks.length);
     }
 
     const result = filteredProducts.map((product) => ({
@@ -431,9 +460,8 @@ app.get("/api/products", async (req, res) => {
       color: product.color,
       package_weight: product.package_weight,
       stock_item: product.stock_item,
-      feedback_id: product.feedbacks.map((fb) => fb.feedback_id),
-      summary_rating: calculateSummaryRating(product.feedbacks),
-      warehouse_id: product.WarehouseItem.map((wh) => wh.warehouse_id),
+      summary_rating: product.summary_rating,
+      warehouse_city: product.WarehouseItem[0]?.warehouse?.city,
       images: product.images.map((img) => img.image_url),
     }));
 
@@ -445,6 +473,8 @@ app.get("/api/products", async (req, res) => {
     });
   }
 });
+
+
 
 //BAGIAN MUKTI (ACTIVITY 7, 8, 9)
 /* note/DOKUMENTASI PENGGUNAAN DATA :
@@ -867,7 +897,7 @@ app.put("/admin/orders/:id", async (req, res) => {
 
 // warehouse
 // Get Warehouse
-app.get("/api/warehouses", async (req, res) => {
+app.get("/api/warehouses", authenticateTokenMiddleware, authorizeAdmin, async (_, res) => {
   try {
     const warehouses = await prisma.warehouse.findMany({
       select: {
@@ -887,7 +917,7 @@ app.get("/api/warehouses", async (req, res) => {
 });
 
 // Get Warehouse By Id
-app.get("/api/warehouses/:id", async (req, res) => {
+app.get("/api/warehouses/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   const warehouseId = parseInt(req.params.id);
 
   try {
@@ -899,6 +929,8 @@ app.get("/api/warehouses/:id", async (req, res) => {
         warehouse_id: true,
         city: true,
         province: true,
+        city_id: true,
+        province_id: true
       },
     });
 
@@ -919,14 +951,16 @@ app.get("/api/warehouses/:id", async (req, res) => {
 });
 
 // create warehouse
-app.post("/api/warehouses", async (req, res) => {
-  const { city, province } = req.body;
+app.post("/api/warehouses", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
+  const { city, province, city_id, province_id } = req.body;
 
   try {
     const newWarehouse = await prisma.warehouse.create({
       data: {
         city: city,
         province: province,
+        city_id: parseInt(city_id),
+        province_id: parseInt(province_id)
       },
     });
 
@@ -943,14 +977,16 @@ app.post("/api/warehouses", async (req, res) => {
   }
 });
 
-app.put("/api/warehouses/:id", async (req, res) => {
+app.put("/api/warehouses/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   const warehouseId = parseInt(req.params.id);
-  const { city, province } = req.body;
+  const { city, province, city_id, province_id } = req.body;
 
   try {
     let updateData = {};
     if (city) updateData.city = city;
     if (province) updateData.province = province;
+    if (city_id) updateData.city_id = parseInt(city_id);
+    if (province_id) updateData.province_id = parseInt(province_id);
 
     const updatedWarehouse = await prisma.warehouse.update({
       where: {
@@ -973,7 +1009,7 @@ app.put("/api/warehouses/:id", async (req, res) => {
 });
 
 // delete warehouse
-app.delete("/api/warehouses/:id", async (req, res) => {
+app.delete("/api/warehouses/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   const warehouseId = parseInt(req.params.id);
 
   try {
@@ -1042,8 +1078,6 @@ app.get("/api/city", async (req, res) => {
 
 app.post("/api/cost", async (req, res) => {
   const { origin, destination, weight, courier } = req.body;
-
-  console.log(res.body);
 
   if (!origin || !destination || !weight || !courier) {
     return res.status(400).json({

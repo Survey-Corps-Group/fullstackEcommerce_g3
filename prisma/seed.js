@@ -1,27 +1,31 @@
 const { PrismaClient } = require("@prisma/client");
-
 const prisma = new PrismaClient();
+const bcrypt = require("bcrypt");
 
 async function main() {
   // Create a user
+
+  const hashedPassword = await bcrypt.hash("admin", 10);
   const user = await prisma.user.create({
     data: {
       username: "admin",
       email: "admin@surveycorps.com",
-      password: "admin",
+      password: hashedPassword,
       address: "1234 Main St",
       full_name: "Test User",
       phone: "555-1234",
       role: "admin",
+      city_id : 152,
+      province_id: 6
     },
   });
 
   // Create an item
   const item = await prisma.item.create({
     data: {
-      item_name: "Sample Item",
-      price: 19.99,
-      description: "A sample item for testing",
+      item_name: "Action Figure One Piece",
+      price: 10000,
+      description: "Luffy D Monkey Asli Anak Tanjung Priok",
       color: "red",
       package_weight: 2,
       stock_item: 50,
@@ -48,8 +52,10 @@ async function main() {
   // Create a warehouse
   const warehouse = await prisma.warehouse.create({
     data: {
-      city: "Warehouse City",
-      province: "Warehouse Province",
+      city: "Jakarta Barat",
+      province: "DKI Jakarta",
+      city_id : 151,
+      province_id : 6,
     },
   });
 
@@ -66,11 +72,10 @@ async function main() {
     data: {
       salesorder_no: "SO12345",
       user_id: user.user_id,
-      product: "Sample Product",
       order_status: "processed",
       customer_name: user.full_name,
-      shipping_cost: 5.99,
-      sub_total: 19.99,
+      shipping_cost: 20000,
+      sub_total: 30000,
       is_verified: true,
       image_payment: "http://example.com/payment.jpg",
     },
