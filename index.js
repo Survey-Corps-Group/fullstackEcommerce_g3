@@ -1078,7 +1078,6 @@ app.post("/api/cost", async (req, res) => {
 // Search Product name
 app.get('/api/products/search/:name', async (req, res) => {
   const product_name = req.params.name
-  console.log(product_name)
   try {
     const productByName = await prisma.item.findMany({
       where: {
@@ -1104,7 +1103,6 @@ app.get('/api/products/search/:name', async (req, res) => {
 app.get('/api/products/:id', async (req, res) => {
   const id = req.params.id
 
-  console.log(id)
   try {
     const productById = await prisma.item.findUnique({
       where: { item_id: Number(id) },
@@ -1180,7 +1178,6 @@ app.put('/api/product/recieved/:salesorder_id', async (req, res) => {
 // create order
 app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req, res) => {
   const { salesorder_no, order_status, customer_name, shipping_cost, sub_total } = req.body
-  console.log(req.body)
   const orderDetails = req.body.orderDetails;
   try {
     const createOrder = await prisma.SalesOrder.create({
@@ -1208,16 +1205,25 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
         }
       });
     }));
-
-    res.json({ createOrder, createdOrderDetails });
-    console.log(createOrder, createdOrderDetails)
+    
+    const findCartId = await prisma.cart.findFirst({
+      where: {
+        userId: req.userId,
+      }
+    })
+    const deleteCart = await prisma.cartItem.deleteMany({
+      where: {
+        cartId: findCartId.cartId
+      }
+    })
+    res.json({ createOrder, createdOrderDetails , deleteCart});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 })
 
-app.post('/api/cart', async (req, res) => {
+app.post('/api/cart',authenticateTokenMiddleware, async (req, res) => {
   const { items } = req.body;
 
   const userId = req.userId;
@@ -1344,6 +1350,27 @@ app.get('/api/cart/:userId', async (req, res) => {
   }
 });
 
+// verified
+app.put('/api/verified/:salesorder_id', async( req, res) => {
+  const salesorder_id = req.params.salesorder_id;
+  try{
+    const verified = await prisma.salesOrder.update({
+      where: {
+        salesorder_id: Number(salesorder_id)
+      },
+      data: {
+        is_verified: true
+      }
+    })
+    res.json({
+      verified
+    })
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+
+})
 
 
 app.listen(8000, () => {
