@@ -521,7 +521,7 @@ from salesorder
 */
 
 //api dashboard home login as admin (menampilkan list product)
-app.get("/admin/products", async (req, res) => {
+app.get("/admin/products", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   try {
     const adminProducts = await prisma.item.findMany({
       select: {
@@ -572,7 +572,7 @@ app.get("/admin/products", async (req, res) => {
   }
 });
 //api admin add product
-app.post("/admin/products", upload.array("images", 5), async (req, res) => {
+app.post("/admin/products", authenticateTokenMiddleware, authorizeAdmin, upload.array("images", 5), async (req, res) => {
   try {
     const {
       item_name,
@@ -637,7 +637,7 @@ app.post("/admin/products", upload.array("images", 5), async (req, res) => {
 });
 //api edit product
 app.put(
-  "/admin/products/:itemId",
+  "/admin/products/:itemId", authenticateTokenMiddleware, authorizeAdmin, 
   upload.array("images", 5),
   async (req, res) => {
     try {
@@ -722,7 +722,7 @@ app.put(
   }
 );
 //api admin delete product by id
-app.delete("/admin/products/:id", async (req, res) => {
+app.delete("/admin/products/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   try {
     const itemId = parseInt(req.params.id);
 
@@ -766,7 +766,7 @@ app.delete("/admin/products/:id", async (req, res) => {
   }
 });
 //api admin lihat list order dari customer
-app.get("/admin/listorder", async (req, res) => {
+app.get("/admin/listorder", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   try {
     const orders = await prisma.salesOrder.findMany({
       select: {
@@ -787,7 +787,7 @@ app.get("/admin/listorder", async (req, res) => {
   }
 });
 // API admin retrieve detailed information about a specific order
-app.get("/admin/orders/:id", async (req, res) => {
+app.get("/admin/orders/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   try {
     const orderId = parseInt(req.params.id);
 
@@ -853,7 +853,7 @@ app.get("/admin/orders/:id", async (req, res) => {
 });
 //api untuk set isverified = true
 //sKENario : admin mengklik accept di salah satu order customer (utk mengacc pembayaran)
-app.put("/admin/orders/:id", async (req, res) => {
+app.put("/admin/orders/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   try {
     const orderId = parseInt(req.params.id);
 
@@ -1256,132 +1256,139 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
   }
 })
 
-app.post('/api/cart',authenticateTokenMiddleware, async (req, res) => {
-  const { items } = req.body;
 
-  const userId = req.userId;
-
+//createcart digunakan di tombol yang sama dengan create user
+//skenarionya : jika klik tombol create user maka, masukan api ini juga utk create cart nya berdsarkan userId
+app.post("/api/createcart",  async (req, res) => {
   try {
-    let cart = await prisma.cart.findFirst({
-      where: { userId: userId }
-    });
+    // Get userId from the request body
+    const { userId } = req.body;
 
-    if (!cart) {
-      cart = await prisma.cart.create({ data: { userId: userId } });
+    // Check if userId is provided
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "UserId is required in the request body.",
+      });
     }
 
-    await Promise.all(items.map(async item => {
-      const itemData = await prisma.item.findUnique({
-        where: { item_id: item.itemId }
-      });
-
-      if (!itemData || item.quantity > itemData.stock_item) {
-        throw new Error(`Item ${item.itemId} is out of stock or does not exist.`);
-      }
-
-      const existingCartItem = await prisma.cartItem.findUnique({
-        where: {
-          cartId_itemId: {
-            cartId: cart.cartId,
-            itemId: item.itemId
-          }
-        }
-      });
-
-      if (existingCartItem) {
-        const newQuantity = item.quantity;
-        if (newQuantity === 0) {
-          await prisma.cartItem.delete({
-            where: {
-              cartId_itemId: {
-                cartId: cart.cartId,
-                itemId: item.itemId
-              }
-            }
-          });
-        } else if (newQuantity < 0) {
-          res.status(400).json({
-            success: false,
-            message: 'Invalid quantity value'
-          });
-        } else {
-          await prisma.cartItem.update({
-            where: {
-              cartId_itemId: {
-                cartId: cart.cartId,
-                itemId: item.itemId
-              }
-            },
-            data: { quantity: newQuantity, count_price: itemData.price * newQuantity }
-          });
-        }
-      } else if (item.quantity > 0) {
-        await prisma.cartItem.create({
-          data: {
-            cartId: cart.cartId,
-            itemId: item.itemId,
-            quantity: item.quantity,
-            count_price: itemData.price * item.quantity
-          }
-        });
-      }
-    }));
-
-    res.json({
-      success: true,
-      message: "Cart updated successfully"
+    // Check if the user with the provided userId exists
+    const existingUser = await prisma.user.findUnique({
+      where: { user_id: userId },
     });
-  } catch (err) {
-    res.status(500).json({
+
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found with the provided userId.",
+      });
+    }
+
+    // Create a new cart with the given userId and set cartId to userId
+    const newCart = await prisma.cart.create({
+      data: {
+        userId: userId,
+        cartId: userId,
+      },
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Cart created successfully.",
+      cartId: newCart.cartId,
+    });
+  } catch (error) {
+    console.error("Error creating cart:", error);
+    return res.status(500).json({
       success: false,
-      message: `Error updating cart: ${err.message}`
+      message: "Internal server error.",
     });
   }
 });
 
+//create iteminsidecart
+app.post('/api/itemcart', authenticateTokenMiddleware, async (req, res) => {
+  try {
+    const { userId, itemIds } = req.body;
 
+    // Cek apakah userId valid
+    const user = await prisma.user.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Buat keranjang baru atau temukan yang sudah ada
+    let cart = await prisma.cart.findFirst({
+      where: { userId: userId },
+    });
+
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: { userId: userId },
+      });
+    }
+
+    // Tambahkan item ke keranjang
+    for (const itemId of itemIds) {
+      await prisma.cartItem.create({
+        data: {
+          cartId: cart.cartId,
+          itemId: itemId,
+        },
+      });
+    }
+
+    return res.status(201).json({ message: 'CartItems added successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//get isi cart berdasarkan id
 app.get('/api/cart/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
-    const cart = await prisma.cart.findFirst({
-      where: { userId: userId },
+    // Menggunakan Prisma untuk mengambil data item berdasarkan userId
+    const cartItems = await prisma.cartItem.findMany({
+      where: {
+        cart: {
+          userId: userId,
+        },
+      },
       include: {
-        items: {
-          include: {
-            item: true
-          }
-        }
-      }
+        item: {
+          select: {
+            item_name: true,
+            price: true,
+            images: {
+              select: {
+                image_url: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    if (cart) {
-      const cartDetails = cart.items.map(cartItem => ({
-        itemId: cartItem.itemId,
-        quantity: cartItem.quantity,
-        count_price: cartItem.count_price,
-        itemName: cartItem.item.item_name
-      }));
+    // Mengambil data gambar untuk setiap item
+    const itemsWithImages = cartItems.map((cartItem) => ({
+      item_name: cartItem.item.item_name,
+      price: cartItem.item.price,
+      image_url: cartItem.item.images[0]?.image_url || null, // Mengambil image_url pertama, jika ada
+    }));
 
-      res.json({
-        success: true,
-        message: "Cart retrieved successfully",
-        cartId: cart.cartId,
-        cartDetails
-      });
-    } else {
-      res.status(404).json({
-        success: false,
-        message: "Cart not found"
-      });
-    }
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: `Error retrieving cart: ${err.message}`
-    });
+    res.json(itemsWithImages);
+  } catch (error) {
+    console.error('Error retrieving cart items:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // verified
 app.put('/api/verified/:salesorder_id', async( req, res) => {
