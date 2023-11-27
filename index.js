@@ -1218,7 +1218,6 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
       data: {
         salesorder_no,
         user_id: req.userId,
-        product: "",
         order_status,
         customer_name,
         shipping_cost,
