@@ -48,7 +48,7 @@ function authorizeAdmin(req, res, next) {
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     allowedHeaders:
       "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -1135,23 +1135,32 @@ app.get('/api/products/search/:name', async (req, res) => {
 
 // find product by id
 app.get('/api/products/:id', async (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
   try {
     const productById = await prisma.item.findUnique({
       where: { item_id: Number(id) },
+      include: {
+        feedbacks: true,
+        images: {
+          select: {
+            image_url: true
+          }
+        }
+      }
     });
 
     if (productById) {
-      res.json({ productById });
+      res.json(productById);
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({success: "false", message: 'Product not found' });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ success: "false", message: 'Internal Server Error' });
   }
-})
+});
+
 
 // create feedback
 app.post('/api/products/:id/feedback', async (req, res) => {
