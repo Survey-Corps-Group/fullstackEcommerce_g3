@@ -11,7 +11,7 @@ import {
 import SampleNextArrow from "./SampleNextArrow";
 import SamplePrevArrow from "./SamplePrevArrow";
 
-const Women = () => {
+const Children = () => {
   const settings = {
     infinite: true,
     speed: 500,
@@ -48,7 +48,7 @@ const Women = () => {
   };
   return (
     <div className="w-full pb-16">
-      <Heading heading="Women's Clothes" />
+      <Heading heading="Children Clothes" />
       <Slider {...settings}>
         <div className="px-2">
           <Product
@@ -110,4 +110,4 @@ const Women = () => {
   );
 };
 
-export default Women;
+export default Children;
