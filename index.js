@@ -400,7 +400,7 @@ function calculateSummaryRating(feedbacks) {
 
 app.get("/api/products", async (req, res) => {
   const { page, item_name, price, rating, sort } = req.query;
-  const limit = 10;
+  const limit = 9;
   const offset = page ? (page - 1) * limit : 0;
 
   try {
