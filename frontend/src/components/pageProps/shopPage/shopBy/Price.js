@@ -23,16 +23,6 @@ const Price = () => {
       priceOne: 200.0,
       priceTwo: 399.99,
     },
-    {
-      _id: 954,
-      priceOne: 400.0,
-      priceTwo: 599.99,
-    },
-    {
-      _id: 955,
-      priceOne: 600.0,
-      priceTwo: 1000.0,
-    },
   ];
   return (
     <div className="cursor-pointer">
