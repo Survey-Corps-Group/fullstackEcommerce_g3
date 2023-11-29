@@ -14,6 +14,7 @@ import SpecialCase from "./components/SpecialCase/SpecialCase";
 import About from "./pages/About/About";
 import SignIn from "./pages/Account/SignIn";
 import SignUp from "./pages/Account/SignUp";
+
 import Cart from "./pages/Cart/Cart";
 import Contact from "./pages/Contact/Contact";
 import Home from "./pages/Home/Home";
@@ -21,6 +22,11 @@ import Offer from "./pages/Offer/Offer";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
+import SignInAdmin from "./pages/Admin/SignInAdmin";
+import AdminPage from "./pages/Admin/AdminPage";
+
+
+
 
 const Layout = () => {
   return (
@@ -32,6 +38,7 @@ const Layout = () => {
       <Outlet />
       <Footer />
       <FooterBottom />
+      
     </div>
   );
 };
@@ -52,6 +59,8 @@ const router = createBrowserRouter(
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
+      <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
+      <Route path="/AdminPage" element={<AdminPage />}></Route>
     </Route>
   )
 );
