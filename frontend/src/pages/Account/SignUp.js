@@ -1,19 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { logoLight } from "../../assets/images";
+import { rajaOngkirProvince } from "../../modules/fetch";
+import { rajaOngkirCity } from "../../modules/fetch";
+import { register } from "../../modules/fetch";
 
 const SignUp = () => {
   // ============= Initial State Start here =============
-  const [clientName, setClientName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [zip, setZip] = useState("");
   const [checked, setChecked] = useState(false);
+  const [username, setUsername] = useState("");
+  const [provinces, setProvinces] = useState([])
+  const [province, setProvince] = useState("")
+  const [cities, setCities] = useState([])
+  const [city, setCity] = useState("")
   // ============= Initial State End here ===============
   // ============= Error Msg Start here =================
   const [errClientName, setErrClientName] = useState("");
@@ -27,8 +34,8 @@ const SignUp = () => {
   // ============= Error Msg End here ===================
   const [successMsg, setSuccessMsg] = useState("");
   // ============= Event Handler Start here =============
-  const handleName = (e) => {
-    setClientName(e.target.value);
+  const handleFullname = (e) => {
+    setFullName(e.target.value);
     setErrClientName("");
   };
   const handleEmail = (e) => {
@@ -59,6 +66,14 @@ const SignUp = () => {
     setZip(e.target.value);
     setErrZip("");
   };
+
+  const handleUsername = (e) => {
+    setUsername(e.target.value)
+  }
+
+  const handleProvince = (e) => {
+    setProvince(e.target.value)
+  }
   // ============= Event Handler End here ===============
   // ================= Email Validation start here =============
   const EmailValidation = (email) => {
@@ -68,10 +83,38 @@ const SignUp = () => {
   };
   // ================= Email Validation End here ===============
 
-  const handleSignUp = (e) => {
+
+  // fetch province dari raja ongkir
+  useEffect(() => {
+    const fetchProvince = async () => {
+        try{
+          const response = await rajaOngkirProvince()
+          setProvinces(response.data)
+        }catch (e) {
+
+        }
+    }
+    fetchProvince();
+  }, [])
+
+  // fetch city dari raja ongkir
+  useEffect( () => {
+    const fetchCity = async () => {
+      const id = province
+      try {
+        const response = await rajaOngkirCity(id)
+        setCities(response.data)
+      }catch(e){
+
+      }
+    }
+    fetchCity()
+  }, [province])
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
     if (checked) {
-      if (!clientName) {
+      if (!fullName) {
         setErrClientName("Enter your name");
       }
       if (!email) {
@@ -105,7 +148,7 @@ const SignUp = () => {
       }
       // ============== Getting the value ==============
       if (
-        clientName &&
+        fullName &&
         email &&
         EmailValidation(email) &&
         password &&
@@ -116,9 +159,9 @@ const SignUp = () => {
         zip
       ) {
         setSuccessMsg(
-          `Hello dear ${clientName}, Welcome you to OREBI Admin panel. We received your Sign up request. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
+          `Hello dear ${fullName}, Welcome you to OREBI Admin panel. We received your Sign up request. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
         );
-        setClientName("");
+        setFullName("");
         setEmail("");
         setPhone("");
         setPassword("");
@@ -127,6 +170,7 @@ const SignUp = () => {
         setCountry("");
         setZip("");
       }
+      await register( username, email, password, address, fullName, phone, province, city)
     }
   };
   return (
@@ -210,8 +254,28 @@ const SignUp = () => {
                     Full Name
                   </p>
                   <input
-                    onChange={handleName}
-                    value={clientName}
+                    onChange={handleFullname}
+                    value={fullName}
+                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
+                    type="text"
+                    placeholder="eg. Mail Slay"
+                  />
+                  {errClientName && (
+                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                      <span className="font-bold italic mr-1">!</span>
+                      {errClientName}
+                    </p>
+                  )}
+                </div>
+
+                 {/* username */}
+                 <div className="flex flex-col gap-.5">
+                  <p className="font-titleFont text-base font-semibold text-gray-600">
+                    Username
+                  </p>
+                  <input
+                    onChange={handleUsername}
+                    value={username}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
                     type="text"
                     placeholder="eg. Mail Slay"
@@ -299,24 +363,61 @@ const SignUp = () => {
                     </p>
                   )}
                 </div>
+                {/* Province Dropdown */}
+                <div className="flex flex-col gap-.5">
+                  <p className="font-titleFont text-base font-semibold text-gray-600">
+                    Province
+                  </p>
+                  <select
+                    onChange={handleProvince}
+                    value={province}
+                    className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
+                  >
+                    <option value="" disabled selected hidden>
+                      Select Province
+                    </option>
+                    {
+                      provinces.map((provincesOption) => (
+                        <option key={provincesOption.province_id} value={provincesOption.province_id}> 
+                          {provincesOption.province}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  {/* {errRole && (
+                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                      <span className="font-bold italic mr-1">!</span>
+                      {errRole}
+                    </p>
+                  )} */}
+                </div>
                 {/* City */}
                 <div className="flex flex-col gap-.5">
                   <p className="font-titleFont text-base font-semibold text-gray-600">
                     City
                   </p>
-                  <input
+                  <select
                     onChange={handleCity}
                     value={city}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="text"
-                    placeholder="Your city"
-                  />
-                  {errCity && (
+                    className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
+                  >
+                    <option value="" disabled selected hidden>
+                      Select City
+                    </option>
+                    {
+                      cities.map((citiesOption) => (
+                        <option key={citiesOption.city_id} value={citiesOption.city_id}> 
+                          {citiesOption.city_name}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  {/* {errRole && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
                       <span className="font-bold italic mr-1">!</span>
-                      {errCity}
+                      {errRole}
                     </p>
-                  )}
+                  )} */}
                 </div>
                 {/* Country */}
                 <div className="flex flex-col gap-.5">
