@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logoLight } from "../../assets/images";
 import { login } from "../../modules/fetch";
 
+
 const SignIn = () => {
+  const navigate = useNavigate();
+
   // ============= Initial State Start here =============
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -40,9 +43,15 @@ const SignIn = () => {
           `Hello dear, Thank you for your attempt. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${username}`
         );
       }
-      await login (username, password)
-    }catch (err){
+      const token = await login (username, password)
 
+      console.log('isi token', token)
+
+      window.localStorage.setItem("token", token.token);
+      navigate("/");
+
+    }catch (err){
+      setSuccessMsg(err);
     }
    
   };
