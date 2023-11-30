@@ -1372,6 +1372,8 @@ app.get('/api/cart/:userId', async (req, res) => {
       include: {
         item: {
           select: {
+            item_id : true,
+            package_weight: true,
             item_name: true,
             price: true,
             images: {
@@ -1386,6 +1388,9 @@ app.get('/api/cart/:userId', async (req, res) => {
 
     // Mengambil data gambar untuk setiap item
     const itemsWithImages = cartItems.map((cartItem) => ({
+      cartId: cartItem.cartId,
+      item_id: cartItem.item.item_id,
+      package_weight: cartItem.item.package_weight,
       item_name: cartItem.item.item_name,
       price: cartItem.item.price,
       image_url: cartItem.item.images[0]?.image_url || null, // Mengambil image_url pertama, jika ada
@@ -1398,6 +1403,65 @@ app.get('/api/cart/:userId', async (req, res) => {
   }
 });
 
+app.delete('/api/cart/:userId', async (req, res) => {
+  const userId = parseInt(req.params.userId);
+
+  try {
+    await prisma.cartItem.deleteMany({
+      where: {
+        cart: {
+          userId: userId,
+        },
+      },
+    });
+
+    res.json({ message: 'Cart items deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting cart items:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.delete('/api/cartItem', async (req, res) => {
+  const itemId = parseInt(req.body.itemId);
+  const cartId = parseInt(req.body.cartId);
+
+  try {
+    await prisma.cartItem.delete({
+      where: {
+        cartId_itemId: { 
+          cartId: cartId,
+          itemId: itemId,
+        },
+      },
+    });
+
+    res.json({ message: 'Cart item deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting cart item:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/cartItem/count/:userId', async (req, res) => {
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const itemCount = await prisma.cartItem.count({
+      where: {
+        cart: {
+          userId: userId,
+        },
+      },
+    });
+
+    res.json({ userId: userId, itemCount: itemCount });
+  } catch (error) {
+    console.error('Error counting cart items:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // verified
 app.put('/api/verified/:salesorder_id', async( req, res) => {
