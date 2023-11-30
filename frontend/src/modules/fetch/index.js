@@ -13,4 +13,13 @@ async function getAllProducts(page, itemName, price, rating, sort) {
   }
 }
 
-export { getAllProducts };
+async function getProductById(id) {
+  try {
+    const response = await instance.get(`/api/products/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+export { getAllProducts, getProductById }

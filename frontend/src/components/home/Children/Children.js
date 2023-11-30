@@ -7,7 +7,7 @@
 
 // const Children = () => {
 //   const [products, setProducts] = useState([]);
-  
+
 //   const settings = {
 //     infinite: true,
 //     speed: 500,
@@ -86,6 +86,8 @@ import Product from "../Products/Product";
 import SampleNextArrow from "./SampleNextArrow";
 import SamplePrevArrow from "./SamplePrevArrow";
 
+import { getAllProducts } from "../../../modules/fetch/index";
+
 const Children = () => {
   const [products, setProducts] = useState([]);
 
@@ -125,11 +127,15 @@ const Children = () => {
   };
 
   useEffect(() => {
-    // Fetch data from the API
-    fetch("http://localhost:8000/api/products")
-      .then((response) => response.json())
-      .then((data) => setProducts(data.products))
-      .catch((error) => console.error("Error fetching data:", error));
+    const fetchProducts = async () => {
+      try {
+        const response = await getAllProducts();
+        setProducts(response.products);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchProducts();
   }, []);
 
   return (

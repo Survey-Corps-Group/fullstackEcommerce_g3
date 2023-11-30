@@ -4,24 +4,35 @@ import { addToCart } from "../../../redux/orebiSlice";
 
 const ProductInfo = ({ productInfo }) => {
   const dispatch = useDispatch();
+  const hasFeedbacks = productInfo?.feedbacks?.length > 0;
+
+
   return (
     <div className="flex flex-col gap-5">
-      <h2 className="text-4xl font-semibold">{productInfo.productName}</h2>
-      <p className="text-xl font-semibold">${productInfo.price}</p>
-      <p className="text-base text-gray-600">{productInfo.des}</p>
-      <p className="text-sm">Be the first to leave a review.</p>
+      <h2 className="text-4xl font-semibold">{productInfo?.item_name}</h2>
+      <p className="text-xl font-semibold">${productInfo?.price}</p>
+      <p className="text-base text-gray-600">{productInfo?.description}</p>
+        {
+          hasFeedbacks ? 
+          productInfo.feedbacks.map(feedback => (
+            <div key={feedback.feedback_id} className="feedback">
+              <p className="text-sm">{feedback.description}</p>
+            </div>
+          )) : 
+          <p className="text-sm">Be the first to leave a review.</p>
+        }
       <p className="font-medium text-lg">
-        <span className="font-normal">Colors:</span> {productInfo.color}
+        <span className="font-normal">Colors:</span> {productInfo?.color}
       </p>
       <button
         onClick={() =>
           dispatch(
             addToCart({
               _id: productInfo.id,
-              name: productInfo.productName,
-              quantity: 1,
+              name: productInfo.item_name,
+              quantity: productInfo.stock_item,
               image: productInfo.img,
-              badge: productInfo.badge,
+              badge: productInfo.package_weight,
               price: productInfo.price,
               colors: productInfo.color,
             })
