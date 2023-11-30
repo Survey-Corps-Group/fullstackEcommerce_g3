@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { logoLight } from "../../assets/images";
+import { login } from "../../modules/fetch";
 
 const SignIn = () => {
   // ============= Initial State Start here =============
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   // ============= Initial State End here ===============
   // ============= Error Msg Start here =================
@@ -16,7 +17,7 @@ const SignIn = () => {
   const [successMsg, setSuccessMsg] = useState("");
   // ============= Event Handler Start here =============
   const handleEmail = (e) => {
-    setEmail(e.target.value);
+    setUsername(e.target.value);
     setErrEmail("");
   };
   const handlePassword = (e) => {
@@ -24,24 +25,26 @@ const SignIn = () => {
     setErrPassword("");
   };
   // ============= Event Handler End here ===============
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+    try{
+      if (!username) {
+        setErrEmail("Enter your username");
+      }
+      if (!password) {
+        setErrPassword("Create a password");
+      }
+      // ============== Getting the value ==============
+      if (username && password) {
+        setSuccessMsg(
+          `Hello dear, Thank you for your attempt. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${username}`
+        );
+      }
+      await login (username, password)
+    }catch (err){
 
-    if (!email) {
-      setErrEmail("Enter your email");
     }
-
-    if (!password) {
-      setErrPassword("Create a password");
-    }
-    // ============== Getting the value ==============
-    if (email && password) {
-      setSuccessMsg(
-        `Hello dear, Thank you for your attempt. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
-      );
-      setEmail("");
-      setPassword("");
-    }
+   
   };
   return (
     <div className="w-full h-screen flex items-center justify-center">
@@ -123,14 +126,13 @@ const SignIn = () => {
                 {/* Email */}
                 <div className="flex flex-col gap-.5">
                   <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Email
+                    Username
                   </p>
                   <input
                     onChange={handleEmail}
-                    value={email}
+                    value={username}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="email"
-                    placeholder="mail@gmail.com"
+                    type="text"
                   />
                   {errEmail && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
