@@ -110,7 +110,7 @@ app.post("/api/users/register", async (req, res) => {
     }
 
     // Jika tidak ada user dengan email atau username yang sama
-    await prisma.user.create({
+    const createUser = await prisma.user.create({
       data: {
         username,
         email,
@@ -124,15 +124,25 @@ app.post("/api/users/register", async (req, res) => {
       },
     });
 
+    // create cart
+    const createCart = await prisma.cart.create({
+      data: {
+        userId: createUser.user_id,
+        cartId: createUser.user_id,
+      },
+    });
+
     res.json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered and cart register successfully",
+      createCart,
+      createUser
     });
   } catch (err) {
     console.error(err);
     res.status(400).json({
       success: false,
-      message: `Error registering user: ${err.message}`,
+      message: `Error registering user and cart: ${err.message}`,
     });
   }
 });
