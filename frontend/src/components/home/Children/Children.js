@@ -130,6 +130,7 @@ const Children = () => {
     const fetchProducts = async () => {
       try {
         const response = await getAllProducts();
+        console.log(response)
         setProducts(response.products);
       } catch (e) {
         console.log(e);

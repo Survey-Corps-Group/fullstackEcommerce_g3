@@ -13,6 +13,7 @@ const HeaderBottom = () => {
   const [showUser, setShowUser] = useState(false);
   const navigate = useNavigate();
   const ref = useRef();
+  
   useEffect(() => {
     document.body.addEventListener("click", (e) => {
       if (ref.current.contains(e.target)) {
@@ -23,6 +24,11 @@ const HeaderBottom = () => {
     });
   }, [show, ref]);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setShowUser(!!token);
+  }, []);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [setShowSearchBar] = useState(false);
@@ -64,7 +70,7 @@ const HeaderBottom = () => {
                   Women's Clothing
                 </li>
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Children Clothes
+                  Our Products
                 </li>
               
                 
