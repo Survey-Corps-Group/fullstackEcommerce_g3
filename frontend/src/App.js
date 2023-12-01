@@ -20,7 +20,7 @@ import Home from "./pages/Home/Home";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
-import SignInAdmin from "./pages/Admin/SignInAdmin";
+import Profile from "./pages/Account/Profile";
 import AdminPage from "./pages/Admin/AdminPage";
 
 
