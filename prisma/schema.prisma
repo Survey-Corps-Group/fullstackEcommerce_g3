@@ -109,6 +109,7 @@ model Cart {
 model CartItem {
   cartId Int
   itemId Int
+  quantity Int
   cart   Cart @relation(fields: [cartId], references: [cartId])
   item   Item @relation(fields: [itemId], references: [item_id])
 

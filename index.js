@@ -1328,7 +1328,9 @@ app.post("/api/createcart",  async (req, res) => {
 //create iteminsidecart
 app.post('/api/itemcart', authenticateTokenMiddleware, async (req, res) => {
   try {
-    const { userId, itemIds } = req.body;
+
+    console.log(req.body)
+    const { userId, items } = req.body;
 
     // Cek apakah userId valid
     const user = await prisma.user.findUnique({
@@ -1351,11 +1353,20 @@ app.post('/api/itemcart', authenticateTokenMiddleware, async (req, res) => {
     }
 
     // Tambahkan item ke keranjang
-    for (const itemId of itemIds) {
+    for (const item of items) {
+      const itemData = await prisma.item.findUnique({
+        where: { item_id: item.itemId },
+      });
+
+      if (!itemData || itemData.quantity < item.quantity) {
+        return res.status(400).json({ error: `Insufficient quantity for item ${item.itemId}` });
+      }
+
       await prisma.cartItem.create({
         data: {
           cartId: cart.cartId,
-          itemId: itemId,
+          itemId: item.itemId,
+          quantity: item.quantity,
         },
       });
     }
