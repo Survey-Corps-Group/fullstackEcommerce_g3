@@ -30,11 +30,7 @@ export const navBarList = [
     title: "About",
     link: "/about",
   },
-  {
-    _id: 1004,
-    title: "Contact",
-    link: "contact",
-  },
+  
 ];
 // =================== NavBarList End here ======================
 // =================== Special Offer data Start here ============

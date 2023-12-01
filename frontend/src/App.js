@@ -16,11 +16,11 @@ import SignIn from "./pages/Account/SignIn";
 import SignUp from "./pages/Account/SignUp";
 import SignInAdmin from "./pages/Admin/SignInAdmin";
 import Cart from "./pages/Cart/Cart";
-import Contact from "./pages/Contact/Contact";
 import Home from "./pages/Home/Home";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
+import Profile from "./pages/Account/Profile";
 
 const Layout = () => {
   return (
@@ -43,7 +43,7 @@ const router = createBrowserRouter(
         <Route index element={<Home />}></Route>
         <Route path="/shop" element={<Shop />}></Route>
         <Route path="/about" element={<About />}></Route>
-        <Route path="/contact" element={<Contact />}></Route>
+        <Route path="/profile" element={<Profile />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         
         <Route path="/product/:_id" element={<ProductDetails />}></Route>
@@ -52,6 +52,7 @@ const router = createBrowserRouter(
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
+      
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
     </Route>
   )
