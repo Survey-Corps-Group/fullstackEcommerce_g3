@@ -31,6 +31,7 @@ function authenticateTokenMiddleware(req, res, next) {
   const user = jwt.verify(token, process.env.JWT_SECRET);
   req.userId = user.userId;
   req.role = user.role;
+  req.city_id = user.city_id;
   next();
 }
 
@@ -166,7 +167,7 @@ app.post("/api/users/login", async (req, res) => {
       });
     }
     const token = jwt.sign(
-      { userId: user.user_id, role: user.role },
+      { userId: user.user_id, role: user.role, city_id: user.city_id },
       process.env.JWT_SECRET , { expiresIn: "1h"}
     );
     res.json({
@@ -1402,6 +1403,15 @@ app.get('/api/cart/:userId', async (req, res) => {
                 image_url: true,
               },
             },
+            WarehouseItem: {
+              include: {
+                warehouse: {
+                  select: {
+                    city_id: true,
+                  }
+                }
+              }
+            },
           },
         },
       },
@@ -1414,6 +1424,8 @@ app.get('/api/cart/:userId', async (req, res) => {
       package_weight: cartItem.item.package_weight,
       item_name: cartItem.item.item_name,
       price: cartItem.item.price,
+      quantity: cartItem.quantity,
+      warehouse_city: cartItem.item.WarehouseItem[0]?.warehouse?.city_id,
       image_url: cartItem.item.images[0]?.image_url || null, // Mengambil image_url pertama, jika ada
     }));
 
@@ -1445,8 +1457,8 @@ app.delete('/api/cart/:userId', async (req, res) => {
 
 
 app.delete('/api/cartItem', async (req, res) => {
-  const itemId = parseInt(req.body.itemId);
-  const cartId = parseInt(req.body.cartId);
+  const itemId = parseInt(req.query.itemId);
+  const cartId = parseInt(req.query.cartId);
 
   try {
     await prisma.cartItem.delete({
@@ -1464,6 +1476,54 @@ app.delete('/api/cartItem', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+app.patch('/api/cartItem', async (req, res) => {
+  const { userId, itemId, newQuantity } = req.body;
+
+  if (newQuantity <= 0) {
+    return res.status(400).json({ error: 'Quantity must be greater than 0' });
+  }
+
+  try {
+    const item = await prisma.item.findUnique({
+      where: { item_id: parseInt(itemId) },
+    });
+
+    if (!item || item.quantity < newQuantity) {
+      return res.status(400).json({ error: 'Insufficient stock available' });
+    }
+
+    const userCart = await prisma.cart.findFirst({
+      where: { userId: parseInt(userId) },
+    });
+
+    if (!userCart) {
+      return res.status(404).json({ error: 'Cart not found for the user' });
+    }
+
+    const updatedCartItem = await prisma.cartItem.updateMany({
+      where: {
+        cartId: userCart.cartId,
+        itemId: parseInt(itemId),
+      },
+      data: {
+        quantity: parseInt(newQuantity),
+      },
+    });
+
+    if (updatedCartItem.count === 0) {
+      return res.status(404).json({ error: 'Cart item not found' });
+    }
+
+    res.json({ message: 'Cart item updated successfully' });
+  } catch (error) {
+    console.error('Error updating cart item:', error);
+    console.log(error)
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.get('/api/cartItem/count/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
