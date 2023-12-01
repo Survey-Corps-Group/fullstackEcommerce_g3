@@ -1,6 +1,5 @@
 import React from "react";
 import { MdLocalShipping } from "react-icons/md";
-import { CgRedo } from "react-icons/cg";
 
 const BannerBottom = () => {
   return (
@@ -8,7 +7,7 @@ const BannerBottom = () => {
       <div className="max-w-container mx-auto h-20 flex flex-col md:flex-row justify-between items-center">
         <div className="flex items-center gap-2 w-72 shadow-sm hover:shadow-md duration-300">
           <span className="font-bold font-titleFont w-6 text-center">1</span>
-          <p className="text-lightText text-base">One of the best ecommerce</p>
+          <p className="text-lightText text-base">One of the best E-commerce</p>
         </div>
         <div className="flex md:w-auto items-center gap-2 w-72 shadow-sm hover:shadow-md duration-300">
           <span className="text-xl text-center w-6 ml-1">
@@ -16,12 +15,7 @@ const BannerBottom = () => {
           </span>
           <p className="text-lightText text-base">Fast service</p>
         </div>
-        <div className="flex md:w-auto items-center gap-2 w-72 shadow-sm hover:shadow-md duration-300">
-          <span className="text-2xl text-center w-6">
-            <CgRedo />
-          </span>
-          <p className="text-lightText text-base">Return policy</p>
-        </div>
+        
       </div>
     </div>
   );

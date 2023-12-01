@@ -52,7 +52,7 @@ export {
   bestSellerThree,
   bestSellerFour,
 
-  // Special Offers
+  // Sprcial Offers
   spfOne,
   spfTwo,
   spfThree,

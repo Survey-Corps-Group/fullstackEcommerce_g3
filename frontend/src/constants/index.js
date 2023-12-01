@@ -27,14 +27,10 @@ export const navBarList = [
   },
   {
     _id: 1003,
-    title: "About",
-    link: "/about",
+    title: "Order",
+    link: "/order",
   },
-  {
-    _id: 1004,
-    title: "Contact",
-    link: "contact",
-  },
+  
 ];
 // =================== NavBarList End here ======================
 // =================== Special Offer data Start here ============

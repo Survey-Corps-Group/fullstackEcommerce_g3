@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import NavTitle from "./NavTitle";
 
-const Brand = () => {
-  const [showBrands, setShowBrands] = useState(true);
+const Ratings = () => {
   const brands = [
     {
       _id: 9006,
@@ -28,19 +26,8 @@ const Brand = () => {
   ];
 
   return (
-    <div>
-      <div
-        onClick={() => setShowBrands(!showBrands)}
-        className="cursor-pointer"
-      >
-        <NavTitle title="Shop by Ratings" icons={true} />
-      </div>
-      {showBrands && (
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+    <div className="cursor-pointer">
+      <NavTitle title="Shop by Ratings" icons={false} />
           <ul className="flex flex-col gap-4 text-sm lg:text-base text-[#767676]">
             {brands.map((item) => (
               <li
@@ -51,10 +38,9 @@ const Brand = () => {
               </li>
             ))}
           </ul>
-        </motion.div>
-      )}
+        
     </div>
   );
 };
 
-export default Brand;
+export default Ratings;
