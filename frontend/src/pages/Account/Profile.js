@@ -104,7 +104,7 @@ const Profile = () => {
       ) : (
         <form className="pb-20 ">
           
-          <div className="h-auto py-6 flex flex-col grid grid-cols-2 gap-4">
+          <div className="max-w-container h-auto py-6 flex flex-col grid grid-cols-2 gap-4">
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Name
