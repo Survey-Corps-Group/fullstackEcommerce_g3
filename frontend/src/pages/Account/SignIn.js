@@ -44,9 +44,6 @@ const SignIn = () => {
         );
       }
       const token = await login (username, password)
-
-      console.log('isi token', token)
-
       window.localStorage.setItem("token", token.token);
       navigate("/");
 

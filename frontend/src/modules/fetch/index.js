@@ -47,22 +47,23 @@ async function login(username, password) {
   try {
     const response = await instance.post('/api/users/login', { username, password });
 
-    console.log(response.data)
     return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
   }
 }
 
-async function register( username,email,password,address,full_name,phone,province_id,city_id) {
+async function register(username, email, password, address, full_name, phone, province_id, city_id) {
   try {
-    const response = await instance.post('/api/users/register', { username,email,password,address,full_name,phone,province_id,city_id});
-    return response.data;
+    const registerResponse = await instance.post('/api/users/register', {
+      username, email, password, address, full_name, phone, province_id, city_id
+    });
+
+    return registerResponse.data;
   } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
   }
 }
-
 
 async function getProductById(id) {
   try {
@@ -73,4 +74,67 @@ async function getProductById(id) {
   }
 }
 
-export { getAllProducts ,getProductById, test, login, register, rajaOngkirProvince, rajaOngkirCity};
+async function createCart(userId, itemId) {
+  try {
+    await instance.post('/api/createcart', { userId: parseInt(userId) });
+  } catch (error) {
+    console.error('Error creating cart:', error);
+  }
+
+  const response = await instance.post('/api/itemcart', { userId: parseInt(userId), itemIds: [itemId] });
+  return response.data;
+}
+
+async function getCart(userId) {
+  try {
+    const response = await instance.get(`/api/cart/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function deleteCartItem(cartId, itemId) {
+  try {
+    const response = await instance.delete(`/api/cartItem}`, {
+      params: { cartId, itemId },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function countCartItems(userId) {
+  try {
+    const response = await instance.get(`/api/cartItem/count/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function deleteAllCartItems(userId) {
+  try {
+    const response = await instance.delete(`/api/cart/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+
+export { 
+  getAllProducts, 
+  getProductById, 
+  test, 
+  login, 
+  register, 
+  rajaOngkirProvince, 
+  rajaOngkirCity, 
+  createCart, 
+  getCart, 
+  deleteCartItem, 
+  countCartItems, 
+  deleteAllCartItems 
+};

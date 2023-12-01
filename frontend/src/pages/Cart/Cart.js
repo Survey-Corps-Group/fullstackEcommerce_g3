@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,33 +6,58 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
+import { jwtDecode } from "jwt-decode";
+import { getCart, deleteAllCartItems } from "../../modules/fetch";
 
 const Cart = () => {
+  const [userDetails, setUserDetails] = useState(false);
+  const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.orebiReducer.products);
-  const [totalAmt, setTotalAmt] = useState("");
-  const [shippingCharge, setShippingCharge] = useState("");
+
   useEffect(() => {
-    let price = 0;
-    products.map((item) => {
-      price += item.price * item.quantity;
-      return price;
-    });
-    setTotalAmt(price);
-  }, [products]);
-  useEffect(() => {
-    if (totalAmt <= 200) {
-      setShippingCharge(30);
-    } else if (totalAmt <= 400) {
-      setShippingCharge(25);
-    } else if (totalAmt > 401) {
-      setShippingCharge(20);
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setUserDetails(decodedToken.userId);
     }
-  }, [totalAmt]);
+  }, []);
+
+  useEffect(() => {
+    if (userDetails) {
+      const fetchProducts = async () => {
+        try {
+          const response = await getCart(userDetails);
+          setProducts(response);
+        } catch (e) {
+          console.log(e);
+        }
+      };
+      fetchProducts();
+    }
+  }, [userDetails]);
+
+  const handleResetCart = async () => {
+    try {
+      await deleteAllCartItems(userDetails);
+      setProducts([]);
+      dispatch(resetCart());
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const calculateTotals = useMemo(() => {
+
+    let total = products?.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    let shipping = total <= 200 ? 30 : total <= 400 ? 25 : 20;
+    return { total, shipping };
+  }, [products]);
+
+
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Cart" />
-      {products.length > 0 ? (
+      {products?.length > 0 ? (
         <div className="pb-20">
           <div className="w-full h-20 bg-[#F5F7F7] text-primeColor hidden lgl:grid grid-cols-5 place-content-center px-6 text-lg font-titleFont font-semibold">
             <h2 className="col-span-2">Product</h2>
@@ -42,14 +67,14 @@ const Cart = () => {
           </div>
           <div className="mt-5">
             {products.map((item) => (
-              <div key={item._id}>
+              <div key={item.item_id}>
                 <ItemCard item={item} />
               </div>
             ))}
           </div>
 
           <button
-            onClick={() => dispatch(resetCart())}
+            onClick={handleResetCart}
             className="py-2 px-10 bg-red-500 text-white font-semibold uppercase mb-4 hover:bg-red-700 duration-300"
           >
             Reset cart
@@ -63,19 +88,19 @@ const Cart = () => {
                 <p className="flex items-center justify-between border-[1px] border-gray-400 border-b-0 py-1.5 text-lg px-4 font-medium">
                   Subtotal
                   <span className="font-semibold tracking-wide font-titleFont">
-                    ${totalAmt}
+                    ${calculateTotals.total}
                   </span>
                 </p>
                 <p className="flex items-center justify-between border-[1px] border-gray-400 border-b-0 py-1.5 text-lg px-4 font-medium">
                   Shipping Charge
                   <span className="font-semibold tracking-wide font-titleFont">
-                    ${shippingCharge}
+                    ${calculateTotals.shipping}
                   </span>
                 </p>
                 <p className="flex items-center justify-between border-[1px] border-gray-400 py-1.5 text-lg px-4 font-medium">
                   Total
                   <span className="font-bold tracking-wide text-lg font-titleFont">
-                    ${totalAmt + shippingCharge}
+                    ${calculateTotals.total + calculateTotals.shipping}
                   </span>
                 </p>
               </div>

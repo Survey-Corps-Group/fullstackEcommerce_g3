@@ -28,7 +28,7 @@ const ProductDetails = () => {
   }, [_id]);
 
   const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
-  const imageUrl = productInfo?.images?.[0]?.image_url || notFoundImage;
+  const imageUrl = `http://localhost:8000/${productInfo?.images?.[0]?.image_url}` || notFoundImage;
 
   return (
     <div className="w-full mx-auto border-b-[1px] border-b-gray-300">
@@ -43,8 +43,8 @@ const ProductDetails = () => {
           <div className="h-full xl:col-span-2">
             <img
               className="w-full h-full object-cover"
-              src={`http://localhost:8000/${imageUrl}`}
-              alt={`http://localhost:8000/${imageUrl}`}
+              src={imageUrl}
+              alt={imageUrl}
             />
           </div>
           <div className="h-full w-full md:col-span-2 xl:col-span-3 xl:p-14 flex flex-col gap-6 justify-center">
