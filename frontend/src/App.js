@@ -22,6 +22,9 @@ import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
 import SignInAdmin from "./pages/Admin/SignInAdmin";
 import AdminPage from "./pages/Admin/AdminPage";
+import AdminListOrder from "./pages/Admin/AdminListOrder";
+import PaymentVerify from "./pages/Admin/PaymentVerify";
+import VerifyPage from "./components/Admin/VerifyPage"; // Import halaman Verify
 
 
 
@@ -59,6 +62,9 @@ const router = createBrowserRouter(
       <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
       <Route path="/AdminPage" element={<AdminPage />}></Route>
+      <Route path="/AdminListOrder" element={<AdminListOrder />}></Route>
+      <Route path="/PaymentVerify" element={<PaymentVerify />}></Route>
+      <Route path="/Admin/Verify" component={VerifyPage} />
     </Route>
   )
 );
