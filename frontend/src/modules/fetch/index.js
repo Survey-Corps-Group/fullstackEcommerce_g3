@@ -76,13 +76,11 @@ async function getProductById(id) {
 
 async function createCart(userId, itemId) {
   try {
-    await instance.post('/api/createcart', { userId: parseInt(userId) });
-  } catch (error) {
-    console.error('Error creating cart:', error);
-  }
-
   const response = await instance.post('/api/itemcart', { userId: parseInt(userId), itemIds: [itemId] });
   return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
 }
 
 async function getCart(userId) {

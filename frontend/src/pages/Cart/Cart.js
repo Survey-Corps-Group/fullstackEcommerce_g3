@@ -1,32 +1,27 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
-import { jwtDecode } from "jwt-decode";
 import { getCart, deleteAllCartItems } from "../../modules/fetch";
 
+import useToken from '../../hooks/useToken' 
+
 const Cart = () => {
-  const [userDetails, setUserDetails] = useState(false);
   const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setUserDetails(decodedToken.userId);
-    }
-  }, []);
+  const { userId } = useToken();
 
   useEffect(() => {
-    if (userDetails) {
+
+    if (userId) {
       const fetchProducts = async () => {
         try {
-          const response = await getCart(userDetails);
+          const response = await getCart(userId);
           setProducts(response);
         } catch (e) {
           console.log(e);
@@ -34,11 +29,11 @@ const Cart = () => {
       };
       fetchProducts();
     }
-  }, [userDetails]);
+  }, [userId]);
 
   const handleResetCart = async () => {
     try {
-      await deleteAllCartItems(userDetails);
+      await deleteAllCartItems(userId);
       setProducts([]);
       dispatch(resetCart());
     } catch (e) {
