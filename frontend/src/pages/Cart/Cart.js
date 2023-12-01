@@ -6,30 +6,47 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
-import { getCart, deleteAllCartItems } from "../../modules/fetch";
+import { getCart, deleteAllCartItems, fetchShippingCost } from "../../modules/fetch";
+import useToken from '../../hooks/useToken';
 
-import useToken from '../../hooks/useToken' 
-
-const Cart = () => {
+const Cart = () => { 
   const [products, setProducts] = useState([]);
+  const [shippingCost, setShippingCost] = useState(0);
   const dispatch = useDispatch();
-
-  const { userId } = useToken();
+  const { userId, city_id } = useToken();
 
   useEffect(() => {
-
-    if (userId) {
-      const fetchProducts = async () => {
+    const fetchProducts = async () => {
+      if (userId) {
         try {
           const response = await getCart(userId);
           setProducts(response);
         } catch (e) {
           console.log(e);
         }
-      };
-      fetchProducts();
-    }
+      }
+    };
+
+    fetchProducts();
   }, [userId]);
+
+  useEffect(() => {
+    const calculateShippingCost = async () => {
+      if (products.length > 0) {
+        const userCityId = city_id;
+
+        const shippingCostPromises = products.map(product => 
+          fetchShippingCost(userCityId, parseInt(product.warehouse_city), product.package_weight * 1000, 'jne')
+        );
+
+        const shippingCosts = await Promise.all(shippingCostPromises);
+        const totalShippingCost = shippingCosts.reduce((acc, cost) => acc + cost.value, 0);
+        setShippingCost(totalShippingCost);
+      }
+    };
+
+    calculateShippingCost();
+  }, [products]);
 
   const handleResetCart = async () => {
     try {
@@ -42,11 +59,9 @@ const Cart = () => {
   };
 
   const calculateTotals = useMemo(() => {
-
-    let total = products?.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    let shipping = total <= 200 ? 30 : total <= 400 ? 25 : 20;
-    return { total, shipping };
-  }, [products]);
+    let totalProductCost = products?.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    return { total: totalProductCost, shipping: shippingCost };
+  }, [products, shippingCost]);
 
 
   return (
@@ -87,7 +102,7 @@ const Cart = () => {
                   </span>
                 </p>
                 <p className="flex items-center justify-between border-[1px] border-gray-400 border-b-0 py-1.5 text-lg px-4 font-medium">
-                  Shipping Charge
+                  JNE Ekonomis Charge
                   <span className="font-semibold tracking-wide font-titleFont">
                     ${calculateTotals.shipping}
                   </span>

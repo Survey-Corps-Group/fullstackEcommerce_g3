@@ -43,6 +43,41 @@ async function rajaOngkirCity(id){
   }
 }
 
+async function fetchShippingCost(origin, destination, weight, courier) {
+  try {
+    const response = await instance.post('/api/cost', {
+      origin,
+      destination,
+      weight,
+      courier
+    });
+    
+    const payload = response.data;
+
+    let cheapestOption = null;
+    for (const courier of payload) {
+      for (const costOption of courier.costs) {
+        for (const costDetail of costOption.cost) {
+          if (cheapestOption === null || costDetail.value < cheapestOption.value) {
+            cheapestOption = {
+              courierName: courier.name,
+              service: costOption.service,
+              value: costDetail.value,
+              etd: costDetail.etd,
+              description: costOption.description
+            };
+          }
+        }
+      }
+    }
+
+    return cheapestOption;
+
+  } catch (error) {
+    window.alert(error)
+  }
+}
+
 async function login(username, password) {
   try {
     const response = await instance.post('/api/users/login', { username, password });
@@ -94,14 +129,29 @@ async function getCart(userId) {
 
 async function deleteCartItem(cartId, itemId) {
   try {
-    const response = await instance.delete(`/api/cartItem}`, {
-      params: { cartId, itemId },
+    const response = await instance.delete(`/api/cartItem`, {
+      params: { cartId, itemId }
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.message || 'Something went wrong');
+    window.alert(error);
   }
 }
+
+
+async function updateCartItem(userId, itemId, newQuantity) {
+  try {
+    const response = await instance.patch(`/api/cartItem`, {
+      userId,
+      itemId,
+      newQuantity
+    });
+    return response.data;
+  } catch (error) {
+    window.alert(error);
+  }
+}
+
 
 async function countCartItems(userId) {
   try {
@@ -134,5 +184,7 @@ export {
   getCart, 
   deleteCartItem, 
   countCartItems, 
-  deleteAllCartItems 
+  deleteAllCartItems,
+  updateCartItem,
+  fetchShippingCost
 };

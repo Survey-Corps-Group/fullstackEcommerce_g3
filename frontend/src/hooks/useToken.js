@@ -3,16 +3,16 @@ import { jwtDecode } from 'jwt-decode';
 
 const useToken = () => {
     const token = localStorage.getItem("token");
-    const [userDetails, setUserDetails] = useState({ token: null, userId: null });
+    const [userDetails, setUserDetails] = useState({ token: null, userId: null, city_id: null });
 
     useEffect(() => {
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                setUserDetails({ token, userId: decodedToken.userId });
+                setUserDetails({ token, userId: decodedToken.userId, city_id:decodedToken.city_id });
             } catch (error) {
                 console.error('Invalid token', error);
-                setUserDetails({ token: null, userId: null });
+                setUserDetails({ token: null, userId: null, city_id: null });
             }
         }
     }, [token]);

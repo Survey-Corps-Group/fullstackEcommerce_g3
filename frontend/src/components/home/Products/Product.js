@@ -10,18 +10,18 @@ import { createCart } from "../../../modules/fetch";
 
 import useToken from '../../../hooks/useToken' 
 
-const Product = ({ productName, _id, img, badge, price, color }) => {
+const Product = ({ productName, _id, img, badge, price, color, city_id }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { token, userId } = useToken();
 
   const handleProductDetails = () => {
-    navigate(`/product/${_id}`, { state: { item: { productName, _id, img, badge, price, color } } });
+    navigate(`/product/${_id}`, { state: { item: { productName, _id, img, badge, price, color, city_id } } });
   };
 
   const handleAddToCart = async () => {
-    const productData = { _id, name: productName, quantity: 1, image: img, badge, price, colors: color };
+    const productData = { _id, name: productName, quantity: 1, image: img, badge, price, colors: color, city_id:city_id };
     if (token) {
       try {
         await createCart(userId, _id, productData.quantity);

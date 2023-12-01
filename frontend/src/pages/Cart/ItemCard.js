@@ -1,24 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import { ImCross } from "react-icons/im";
-import { useDispatch } from "react-redux";
-import {
-  drecreaseQuantity,
-  increaseQuantity,
-} from "../../redux/orebiSlice";
+import useToken from '../../hooks/useToken' 
 
-import { deleteCartItem } from "../../modules/fetch";
+import { deleteCartItem, updateCartItem} from "../../modules/fetch";
+import { useDispatch } from "react-redux";
+import {deleteItem, drecreaseQuantity,
+  increaseQuantity,} from "../../redux/orebiSlice";
 
 const ItemCard = ({ item }) => {
   const dispatch = useDispatch();
-
+  const { userId } = useToken();
+  const [quantity, setQuantity] = useState(item.quantity);
   const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
   const imageUrl = item?.image_url ? `http://localhost:8000/${item.image_url}` : notFoundImage;
+
 
   const handleDeleteItem = async (cartId, itemId) => {
     try {
       await deleteCartItem(cartId, itemId);
+      dispatch(deleteItem(itemId))
+      window.location.reload()
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const handleIncreaseQuantity = async () => {
+    const newQuantity = quantity + 1;
+    try {
+      await updateCartItem(userId, item.item_id, newQuantity);
+      setQuantity(newQuantity);
+      dispatch(increaseQuantity({ _id: item._id }))
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDecreaseQuantity = async () => {
+    if (item.quantity > 1) {
+      const newQuantity = quantity - 1;
+      try {
+        await updateCartItem(userId, item.item_id, newQuantity);
+        setQuantity(newQuantity);
+        dispatch(drecreaseQuantity({ _id: item._id }))
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -39,21 +66,21 @@ const ItemCard = ({ item }) => {
         </div>
         <div className="w-1/3 flex items-center gap-6 text-lg">
           <span
-            onClick={() => dispatch(drecreaseQuantity({ _id: item.id }))}
+            onClick={handleDecreaseQuantity}
             className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
           >
             -
           </span>
-          <p>{item.quantity}</p>
+          <p>{quantity}</p>
           <span
-            onClick={() => dispatch(increaseQuantity({ _id: item.id }))}
+            onClick={handleIncreaseQuantity}
             className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
           >
             +
           </span>
         </div>
         <div className="w-1/3 flex items-center font-titleFont font-bold text-lg">
-          <p>${item.quantity * item.price}</p>
+          <p>${quantity * item.price}</p>
         </div>
       </div>
     </div>

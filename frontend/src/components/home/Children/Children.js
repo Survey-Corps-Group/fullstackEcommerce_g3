@@ -154,6 +154,7 @@ const Children = () => {
               price={product.price.toFixed(2)}
               color={product.color}
               sumRating={product.summary_rating}
+              city_id = {product.city_id}
             />
           </div>
         ))}

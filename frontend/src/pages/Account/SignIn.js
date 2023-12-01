@@ -48,7 +48,8 @@ const SignIn = () => {
       navigate("/");
 
     }catch (err){
-      setSuccessMsg(err);
+      // setSuccessMsg(err);
+      window.alert(err)
     }
    
   };
