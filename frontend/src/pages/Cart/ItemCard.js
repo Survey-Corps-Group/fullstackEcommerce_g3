@@ -12,7 +12,7 @@ const ItemCard = ({ item }) => {
   const dispatch = useDispatch();
 
   const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
-  const imageUrl = `http://localhost:8000/${item.image_url}` || notFoundImage;
+  const imageUrl = item?.image_url ? `http://localhost:8000/${item.image_url}` : notFoundImage;
 
   const handleDeleteItem = async (cartId, itemId) => {
     try {

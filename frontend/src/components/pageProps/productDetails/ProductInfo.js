@@ -1,11 +1,28 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../../redux/orebiSlice";
+import { createCart } from "../../../modules/fetch";
+import useToken from '../../../hooks/useToken' 
 
 const ProductInfo = ({ productInfo }) => {
   const dispatch = useDispatch();
   const hasFeedbacks = productInfo?.feedbacks?.length > 0;
 
+  const { token, userId } = useToken();
+
+  const handleAddToCart = async () => {
+    if (token) {
+      try {
+        await createCart(userId, productInfo.item_id, 1);
+        dispatch(addToCart(productInfo));
+      } catch (error) {
+        window.alert('Barang sudah ada didalam cart')
+        console.log(error)
+      }
+    } else {
+      window.alert("Please Login to add to cart");
+    }
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -25,19 +42,7 @@ const ProductInfo = ({ productInfo }) => {
         <span className="font-normal">Colors:</span> {productInfo?.color}
       </p>
       <button
-        onClick={() =>
-          dispatch(
-            addToCart({
-              _id: productInfo.id,
-              name: productInfo.item_name,
-              quantity: productInfo.stock_item,
-              image: productInfo.img,
-              badge: productInfo.package_weight,
-              price: productInfo.price,
-              colors: productInfo.color,
-            })
-          )
-        }
+        onClick={handleAddToCart}
         className="w-full py-4 bg-primeColor hover:bg-black duration-300 text-white text-lg font-titleFont"
       >
         Add to Cart

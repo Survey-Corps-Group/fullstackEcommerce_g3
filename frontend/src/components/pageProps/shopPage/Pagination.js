@@ -108,6 +108,8 @@ const Pagination = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mdl:gap-4 lg:gap-10">
@@ -115,7 +117,7 @@ const Pagination = () => {
           <div key={product._id} className="w-full">
             <Product
               _id={product.item_id}
-              img={`http://localhost:8000/${product.images[0]}`}
+              img={product?.images[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}

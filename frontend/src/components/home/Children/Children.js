@@ -91,6 +91,8 @@ import { getAllProducts } from "../../../modules/fetch/index";
 const Children = () => {
   const [products, setProducts] = useState([]);
 
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+
   const settings = {
     infinite: true,
     speed: 500,
@@ -147,7 +149,7 @@ const Children = () => {
           <div className="px-2" key={product.item_id}>
             <Product
               _id={product.item_id}
-              img={`http://localhost:8000/${product.images[0]}`}
+              img={product?.images?.[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}

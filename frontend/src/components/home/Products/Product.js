@@ -24,7 +24,7 @@ const Product = ({ productName, _id, img, badge, price, color }) => {
     const productData = { _id, name: productName, quantity: 1, image: img, badge, price, colors: color };
     if (token) {
       try {
-        await createCart(userId, _id);
+        await createCart(userId, _id, productData.quantity);
         dispatch(addToCart(productData));
       } catch (error) {
         window.alert('Barang sudah ada didalam cart')

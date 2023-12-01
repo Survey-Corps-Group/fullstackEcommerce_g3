@@ -28,7 +28,7 @@ const ProductDetails = () => {
   }, [_id]);
 
   const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
-  const imageUrl = `http://localhost:8000/${productInfo?.images?.[0]?.image_url}` || notFoundImage;
+  const imageUrl = productInfo?.images?.[0]?.image_url ? `http://localhost:8000/${productInfo.images[0].image_url}` : notFoundImage;
 
   return (
     <div className="w-full mx-auto border-b-[1px] border-b-gray-300">

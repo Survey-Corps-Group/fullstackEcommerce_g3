@@ -74,9 +74,9 @@ async function getProductById(id) {
   }
 }
 
-async function createCart(userId, itemId) {
+async function createCart(userId, itemId, quantity) {
   try {
-  const response = await instance.post('/api/itemcart', { userId: parseInt(userId), itemIds: [itemId] });
+  const response = await instance.post('/api/itemcart', { userId: parseInt(userId), items: [{ itemId, quantity }] });
   return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
