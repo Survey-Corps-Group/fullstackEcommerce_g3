@@ -20,7 +20,11 @@ import Home from "./pages/Home/Home";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
-import Profile from "./pages/Account/Profile";
+import SignInAdmin from "./pages/Admin/SignInAdmin";
+import AdminPage from "./pages/Admin/AdminPage";
+
+
+
 
 const Layout = () => {
   return (
@@ -54,6 +58,7 @@ const router = createBrowserRouter(
       <Route path="/signin" element={<SignIn />}></Route>
       
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
+      <Route path="/AdminPage" element={<AdminPage />}></Route>
     </Route>
   )
 );
