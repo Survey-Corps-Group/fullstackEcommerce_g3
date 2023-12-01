@@ -97,14 +97,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-container mx-auto px-4 ">
+    <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Profile"/>
       {successMsg ? (
         <p className="pb-20 w-96 font-medium text-green-500">{successMsg}</p>
       ) : (
         <form className="pb-20 ">
           
-          <div className="w-[1400px] h-auto py-6 flex flex-col grid grid-cols-2 gap-4">
+          <div className="h-auto py-6 flex flex-col grid grid-cols-2 gap-4">
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Name
