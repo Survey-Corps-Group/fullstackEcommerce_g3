@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import ProductInfo from "../../components/pageProps/productDetails/ProductInfo";
-import ProductsOnSale from "../../components/pageProps/productDetails/ProductsOnSale";
 import { getProductById } from "../../modules/fetch/index";
 
 const ProductDetails = () => {
@@ -37,9 +36,6 @@ const ProductDetails = () => {
           <Breadcrumbs title="" prevLocation={prevLocation} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-          <div className="col-span-2">
-            <ProductsOnSale />
-          </div>
           <div className="col-span-1">
             <img
               className="w-full h-full object-cover rounded-lg"
