@@ -9,7 +9,7 @@ const AdminPage = () => {
       <h2 className="text-3xl font-semibold mb-4 text-gray-800">Admin Dashboard</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link to="/admin/products" className="admin-option bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-md transition duration-300 shadow-md">
+        <Link to="/ManageProduct" className="admin-option bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-md transition duration-300 shadow-md">
           <span className="text-xl font-semibold block mb-2">
             <FaCubes className="inline-block mr-2" /> Manage Products
           </span>
@@ -21,13 +21,13 @@ const AdminPage = () => {
           </span>
           <p className="text-sm text-gray-300">Review and process orders</p>
         </Link>
-        <Link to="/admin/warehouse" className="admin-option bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-md transition duration-300 shadow-md">
+        <Link to="/Warehouse" className="admin-option bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-md transition duration-300 shadow-md">
           <span className="text-xl font-semibold block mb-2">
             <FaBoxOpen className="inline-block mr-2" /> Warehouse
           </span>
           <p className="text-sm text-gray-300">Manage warehouse inventory</p>
         </Link>
-        <Link to="/admin/verify" className="admin-option bg-purple-900 hover:bg-purple-600 text-white p-6 rounded-md transition duration-300 shadow-md">
+        <Link to="/VerifyPayAdmin" className="admin-option bg-purple-900 hover:bg-purple-600 text-white p-6 rounded-md transition duration-300 shadow-md">
           <span className="text-xl font-semibold block mb-2">
             <FaCheckSquare className="inline-block mr-2" /> Verify
           </span>

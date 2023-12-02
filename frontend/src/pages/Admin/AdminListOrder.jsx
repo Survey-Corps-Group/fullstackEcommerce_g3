@@ -34,15 +34,15 @@ const AdminListOrder = () => {
           <table className="min-w-full bg-white border border-gray-300">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="py-2 px-4 border-r">Order ID</th>
+                <th className="py-2 px-4 border-r">Order</th>
                 <th className="py-2 px-4 border-r">Customer Name</th>
                 <th className="py-2 px-4 border-r">Address</th>
-                <th className="py-2 px-4 border-r">Product Name</th>
-                <th className="py-2 px-4 border-r">Quantity</th>
+                {/* <th className="py-2 px-4 border-r">Product Name</th> */}
+                {/* <th className="py-2 px-4 border-r">Quantity</th> */}
                 <th className="py-2 px-4 border-r">Shipping Price</th>
                 <th className="py-2 px-4 border-r">Total Amount</th>
                 <th className="py-2 px-4">Status</th>
-                <th className="py-2 px-4 border-r">Verify</th>
+                {/* <th className="py-2 px-4 border-r">Verify</th> */}
               </tr>
             </thead>
             <tbody>
@@ -51,8 +51,8 @@ const AdminListOrder = () => {
                   <td className="py-2 px-4 border-r">{order.id}</td>
                   <td className="py-2 px-4 border-r">{order.customerName}</td>
                   <td className="py-2 px-4 border-r">{order.address}</td>
-                  <td className="py-2 px-4 border-r">{order.productName}</td>
-                  <td className="py-2 px-4 border-r">{order.quantity}</td>
+                  {/* <td className="py-2 px-4 border-r">{order.productName}</td>
+                  <td className="py-2 px-4 border-r">{order.quantity}</td> */}
                   <td className="py-2 px-4 border-r">{order.shippingPrice}</td>
                   <td className="py-2 px-4 border-r">{order.totalAmount}</td>
                   <td className="py-2 px-4">{order.status}</td>
