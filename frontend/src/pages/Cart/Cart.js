@@ -10,12 +10,16 @@ import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart } from "..
 import useToken from '../../hooks/useToken';
 import useUserDetails from '../../hooks/useUserDetails';
 
+import { useNavigate } from 'react-router-dom';
+
+
 const Cart = () => { 
   const [products, setProducts] = useState([]);
   const [shippingCost, setShippingCost] = useState(0);
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
   const { userDetails } = useUserDetails();
+  const navigate = useNavigate();
 
   const updateProductQuantity = (itemId, newQuantity) => {
     setProducts(currentProducts => 
@@ -39,6 +43,8 @@ const Cart = () => {
         quantity: product.quantity
       }));
 
+      const dataToPass = { cartData: calculateTotals, products };
+      
       const customerName = userDetails?.full_name
   
       const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
@@ -47,8 +53,11 @@ const Cart = () => {
       setProducts([]);
       dispatch(resetCart());
 
+      navigate('/paymentgateway', { state: dataToPass });
+
     } catch (error) {
-      window.alert('Error during checkout process:', error);
+      window.alert('Error during checkout process');
+      console.log(error)
     }
   };
   
@@ -102,9 +111,6 @@ const Cart = () => {
     return { total: totalProductCost, shipping: shippingCost };
   }, [products, shippingCost]);
 
-  console.log('isi products', products)
-
-
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Cart" />
@@ -156,11 +162,11 @@ const Cart = () => {
                 </p>
               </div>
               <div className="flex justify-end">
-              <Link to="/paymentgateway">
-                <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300" onClick={handleCheckout}>
+              <Link onClick={handleCheckout}>
+                <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
                   Proceed to Checkout
                 </button>
-              </Link>
+              </Link>              
               </div>
             </div>
           </div>
