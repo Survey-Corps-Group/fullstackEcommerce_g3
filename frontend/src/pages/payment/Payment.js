@@ -5,7 +5,7 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 const Payment = () => {
   return (
     <div className="max-w-container mx-auto px-4">
-      <Breadcrumbs title="Payment gateway" />
+      <Breadcrumbs title="Payment" />
       <div className="pb-10 ">
       <h1 className="text-primeColor font-semibold text-lg">Alexa</h1>
         <p>08967326173</p>
@@ -35,8 +35,8 @@ const Payment = () => {
           "/>
         </label>
       </form>
-        <Link to="/">
-          <button className="w-52 h-10 bg-primeColor text-white text-lg mt-4 hover:bg-black duration-300">
+        <Link to="/order">
+          <button className="w-44 h-10 bg-primeColor text-white text-lg mt-4 hover:bg-black duration-300">
             Submit
           </button>
         </Link>

@@ -22,6 +22,7 @@ import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
 import Profile from "./pages/Account/Profile";
 import AdminPage from "./pages/Admin/AdminPage";
+import EditProfile from "./pages/Account/EditProfile";
 
 
 
@@ -52,10 +53,12 @@ const router = createBrowserRouter(
         
         <Route path="/product/:_id" element={<ProductDetails />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
+        <Route path="/editProfile" element={<EditProfile />}></Route>
         <Route path="/paymentgateway" element={<Payment />}></Route>
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
+      
       
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
       <Route path="/AdminPage" element={<AdminPage />}></Route>

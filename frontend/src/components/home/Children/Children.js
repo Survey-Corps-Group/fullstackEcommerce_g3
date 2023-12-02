@@ -143,7 +143,7 @@ const Children = () => {
 
   return (
     <div className="w-full pb-16">
-      <Heading heading="Children Clothes" />
+      <Heading heading="New Arrivals" />
       <Slider {...settings}>
         {products.map((product) => (
           <div className="px-2" key={product.item_id}>
