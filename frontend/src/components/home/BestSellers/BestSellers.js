@@ -1,55 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "../Products/Heading";
 import Product from "../Products/Product";
-import {
-  bestSellerOne,
-  bestSellerTwo,
-  bestSellerThree,
-  bestSellerFour,
-} from "../../../assets/images/index";
+import Slider from "react-slick";
+import SampleNextArrow from "../Children/SampleNextArrow";
 
 const BestSellers = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/products")
+      .then((response) => response.json())
+      .then((data) => {
+        // Sort products by sumRating in descending order
+        const sortedProducts = data.products.sort(
+          (a, b) => b.summary_rating - a.summary_rating
+        );
+        setProducts(sortedProducts);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  const settings = {
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    nextArrow: <SampleNextArrow />,
+    // prevArrow: <SamplePrevArrow />,
+    responsive: [
+      {
+        breakpoint: 1025,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          infinite: true,
+        },
+      },
+      {
+        breakpoint: 769,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          infinite: true,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+        },
+      },
+    ],
+  };
+
   return (
     <div className="w-full pb-20">
-      <Heading heading="Our Bestsellers" />
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lgl:grid-cols-3 xl:grid-cols-4 gap-10">
-        <Product
-          _id="1011"
-          img={bestSellerOne}
-          productName="Flower Base"
-          price="35.00"
-          color="Blank and White"
-          badge={true}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-        <Product
-          _id="1012"
-          img={bestSellerTwo}
-          productName="New Backpack"
-          price="180.00"
-          color="Gray"
-          badge={false}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-        <Product
-          _id="1013"
-          img={bestSellerThree}
-          productName="Household materials"
-          price="25.00"
-          color="Mixed"
-          badge={true}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-        <Product
-          _id="1014"
-          img={bestSellerFour}
-          productName="Travel Bag"
-          price="220.00"
-          color="Black"
-          badge={false}
-          des="Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis."
-        />
-      </div>
+      <Heading heading="Our Highest Rating Product" />
+      <Slider {...settings}>
+        {products.map((product) => (
+          <div className="px-2" key={product.item_id}>
+            <Product
+              _id={product.item_id}
+              img={`http://localhost:8000/${product.images[0]}`}
+              productName={product.item_name}
+              price={product.price.toFixed(2)}
+              color={product.color}
+              sumRating={product.summary_rating}
+            />
+          </div>
+        ))}
+      </Slider>
     </div>
   );
 };
