@@ -15,6 +15,20 @@ const Cart = () => {
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
 
+  const updateProductQuantity = (itemId, newQuantity) => {
+    setProducts(currentProducts => 
+      currentProducts.map(product => 
+        product.item_id === itemId ? { ...product, quantity: newQuantity } : product
+      )
+    );
+  };
+
+  const handleDeleteItem = (itemId) => {
+    setProducts(currentProducts => 
+      currentProducts.filter(product => product.item_id !== itemId)
+    );
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       if (userId) {
@@ -34,17 +48,18 @@ const Cart = () => {
     const calculateShippingCost = async () => {
       if (products.length > 0) {
         const userCityId = city_id;
-
-        const shippingCostPromises = products.map(product => 
-          fetchShippingCost(userCityId, parseInt(product.warehouse_city), product.package_weight * 1000, 'jne')
-        );
-
+    
+        const shippingCostPromises = products.map(product => {
+          const weight = product.package_weight * product.quantity * 1000;
+          return fetchShippingCost(userCityId, parseInt(product.warehouse_city), weight, 'jne');
+        });
+  
         const shippingCosts = await Promise.all(shippingCostPromises);
         const totalShippingCost = shippingCosts.reduce((acc, cost) => acc + cost.value, 0);
         setShippingCost(totalShippingCost);
       }
     };
-
+  
     calculateShippingCost();
   }, [products, city_id]);
 
@@ -63,6 +78,8 @@ const Cart = () => {
     return { total: totalProductCost, shipping: shippingCost };
   }, [products, shippingCost]);
 
+  console.log('isi products', products)
+
 
   return (
     <div className="max-w-container mx-auto px-4">
@@ -78,7 +95,7 @@ const Cart = () => {
           <div className="mt-5">
             {products.map((item) => (
               <div key={item.item_id}>
-                <ItemCard item={item} />
+                <ItemCard item={item} updateQuantity={updateProductQuantity} onDeleteItem={handleDeleteItem}/>
               </div>
             ))}
           </div>

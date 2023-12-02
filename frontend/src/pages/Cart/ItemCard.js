@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import {deleteItem, drecreaseQuantity,
   increaseQuantity,} from "../../redux/orebiSlice";
 
-const ItemCard = ({ item }) => {
+const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {
   const dispatch = useDispatch();
   const { userId } = useToken();
   const [quantity, setQuantity] = useState(item.quantity);
@@ -18,36 +18,33 @@ const ItemCard = ({ item }) => {
   const handleDeleteItem = async (cartId, itemId) => {
     try {
       await deleteCartItem(cartId, itemId);
+      onDeleteItem(itemId);
       dispatch(deleteItem(itemId))
-      window.location.reload()
     } catch (e) {
       console.log(e);
     }
   };
 
   const handleIncreaseQuantity = async () => {
-    const newQuantity = quantity + 1;
-    try {
+    if (quantity < item.stock_item) {
+      const newQuantity = quantity + 1;
       await updateCartItem(userId, item.item_id, newQuantity);
       setQuantity(newQuantity);
-      dispatch(increaseQuantity({ _id: item._id }))
-    } catch (e) {
-      console.log(e);
+      dispatch(increaseQuantity({ _id: item._id }));
+      updateQuantity(item.item_id, newQuantity);
     }
   };
 
   const handleDecreaseQuantity = async () => {
-    if (item.quantity > 1) {
+    if (quantity > 1) {
       const newQuantity = quantity - 1;
-      try {
-        await updateCartItem(userId, item.item_id, newQuantity);
-        setQuantity(newQuantity);
-        dispatch(drecreaseQuantity({ _id: item._id }))
-      } catch (e) {
-        console.log(e);
-      }
+      await updateCartItem(userId, item.item_id, newQuantity);
+      setQuantity(newQuantity);
+      dispatch(drecreaseQuantity({ _id: item._id }));
+      updateQuantity(item.item_id, newQuantity);
     }
   };
+
 
 
   return (
@@ -65,19 +62,23 @@ const ItemCard = ({ item }) => {
           ${item.price}
         </div>
         <div className="w-1/3 flex items-center gap-6 text-lg">
-          <span
-            onClick={handleDecreaseQuantity}
-            className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
-          >
-            -
-          </span>
+          {quantity > 1 && (
+            <span
+              onClick={handleDecreaseQuantity}
+              className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
+            >
+              -
+            </span>
+          )}
           <p>{quantity}</p>
-          <span
-            onClick={handleIncreaseQuantity}
-            className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
-          >
-            +
-          </span>
+          {quantity < item.stock_item && (
+            <span
+              onClick={handleIncreaseQuantity}
+              className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
+            >
+              +
+            </span>
+          )}
         </div>
         <div className="w-1/3 flex items-center font-titleFont font-bold text-lg">
           <p>${quantity * item.price}</p>
