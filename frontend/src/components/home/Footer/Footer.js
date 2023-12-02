@@ -31,7 +31,7 @@ const Footer = () => {
           </div>
         </div>
         <div>
-          <FooterListTitle title="MomMeMall" />
+          <FooterListTitle title="Features" />
           <ul className="flex flex-col gap-2">
             <Link to="/">
               <li className="font-titleFont text-base text-lightText hover:text-black hover:underline decoration-[1px] decoration-gray-500 underline-offset-2 cursor-pointer duration-300">
@@ -47,18 +47,17 @@ const Footer = () => {
           </ul>
         </div>
         <div>
-          <FooterListTitle title="Category" />
+          <FooterListTitle title="Our Services" />
           <ul className="flex flex-col gap-2">
-            <li className="font-titleFont text-base text-lightText hover:text-black hover:underline decoration-[1px] decoration-gray-500 underline-offset-2 cursor-pointer duration-300">
-              Best Sellers
+            <li className="font-titleFont text-base text-lightText">
+              The best E-commerce
             </li>
-            <li className="font-titleFont text-base text-lightText hover:text-black hover:underline decoration-[1px] decoration-gray-500 underline-offset-2 cursor-pointer duration-300">
-              Women's Clothes
+            <li className="font-titleFont text-base text-lightText">
+              Fast service
             </li>
-            <li className="font-titleFont text-base text-lightText hover:text-black hover:underline decoration-[1px] decoration-gray-500 underline-offset-2 cursor-pointer duration-300">
-              Children's Clothes
+            <li className="font-titleFont text-base text-lightText">
+              Easy to use
             </li>
-            
           </ul>
         </div>
       </div>

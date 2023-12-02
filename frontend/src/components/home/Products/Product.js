@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import { MdOutlineLabelImportant } from "react-icons/md";
 import Image from "../../designLayouts/Image";
@@ -6,31 +6,25 @@ import Badge from "./Badge";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../../redux/orebiSlice";
-import { jwtDecode } from "jwt-decode";
 import { createCart } from "../../../modules/fetch";
 
-const Product = ({ productName, _id, img, badge, price, color }) => {
-  const [userDetails, setUserDetails] = useState({ token: false, userId: false });
+import useToken from '../../../hooks/useToken' 
+
+const Product = ({ productName, _id, img, badge, price, color, city_id }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setUserDetails({ token, userId: decodedToken.userId });
-    }
-  }, []);
+  const { token, userId } = useToken();
 
   const handleProductDetails = () => {
-    navigate(`/product/${_id}`, { state: { item: { productName, _id, img, badge, price, color } } });
+    navigate(`/product/${_id}`, { state: { item: { productName, _id, img, badge, price, color, city_id } } });
   };
 
   const handleAddToCart = async () => {
-    const productData = { _id, name: productName, quantity: 1, image: img, badge, price, colors: color };
-    if (userDetails.token) {
+    const productData = { _id, name: productName, quantity: 1, image: img, badge, price, colors: color, city_id:city_id };
+    if (token) {
       try {
-        await createCart(userDetails.userId, _id);
+        await createCart(userId, _id, productData.quantity);
         dispatch(addToCart(productData));
       } catch (error) {
         window.alert('Barang sudah ada didalam cart')

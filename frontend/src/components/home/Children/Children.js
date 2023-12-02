@@ -91,6 +91,8 @@ import { getAllProducts } from "../../../modules/fetch/index";
 const Children = () => {
   const [products, setProducts] = useState([]);
 
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+
   const settings = {
     infinite: true,
     speed: 500,
@@ -141,17 +143,18 @@ const Children = () => {
 
   return (
     <div className="w-full pb-16">
-      <Heading heading="Children Clothes" />
+      <Heading heading="New Arrivals" />
       <Slider {...settings}>
         {products.map((product) => (
           <div className="px-2" key={product.item_id}>
             <Product
               _id={product.item_id}
-              img={`http://localhost:8000/${product.images[0]}`}
+              img={product?.images?.[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}
               sumRating={product.summary_rating}
+              city_id = {product.city_id}
             />
           </div>
         ))}

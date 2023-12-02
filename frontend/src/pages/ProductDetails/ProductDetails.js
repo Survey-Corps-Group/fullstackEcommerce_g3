@@ -27,10 +27,15 @@ const ProductDetails = () => {
     fetchProduct();
   }, [_id]);
 
+<<<<<<< HEAD
   const notFoundImage =
     "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png";
   const imageUrl =
     `http://localhost:8000/${productInfo?.images?.[0]?.image_url}` || notFoundImage;
+=======
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+  const imageUrl = productInfo?.images?.[0]?.image_url ? `http://localhost:8000/${productInfo.images[0].image_url}` : notFoundImage;
+>>>>>>> d7e74e35fffb78f3a64cb60cdc29f8dacba16e8b
 
   return (
     <div className="w-full mx-auto border-b border-gray-300">

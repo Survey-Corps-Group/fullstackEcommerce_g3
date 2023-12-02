@@ -3,7 +3,7 @@ import { rajaOngkirProvince } from "../../modules/fetch";
 import { rajaOngkirCity } from "../../modules/fetch";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 
-const Profile = () => {
+const EditProfile = () => {
 
   const [clientName, setclientName] = useState("");
   const [email, setEmail] = useState("");
@@ -98,7 +98,7 @@ const Profile = () => {
 
   return (
     <div className="max-w-container mx-auto px-4">
-      <Breadcrumbs title="Profile"/>
+      <Breadcrumbs title="Edit Profile"/>
       {successMsg ? (
         <p className="pb-20 w-96 font-medium text-green-500">{successMsg}</p>
       ) : (
@@ -109,37 +109,13 @@ const Profile = () => {
               <p className="text-base font-titleFont font-semibold px-2">
                 Name
               </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Phone Number
-              </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Username
-              </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
+              <input
+                onChange={handleName}
+                value={clientName}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="text"
+                placeholder="Enter your name here"
+              />
               {errClientName && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
                   <span className="text-sm italic font-bold">!</span>
@@ -151,9 +127,13 @@ const Profile = () => {
               <p className="text-base font-titleFont font-semibold px-2">
                 Address
               </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
+              <input
+                onChange={handleName}
+                value={clientName}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="text"
+                placeholder="Enter your username here"
+              />
               {errClientName && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
                   <span className="text-sm italic font-bold">!</span>
@@ -161,15 +141,131 @@ const Profile = () => {
                 </p>
               )}
             </div>
-            
-            
+            <div>
+              <p className="text-base font-titleFont font-semibold px-2">
+                Username
+              </p>
+              <input
+                onChange={handleName}
+                value={clientName}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="text"
+                placeholder="Enter your email here"
+              />
+              {errClientName && (
+                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                  <span className="text-sm italic font-bold">!</span>
+                  {errClientName}
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="text-base font-titleFont font-semibold px-2">
+                Province
+              </p>
+              <select
+                    onChange={handleProvince}
+                    value={province}
+                    className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
+                  >
+                    <option value="" disabled selected hidden>
+                      Select Province
+                    </option>
+                    {
+                      provinces.map((provincesOption) => (
+                        <option key={provincesOption.province_id} value={provincesOption.province_id}> 
+                          {provincesOption.province}
+                        </option>
+                      ))
+                    }
+                  </select>
+            </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Email
               </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+              <input
+                onChange={handleName}
+                value={clientName}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="text"
+                placeholder="Enter your password here"
+              />
+              {errClientName && (
+                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                  <span className="text-sm italic font-bold">!</span>
+                  {errClientName}
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="text-base font-titleFont font-semibold px-2">
+                City
               </p>
+              <select
+                    onChange={handleCity}
+                    value={city}
+                    className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
+                  >
+                    <option value="" disabled selected hidden>
+                      Select City
+                    </option>
+                    {
+                      cities.map((citiesOption) => (
+                        <option key={citiesOption.city_id} value={citiesOption.city_id}> 
+                          {citiesOption.city_name}
+                        </option>
+                      ))
+                    }
+                  </select>
+            </div>
+            <div>
+              <p className="text-base font-titleFont font-semibold px-2">
+                Phone Number
+              </p>
+              <input
+                onChange={handleName}
+                value={clientName}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="text"
+                placeholder="Enter your province here"
+              />
+              {errClientName && (
+                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                  <span className="text-sm italic font-bold">!</span>
+                  {errClientName}
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="text-base font-titleFont font-semibold px-2">
+                Country
+              </p>
+              <input
+                onChange={handleName}
+                value={clientName}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="text"
+                placeholder="Enter your City here"
+              />
+              {errClientName && (
+                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                  <span className="text-sm italic font-bold">!</span>
+                  {errClientName}
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="text-base font-titleFont font-semibold px-2">
+                Password
+              </p>
+              <input
+                onChange={handleEmail}
+                value={email}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="email"
+                placeholder="Enter your Country here"
+              />
               {errEmail && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
                   <span className="text-sm italic font-bold">!</span>
@@ -179,42 +275,30 @@ const Profile = () => {
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
-                Province
+                Zip/Postal code
               </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Password
-              </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
-              {errClientName && (
+              <input
+                onChange={handleEmail}
+                value={email}
+                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                type="email"
+                placeholder="Enter your zip/postal code here"
+              />
+              {errEmail && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
                   <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
+                  {errEmail}
                 </p>
               )}
             </div>
+        
             
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                City
-              </p>
-              <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
-              </p>
-            </div>
-              
           </div>
           <button
-              onClick='/frontend/src/pages/Account/EditProfile.js'
+              onClick={handlePost}
               className="w-44 bg-primeColor text-gray-200 h-10 font-titleFont text-base tracking-wide font-semibold hover:bg-black hover:text-white duration-200 mt-4"
             >
-              Edit Profile
+              Save changes
             </button>
         </form>
       )}
@@ -222,4 +306,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default EditProfile;

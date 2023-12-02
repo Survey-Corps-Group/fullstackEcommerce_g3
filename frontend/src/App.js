@@ -20,6 +20,7 @@ import Home from "./pages/Home/Home";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
+<<<<<<< HEAD
 
 import AdminPage from "./pages/Admin/AdminPage";
 import { Profiler } from "react";
@@ -28,6 +29,12 @@ import ManageProduct from "./pages/ProductDetails/ManageProduct.jsx";
 import VerifyPayAdmin from "./pages/payment/VerifyPayAdmin.jsx"
 import Warehouse from "./pages/Admin/Warehouse.jsx";
 
+=======
+import Profile from "./pages/Account/Profile";
+import AdminPage from "./pages/Admin/AdminPage";
+import EditProfile from "./pages/Account/EditProfile";
+import Logout from "./pages/Account/Logout";
+>>>>>>> d7e74e35fffb78f3a64cb60cdc29f8dacba16e8b
 
 
 const Layout = () => {
@@ -56,10 +63,13 @@ const router = createBrowserRouter(
         
         <Route path="/product/:_id" element={<ProductDetails />}></Route>
         <Route path="/cart" element={<Cart />}></Route>
+        <Route path="/editProfile" element={<EditProfile />}></Route>
         <Route path="/paymentgateway" element={<Payment />}></Route>
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
+      <Route path="/logout" element={<Logout />}></Route>
+      
       
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
       <Route path="/AdminPage" element={<AdminPage />}></Route>
