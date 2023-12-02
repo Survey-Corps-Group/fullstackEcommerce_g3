@@ -20,13 +20,15 @@ import Home from "./pages/Home/Home";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
+<<<<<<< HEAD
 
 import AdminPage from "./pages/Admin/AdminPage";
 import { Profiler } from "react";
-import AdminListOrder from "./pages/Admin/AdminListOrder.jsx"
+import AdminListOrder from "./pages/Admin/AdminListOrder.jsx";
 import ManageProduct from "./pages/ProductDetails/ManageProduct.jsx";
-import VerifyPayAdmin from "./pages/payment/VerifyPayAdmin.jsx"
+import VerifyPayAdmin from "./pages/payment/VerifyPayAdmin.jsx";
 import Warehouse from "./pages/Admin/Warehouse.jsx";
+
 
 =======
 import Profile from "./pages/Account/Profile";
@@ -77,6 +79,7 @@ const router = createBrowserRouter(
       <Route path="/ProductDetails" element={<ProductDetails />}></Route>
       <Route path="/ManageProduct" element={<ManageProduct />}></Route>
       <Route path="/Warehouse" element={<Warehouse/>}></Route>
+      
     </Route>
   )
 );

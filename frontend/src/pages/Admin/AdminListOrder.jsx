@@ -8,7 +8,7 @@ const AdminListOrder = () => {
   useEffect(() => {
     // Gantilah bagian berikut dengan logika pengambilan data pesanan dari server
     // Contoh menggunakan fetch untuk mendapatkan data dari endpoint API
-    fetch("https://api.example.com/orders")
+    fetch("https://www.postman.com/planetary-equinox-145045/workspace/test/request/27335461-add42818-962f-4382-bb0d-ffef559f6523")
       .then((response) => response.json())
       .then((data) => setOrders(data))
       .catch((error) => console.error("Error fetching orders:", error));
