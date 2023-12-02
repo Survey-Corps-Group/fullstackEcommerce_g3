@@ -4,9 +4,8 @@ import { HiOutlineMenuAlt4 } from "react-icons/hi";
 import { FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
 import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
-import { paginationItems } from "../../../constants";
 import useToken from "../../../hooks/useToken";
-import { getCart } from "../../../modules/fetch";
+import { getCart, getAllProducts } from "../../../modules/fetch";
 
 const HeaderBottom = () => {
   // const products = useSelector((state) => state.orebiReducer.products);
@@ -34,17 +33,25 @@ const HeaderBottom = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [setShowSearchBar] = useState(false);
+  const [searchBar, setShowSearchBar] = useState(false);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
   useEffect(() => {
-    const filtered = paginationItems.filter((item) =>
-      item.productName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredProducts(filtered);
+    const fetchProducts = async (page, itemName, price, rating, sort) => {
+      console.log(itemName)
+        try {
+          const response = await getAllProducts(page, itemName, price, rating, sort);
+          console.log(response)
+          setFilteredProducts(response.products);
+        } catch (e) {
+          console.log(e);
+        }
+      };
+      fetchProducts(1, searchQuery.toLowerCase());
+
   }, [searchQuery]);
 
   const [products, setProducts] = useState("");
@@ -62,6 +69,8 @@ const HeaderBottom = () => {
 
     fetchProducts();
   }, [userId, products]);
+
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
 
   return (
     <div className="w-full bg-[#F5F5F3] relative">
@@ -109,15 +118,11 @@ const HeaderBottom = () => {
               <div
                 className={`w-full mx-auto h-96 bg-white top-16 absolute left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer`}
               >
-                {searchQuery &&
-                  filteredProducts.map((item) => (
+                {searchQuery && filteredProducts?.map((item) => (
                     <div
                       onClick={() =>
                         navigate(
-                          `/product/${item.productName
-                            .toLowerCase()
-                            .split(" ")
-                            .join("")}`,
+                          `/product/${item.item_id}`,
                           {
                             state: {
                               item: item,
@@ -127,13 +132,13 @@ const HeaderBottom = () => {
                         setShowSearchBar(true) &
                         setSearchQuery("")
                       }
-                      key={item._id}
+                      key={item.item_id}
                       className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3"
                     >
-                      <img className="w-24" src={item.img} alt="productImg" />
+                      <img className="w-24" src={item?.images?.[0] ? `http://localhost:8000/${item.images[0]}` : notFoundImage} alt="productImg" />
                       <div className="flex flex-col gap-1">
                         <p className="font-semibold text-lg">
-                          {item.productName}
+                          {item.item_name}
                         </p>
                         <p className="text-xs">{item.des}</p>
                         <p className="text-sm">
