@@ -4,19 +4,19 @@ import { HiOutlineMenuAlt4 } from "react-icons/hi";
 import { FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
 import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { paginationItems } from "../../../constants";
 import useToken from "../../../hooks/useToken";
+import { getCart } from "../../../modules/fetch";
 
 const HeaderBottom = () => {
-  const products = useSelector((state) => state.orebiReducer.products);
+  // const products = useSelector((state) => state.orebiReducer.products);
   const [show, setShow] = useState(false);
   const [showUser, setShowUser] = useState(false);
   const navigate = useNavigate();
   const ref = useRef();
 
   const { userId } = useToken();
-  
+
   useEffect(() => {
     document.body.addEventListener("click", (e) => {
       if (ref.current.contains(e.target)) {
@@ -31,7 +31,7 @@ const HeaderBottom = () => {
     const token = localStorage.getItem("token");
     setShowUser(!!token);
   }, []);
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [setShowSearchBar] = useState(false);
@@ -46,6 +46,22 @@ const HeaderBottom = () => {
     );
     setFilteredProducts(filtered);
   }, [searchQuery]);
+
+  const [products, setProducts] = useState("");
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (userId) {
+        try {
+          const response = await getCart(userId);
+          setProducts(response);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    };
+
+    fetchProducts();
+  }, [userId, products]);
 
   return (
     <div className="w-full bg-[#F5F5F3] relative">
@@ -75,8 +91,8 @@ const HeaderBottom = () => {
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Our Products
                 </li>
-              
-                
+
+
               </motion.ul>
             )}
           </div>
