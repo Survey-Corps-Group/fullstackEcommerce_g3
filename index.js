@@ -1398,6 +1398,7 @@ app.get('/api/cart/:userId', async (req, res) => {
             package_weight: true,
             item_name: true,
             price: true,
+            stock_item: true,
             images: {
               select: {
                 image_url: true,
@@ -1425,6 +1426,7 @@ app.get('/api/cart/:userId', async (req, res) => {
       item_name: cartItem.item.item_name,
       price: cartItem.item.price,
       quantity: cartItem.quantity,
+      stock_item: cartItem.item.stock_item,
       warehouse_city: cartItem.item.WarehouseItem[0]?.warehouse?.city_id,
       image_url: cartItem.item.images[0]?.image_url || null, // Mengambil image_url pertama, jika ada
     }));
