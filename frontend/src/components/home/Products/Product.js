@@ -33,8 +33,8 @@ const Product = ({ productName, _id, img, badge, price, color, city_id, sumRatin
 
 return (
   <div className="border border-gray-200 rounded-md overflow-hidden">
-    <div className="bg-white p-4 shadow-md rounded-md" onClick={handleProductDetails}>
-      <img src={img} alt={productName} className="w-full h-40 object-cover mb-4 rounded-md" />
+    <div className="bg-white p-4 shadow-md rounded-md">
+      <img src={img} alt={productName} className="w-full h-40 object-cover mb-4 rounded-md" onClick={handleProductDetails}/>
       <h3 className="text-lg font-semibold mb-2">{productName}</h3>
       <p className="text-gray-600 mb-2">Price: ${price}</p>
       <p className="text-gray-600 mb-2">Color: {color}</p>
