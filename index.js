@@ -410,6 +410,9 @@ function calculateSummaryRating(feedbacks) {
 }
 
 app.get("/api/products", async (req, res) => {
+
+  console.log(req.query)
+
   const { page, item_name, price, rating, sort } = req.query;
   const limit = 9;
   const offset = page ? (page - 1) * limit : 0;
@@ -420,7 +423,7 @@ app.get("/api/products", async (req, res) => {
       skip: offset,
       take: limit,
       where: {
-        item_name: item_name ? { contains: item_name } : undefined,
+        item_name: item_name ? { contains: item_name, mode: 'insensitive' } : undefined,
         price: price ? { equals: parseFloat(price) } : undefined,
       },
       include: {
