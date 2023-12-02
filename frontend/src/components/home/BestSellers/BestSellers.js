@@ -55,6 +55,8 @@ const BestSellers = () => {
     ],
   };
 
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+
   return (
     <div className="w-full pb-20">
       <Heading heading="Our Highest Rating Product" />
@@ -63,7 +65,7 @@ const BestSellers = () => {
           <div className="px-2" key={product.item_id}>
             <Product
               _id={product.item_id}
-              img={`http://localhost:8000/${product.images[0]}`}
+              img={ product?.images[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}

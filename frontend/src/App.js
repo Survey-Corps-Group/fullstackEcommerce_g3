@@ -23,8 +23,7 @@ import Shop from "./pages/Shop/Shop";
 import Profile from "./pages/Account/Profile";
 import AdminPage from "./pages/Admin/AdminPage";
 import EditProfile from "./pages/Account/EditProfile";
-
-
+import Logout from "./pages/Account/Logout";
 
 
 const Layout = () => {
@@ -58,6 +57,7 @@ const router = createBrowserRouter(
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
+      <Route path="/logout" element={<Logout />}></Route>
       
       
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>

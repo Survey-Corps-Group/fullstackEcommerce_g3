@@ -46,7 +46,7 @@ const Cart = () => {
     };
 
     calculateShippingCost();
-  }, [products]);
+  }, [products, city_id]);
 
   const handleResetCart = async () => {
     try {
