@@ -6,14 +6,16 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
-import { getCart, deleteAllCartItems, fetchShippingCost } from "../../modules/fetch";
+import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart } from "../../modules/fetch";
 import useToken from '../../hooks/useToken';
+import useUserDetails from '../../hooks/useUserDetails';
 
 const Cart = () => { 
   const [products, setProducts] = useState([]);
   const [shippingCost, setShippingCost] = useState(0);
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
+  const { userDetails } = useUserDetails();
 
   const updateProductQuantity = (itemId, newQuantity) => {
     setProducts(currentProducts => 
@@ -28,6 +30,28 @@ const Cart = () => {
       currentProducts.filter(product => product.item_id !== itemId)
     );
   };
+
+  const handleCheckout = async () => {
+    try {
+      const orderDetails = products.map(product => ({
+        item_id: product.item_id,
+        item_price: product.price,
+        quantity: product.quantity
+      }));
+
+      const customerName = userDetails?.full_name
+  
+      const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
+      await checkoutCart(customerName, shippingCost, totalCost, orderDetails);  
+      await deleteAllCartItems(userId);
+      setProducts([]);
+      dispatch(resetCart());
+
+    } catch (error) {
+      window.alert('Error during checkout process:', error);
+    }
+  };
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -132,11 +156,11 @@ const Cart = () => {
                 </p>
               </div>
               <div className="flex justify-end">
-                <Link to="/paymentgateway">
-                  <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
-                    Proceed to Checkout
-                  </button>
-                </Link>
+              <Link to="/paymentgateway">
+                <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300" onClick={handleCheckout}>
+                  Proceed to Checkout
+                </button>
+              </Link>
               </div>
             </div>
           </div>

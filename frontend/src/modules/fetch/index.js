@@ -171,6 +171,36 @@ async function deleteAllCartItems(userId) {
   }
 }
 
+async function checkoutCart(customerName, shippingCost, subTotal, orderDetails) {
+  try {
+    const salesorderNo = `SO/${Date.now()}`;
+    const response = await instance.post('/api/products/cart/checkout', {
+      salesorder_no: salesorderNo,
+      order_status: 'waiting_for_payment',
+      customer_name: customerName,
+      shipping_cost: shippingCost,
+      sub_total: subTotal,
+      orderDetails: orderDetails
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error during checkout:', error);
+    window.alert(error);
+  }
+}
+
+async function fetchUserDetails(userId) {
+  try {
+    const response = await instance.get(`/api/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    window.alert(error);
+  }
+}
+
+
 
 export { 
   getAllProducts, 
@@ -186,5 +216,7 @@ export {
   countCartItems, 
   deleteAllCartItems,
   updateCartItem,
-  fetchShippingCost
+  fetchShippingCost,
+  checkoutCart,
+  fetchUserDetails
 };
