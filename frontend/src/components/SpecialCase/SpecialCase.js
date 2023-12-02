@@ -1,11 +1,28 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Link } from "react-router-dom";
 import { RiShoppingCart2Fill } from "react-icons/ri";
 import { MdSwitchAccount } from "react-icons/md";
-import { useSelector } from "react-redux";
+import useToken from "../../hooks/useToken";
+import { getCart } from "../../modules/fetch";
 
 const SpecialCase = () => {
-  const products = useSelector((state) => state.orebiReducer.products);
+  const { userId} = useToken();
+  const [products, setProducts] = useState("");
+    useEffect(() => {
+      const fetchProducts = async () => {
+        if (userId) {
+          try {
+            const response = await getCart(userId);
+            setProducts(response);
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      };
+  
+      fetchProducts();
+    }, [userId, products]);
+
   return (
     <div className="fixed top-52 right-2 z-20 hidden md:flex flex-col gap-2">
       <Link to="/signin">

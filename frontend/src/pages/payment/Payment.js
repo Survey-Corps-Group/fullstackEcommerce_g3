@@ -1,32 +1,41 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
-
+  
 const Payment = () => {
+  const location = useLocation();
+  console.log(location);
+  const { cartData, products } = location.state || { cartData: null, products: []};
+
+
+  useEffect(() => {
+    console.log("Cart Data:", cartData);
+    console.log("Products:", products);
+  }, [cartData, products]);
+  
+
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Payment" />
-      <div className="pb-10 ">
-      <h1 className="text-primeColor font-semibold text-lg">Alexa</h1>
-        <p>08967326173</p>
-        <p>Padamara Street No.231 Washington USA</p><br />
-        <div className="border-b-[2px] py-4 mb-2">
-          <h2 className="text-primeColor font-semibold text-lg">White Sweater</h2>
-            <p>Quantity : 1 </p><br />
-            <p>Subtotal : $150</p>
+      {products.map((product, index) => (
+        <div key={index} className="border-b-[2px] py-4 mb-2">
+          <h2 className="text-primeColor font-semibold text-lg">{product.item_name}</h2>
+          <p>Quantity: {product.quantity}</p><br />
+          <p>Subtotal: ${product.price * product.quantity}</p>
         </div>
-            
-            <p>Total Price : 
-              <span> $150</span>
-            </p><br />            
+      ))}
+      <p>Total Price: 
+        <span> ${cartData?.total}</span>
+      </p><br/>
         
-      <form class="flex items-center space-x-6">
-        <div class="shrink-0">
+      <form className="flex items-center space-x-6">
+        <div className="shrink-0">
           <h1 className="text-primeColor font-semibold text-lg">Upload proof of payment </h1>        
         </div>
-        <label class="block">
-          <span class="sr-only">Choose profile photo</span>
-          <input type="file" class="block w-full text-sm text-slate-500
+        <label className="block">
+          <span className="sr-only">Choose profile photo</span>
+          <input type="file" className="block w-full text-sm text-slate-500
             file:mr-4 file:py-2 file:px-4
             file:rounded-full file:border-0
             file:text-sm file:font-semibold
@@ -41,7 +50,6 @@ const Payment = () => {
           </button>
         </Link>
       </div>
-    </div>
   );
 };
 

@@ -6,14 +6,61 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
-import { getCart, deleteAllCartItems, fetchShippingCost } from "../../modules/fetch";
+import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart } from "../../modules/fetch";
 import useToken from '../../hooks/useToken';
+import useUserDetails from '../../hooks/useUserDetails';
+
+import { useNavigate } from 'react-router-dom';
+
 
 const Cart = () => { 
   const [products, setProducts] = useState([]);
   const [shippingCost, setShippingCost] = useState(0);
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
+  const { userDetails } = useUserDetails();
+  const navigate = useNavigate();
+
+  const updateProductQuantity = (itemId, newQuantity) => {
+    setProducts(currentProducts => 
+      currentProducts.map(product => 
+        product.item_id === itemId ? { ...product, quantity: newQuantity } : product
+      )
+    );
+  };
+
+  const handleDeleteItem = (itemId) => {
+    setProducts(currentProducts => 
+      currentProducts.filter(product => product.item_id !== itemId)
+    );
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const orderDetails = products.map(product => ({
+        item_id: product.item_id,
+        item_price: product.price,
+        quantity: product.quantity
+      }));
+
+      const dataToPass = { cartData: calculateTotals, products };
+      
+      const customerName = userDetails?.full_name
+  
+      const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
+      await checkoutCart(customerName, shippingCost, totalCost, orderDetails);  
+      await deleteAllCartItems(userId);
+      setProducts([]);
+      dispatch(resetCart());
+
+      navigate('/paymentgateway', { state: dataToPass });
+
+    } catch (error) {
+      window.alert('Error during checkout process');
+      console.log(error)
+    }
+  };
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,17 +81,18 @@ const Cart = () => {
     const calculateShippingCost = async () => {
       if (products.length > 0) {
         const userCityId = city_id;
-
-        const shippingCostPromises = products.map(product => 
-          fetchShippingCost(userCityId, parseInt(product.warehouse_city), product.package_weight * 1000, 'jne')
-        );
-
+    
+        const shippingCostPromises = products.map(product => {
+          const weight = product.package_weight * product.quantity * 1000;
+          return fetchShippingCost(userCityId, parseInt(product.warehouse_city), weight, 'jne');
+        });
+  
         const shippingCosts = await Promise.all(shippingCostPromises);
         const totalShippingCost = shippingCosts.reduce((acc, cost) => acc + cost.value, 0);
         setShippingCost(totalShippingCost);
       }
     };
-
+  
     calculateShippingCost();
   }, [products, city_id]);
 
@@ -63,7 +111,6 @@ const Cart = () => {
     return { total: totalProductCost, shipping: shippingCost };
   }, [products, shippingCost]);
 
-
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Cart" />
@@ -78,7 +125,7 @@ const Cart = () => {
           <div className="mt-5">
             {products.map((item) => (
               <div key={item.item_id}>
-                <ItemCard item={item} />
+                <ItemCard item={item} updateQuantity={updateProductQuantity} onDeleteItem={handleDeleteItem}/>
               </div>
             ))}
           </div>
@@ -115,11 +162,11 @@ const Cart = () => {
                 </p>
               </div>
               <div className="flex justify-end">
-                <Link to="/paymentgateway">
-                  <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
-                    Proceed to Checkout
-                  </button>
-                </Link>
+              <Link onClick={handleCheckout}>
+                <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
+                  Proceed to Checkout
+                </button>
+              </Link>              
               </div>
             </div>
           </div>

@@ -4,19 +4,18 @@ import { HiOutlineMenuAlt4 } from "react-icons/hi";
 import { FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
 import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { paginationItems } from "../../../constants";
 import useToken from "../../../hooks/useToken";
+import { getCart, getAllProducts } from "../../../modules/fetch";
 
 const HeaderBottom = () => {
-  const products = useSelector((state) => state.orebiReducer.products);
+  // const products = useSelector((state) => state.orebiReducer.products);
   const [show, setShow] = useState(false);
   const [showUser, setShowUser] = useState(false);
   const navigate = useNavigate();
   const ref = useRef();
 
   const { userId } = useToken();
-  
+
   useEffect(() => {
     document.body.addEventListener("click", (e) => {
       if (ref.current.contains(e.target)) {
@@ -31,21 +30,47 @@ const HeaderBottom = () => {
     const token = localStorage.getItem("token");
     setShowUser(!!token);
   }, []);
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [setShowSearchBar] = useState(false);
+  const [searchBar, setShowSearchBar] = useState(false);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
   useEffect(() => {
-    const filtered = paginationItems.filter((item) =>
-      item.productName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredProducts(filtered);
+    const fetchProducts = async (page, itemName, price, rating, sort) => {
+      console.log(itemName)
+        try {
+          const response = await getAllProducts(page, itemName, price, rating, sort);
+          console.log(response)
+          setFilteredProducts(response.products);
+        } catch (e) {
+          console.log(e);
+        }
+      };
+      fetchProducts(1, searchQuery.toLowerCase());
+
   }, [searchQuery]);
+
+  const [products, setProducts] = useState("");
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (userId) {
+        try {
+          const response = await getCart(userId);
+          setProducts(response);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    };
+
+    fetchProducts();
+  }, [userId, products]);
+
+  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
 
   return (
     <div className="w-full bg-[#F5F5F3] relative">
@@ -75,8 +100,8 @@ const HeaderBottom = () => {
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Our Products
                 </li>
-              
-                
+
+
               </motion.ul>
             )}
           </div>
@@ -93,15 +118,11 @@ const HeaderBottom = () => {
               <div
                 className={`w-full mx-auto h-96 bg-white top-16 absolute left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer`}
               >
-                {searchQuery &&
-                  filteredProducts.map((item) => (
+                {searchQuery && filteredProducts?.map((item) => (
                     <div
                       onClick={() =>
                         navigate(
-                          `/product/${item.productName
-                            .toLowerCase()
-                            .split(" ")
-                            .join("")}`,
+                          `/product/${item.item_id}`,
                           {
                             state: {
                               item: item,
@@ -111,13 +132,13 @@ const HeaderBottom = () => {
                         setShowSearchBar(true) &
                         setSearchQuery("")
                       }
-                      key={item._id}
+                      key={item.item_id}
                       className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3"
                     >
-                      <img className="w-24" src={item.img} alt="productImg" />
+                      <img className="w-24" src={item?.images?.[0] ? `http://localhost:8000/${item.images[0]}` : notFoundImage} alt="productImg" />
                       <div className="flex flex-col gap-1">
                         <p className="font-semibold text-lg">
-                          {item.productName}
+                          {item.item_name}
                         </p>
                         <p className="text-xs">{item.des}</p>
                         <p className="text-sm">
