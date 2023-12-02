@@ -13,6 +13,7 @@ const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {
   const [quantity, setQuantity] = useState(item.quantity);
   const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
   const imageUrl = item?.image_url ? `http://localhost:8000/${item.image_url}` : notFoundImage;
+  const maxQuantity = item.stock_item;
 
 
   const handleDeleteItem = async (cartId, itemId) => {
@@ -26,7 +27,7 @@ const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {
   };
 
   const handleIncreaseQuantity = async () => {
-    if (quantity < item.stock_item) {
+    if (quantity < maxQuantity) {
       const newQuantity = quantity + 1;
       await updateCartItem(userId, item.item_id, newQuantity);
       setQuantity(newQuantity);
@@ -40,7 +41,7 @@ const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {
       const newQuantity = quantity - 1;
       await updateCartItem(userId, item.item_id, newQuantity);
       setQuantity(newQuantity);
-      dispatch(drecreaseQuantity({ _id: item._id }));
+      dispatch(increaseQuantity({ _id: item._id }));
       updateQuantity(item.item_id, newQuantity);
     }
   };
@@ -71,7 +72,7 @@ const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {
             </span>
           )}
           <p>{quantity}</p>
-          {quantity < item.stock_item && (
+          {quantity < maxQuantity && (
             <span
               onClick={handleIncreaseQuantity}
               className="w-6 h-6 bg-gray-100 text-2xl flex items-center justify-center hover:bg-gray-300 cursor-pointer duration-300 border-[1px] border-gray-300 hover:border-gray-300"
