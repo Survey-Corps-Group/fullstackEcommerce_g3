@@ -75,7 +75,7 @@ const Cart = () => {
     };
 
     fetchProducts();
-  }, [userId, products]);
+  }, [userId]);
 
   useEffect(() => {
     const calculateShippingCost = async () => {
