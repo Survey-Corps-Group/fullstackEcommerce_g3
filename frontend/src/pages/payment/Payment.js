@@ -6,18 +6,22 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 const Payment = () => {
   const location = useLocation();
   console.log(location);
-  const { cartData, products } = location.state || { cartData: null, products: []};
+  const { cartData, products, userDetails } = location.state || { cartData: null, products: [], userDetails: {}};
 
 
   useEffect(() => {
     console.log("Cart Data:", cartData);
     console.log("Products:", products);
-  }, [cartData, products]);
+  }, [cartData, products, userDetails]);
   
 
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Payment" />
+      <div className="pb-10 ">
+      <h1 className="text-primeColor font-semibold text-lg">{userDetails?.full_name}</h1>
+        <p>{userDetails?.phone}</p>
+        <p>{userDetails?.address}</p><br />
       {products.map((product, index) => (
         <div key={index} className="border-b-[2px] py-4 mb-2">
           <h2 className="text-primeColor font-semibold text-lg">{product.item_name}</h2>
@@ -49,6 +53,7 @@ const Payment = () => {
             Submit
           </button>
         </Link>
+      </div>
       </div>
   );
 };
