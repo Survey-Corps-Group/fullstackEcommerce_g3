@@ -43,7 +43,7 @@ const Cart = () => {
         quantity: product.quantity
       }));
 
-      const dataToPass = { cartData: calculateTotals, products };
+      const dataToPass = { cartData: calculateTotals, products, userDetails };
       
       const customerName = userDetails?.full_name
   
