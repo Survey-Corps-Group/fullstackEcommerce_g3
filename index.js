@@ -1529,26 +1529,6 @@ app.patch('/api/cartItem', async (req, res) => {
   }
 });
 
-
-app.get('/api/cartItem/count/:userId', async (req, res) => {
-  const userId = parseInt(req.params.userId);
-
-  try {
-    const itemCount = await prisma.cartItem.count({
-      where: {
-        cart: {
-          userId: userId,
-        },
-      },
-    });
-
-    res.json({ userId: userId, itemCount: itemCount });
-  } catch (error) {
-    console.error('Error counting cart items:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
 // verified
 app.put('/api/verified/:salesorder_id', async( req, res) => {
   const salesorder_id = req.params.salesorder_id;
