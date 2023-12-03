@@ -4,7 +4,7 @@ import useToken from '../../hooks/useToken'
 
 import { deleteCartItem, updateCartItem} from "../../modules/fetch";
 import { useDispatch } from "react-redux";
-import {deleteItem, drecreaseQuantity,
+import {deleteItem, decreaseQuantity,
   increaseQuantity,} from "../../redux/orebiSlice";
 
 const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {

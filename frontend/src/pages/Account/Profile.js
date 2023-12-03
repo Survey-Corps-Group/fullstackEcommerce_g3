@@ -124,7 +124,7 @@ const Profile = () => {
                 Phone Number
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                089652378137
               </p>
               {errClientName && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
@@ -138,7 +138,7 @@ const Profile = () => {
                 Username
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                alexa
               </p>
               {errClientName && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
@@ -152,7 +152,7 @@ const Profile = () => {
                 Address
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                Kaliurang Street No.25 Washington
               </p>
               {errClientName && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
@@ -168,7 +168,7 @@ const Profile = () => {
                 Email
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                alexasabrina@gmail.com
               </p>
               {errEmail && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
@@ -182,7 +182,7 @@ const Profile = () => {
                 Province
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                Bekasi
               </p>
             </div>
             <div>
@@ -190,7 +190,7 @@ const Profile = () => {
                 Password
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                .......
               </p>
               {errClientName && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
@@ -205,7 +205,7 @@ const Profile = () => {
                 City
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                Cibitung
               </p>
             </div>
               

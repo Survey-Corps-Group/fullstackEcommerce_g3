@@ -12,11 +12,11 @@ const Category = () => {
     },
     {
       _id: 991,
-      title: "Women's Clothes",
+      title: "Highest Rating",
     },
     {
       _id: 992,
-      title: "Children's Clothes",
+      title: "Recent Product",
     },
   ];
   return (

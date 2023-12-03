@@ -22,7 +22,6 @@ import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
 
 import AdminPage from "./pages/Admin/AdminPage";
-import { Profiler } from "react";
 import AdminListOrder from "./pages/Admin/AdminListOrder.jsx";
 import ManageProduct from "./pages/ProductDetails/ManageProduct.jsx";
 import VerifyPayAdmin from "./pages/payment/VerifyPayAdmin.jsx";
@@ -55,7 +54,7 @@ const router = createBrowserRouter(
         <Route index element={<Home />}></Route>
         <Route path="/shop" element={<Shop />}></Route>
         <Route path="/order" element={<Order />}></Route>
-        <Route path="/profile" element={<Profiler />}></Route>
+        <Route path="/profile" element={<Profile/>}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         
         <Route path="/product/:_id" element={<ProductDetails />}></Route>
