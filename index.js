@@ -184,8 +184,7 @@ app.post("/api/users/login", async (req, res) => {
     }
     const token = jwt.sign(
       { userId: user.user_id, role: user.role, city_id: user.city_id },
-      process.env.JWT_SECRET , { expiresIn: "1h"}
-    );
+      process.env.JWT_SECRET);
     res.json({
       success: true,
       token: token,
@@ -426,8 +425,6 @@ function calculateSummaryRating(feedbacks) {
 }
 
 app.get("/api/products", async (req, res) => {
-
-  console.log(req.query)
 
   const { page, item_name, price, rating, sort } = req.query;
   const limit = 9;
@@ -1076,7 +1073,6 @@ app.get("/api/province", async (req, res) => {
       params: { key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
-    console.log('province biasa')
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -1088,13 +1084,11 @@ app.get("/api/province", async (req, res) => {
 // province with name
 app.get("/api/province/:id", async (req, res) => {
   const id = req.params.id
-  console.log(id)
   try {
     const response = await axios.get(`${RAJA_ONGKIR_URL}/province?id=${id}`, {
       params: { key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
-    console.log(RAJA_ONGKIR_URL)
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -1368,7 +1362,6 @@ app.post("/api/createcart",  async (req, res) => {
 app.post('/api/itemcart', authenticateTokenMiddleware, async (req, res) => {
   try {
 
-    console.log(req.body)
     const { userId, items } = req.body;
 
     // Cek apakah userId valid
@@ -1559,7 +1552,6 @@ app.patch('/api/cartItem', async (req, res) => {
     res.json({ message: 'Cart item updated successfully' });
   } catch (error) {
     console.error('Error updating cart item:', error);
-    console.log(error)
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
