@@ -1060,6 +1060,25 @@ app.get("/api/province", async (req, res) => {
       params: { key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
+    console.log('province biasa')
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,  
+    });
+  }
+});
+
+// province with name
+app.get("/api/province/:id", async (req, res) => {
+  const id = req.params.id
+  console.log(id)
+  try {
+    const response = await axios.get(`${RAJA_ONGKIR_URL}/province?id=${id}`, {
+      params: { key: RAJA_ONGKIR_KEY },
+    });
+    res.json(response.data.rajaongkir.results);
+    console.log(RAJA_ONGKIR_URL)
   } catch (err) {
     res.status(500).json({
       success: false,
