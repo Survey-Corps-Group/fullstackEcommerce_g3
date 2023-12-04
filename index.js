@@ -1578,6 +1578,52 @@ app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async( req,
 
 })
 
+// update stock quantity when checkout
+app.put("/api/products/:itemId/stock", authenticateTokenMiddleware,
+  async (req, res) => {
+    try {
+      const itemId = parseInt(req.params.itemId);
+      const { stock_quantity } = req.body;
+
+      // Check if the product with the given ID exists
+      const existingProduct = await prisma.item.findUnique({
+        where: {
+          item_id: itemId,
+        },
+      });
+
+      if (!existingProduct) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      const updatedProduct = await prisma.item.update({
+        where: {
+          item_id: itemId,
+        },
+        data: {
+          stock_item: existingProduct.stock_item - parseInt(stock_quantity),
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Stock quantity updated successfully",
+        product: updatedProduct,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        success: false,
+        message: `Server error: ${err.message}`,
+      });
+    }
+  }
+);
+
+
 
 // email
 app.post('/api/send_mail', authenticateTokenMiddleware, (req, res) => {
