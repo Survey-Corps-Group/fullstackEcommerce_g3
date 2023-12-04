@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router-dom';
 const Cart = () => { 
   const [products, setProducts] = useState([]);
   const [shippingCost, setShippingCost] = useState(0);
+  const [salesorderId, setSalesorderId] = useState(null);
+
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
   const { userDetails } = useUserDetails();
@@ -44,26 +46,32 @@ const Cart = () => {
       }));
 
       const dataToPass = { cartData: calculateTotals, products, userDetails };
-      
-      const customerName = userDetails?.full_name
-  
-      const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
-      const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);  
 
-      dataToPass.saleorder = saleorder
+      const customerName = userDetails?.full_name
+
+      const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
+      const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);
+
+      //ambil createOrder dari saleorder
+      const { createOrder } = saleorder || {};
+      //ambil salesorder_id dari createOrder
+      const { salesorder_id } = createOrder || {};
+
+      // Simpan salesorder_id di dalam state
+      setSalesorderId(salesorder_id);
+
+      dataToPass.saleorder = saleorder;
 
       await deleteAllCartItems(userId);
       setProducts([]);
       dispatch(resetCart());
 
       navigate('/paymentgateway', { state: dataToPass });
-
     } catch (error) {
       window.alert('Error during checkout process');
-      console.log(error)
+      console.log(error);
     }
   };
-  
 
   useEffect(() => {
     const fetchProducts = async () => {
