@@ -33,8 +33,17 @@ async function rajaOngkirProvince(){
   }
 }
 
-async function rajaOngkirCity(id){
+async function rajaOngkirProvinceName(id){
   try {
+    const response = await instance.get(`/api/province/${id}`)
+    return response
+  }catch(e){
+
+  }
+}
+
+async function rajaOngkirCity(id){
+  try { 
     const response = await instance.get(`/api/city?province=${id}`)
 
     return response
@@ -218,5 +227,6 @@ export {
   updateCartItem,
   fetchShippingCost,
   checkoutCart,
-  fetchUserDetails
+  fetchUserDetails,
+  rajaOngkirProvinceName
 };

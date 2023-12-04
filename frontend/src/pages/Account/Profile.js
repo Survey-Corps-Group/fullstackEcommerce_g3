@@ -1,100 +1,51 @@
 import React, { useEffect, useState } from "react";
-import { rajaOngkirProvince } from "../../modules/fetch";
+import { rajaOngkirProvince , fetchUserDetails, rajaOngkirProvinceName} from "../../modules/fetch";
 import { rajaOngkirCity } from "../../modules/fetch";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
+import useToken from '../../hooks/useToken';
+import { jwtDecode } from 'jwt-decode';
 
-const Profile = () => {
 
-  const [clientName, setclientName] = useState("");
-  const [email, setEmail] = useState("");
-  const [provinces, setProvinces] = useState([])
-  const [province, setProvince] = useState("")
-  const [errCity, setErrCity] = useState("");
-  const [cities, setCities] = useState([])
-  const [city, setCity] = useState("")
+const Profile = () => { 
 
-  // fetch province dari raja ongkir
+  const [successMsg, setSuccessMsg] = useState("");
+  const [dataUser, setDataUser] = useState([])
+  const [province, setProvince] = useState([])
+
+  // fetch data user
+  const token = localStorage.getItem("token");
+  const decodedToken = jwtDecode(token);
+  const user_id = decodedToken.userId
+
   useEffect(() => {
-    const fetchProvince = async () => {
-        try{
-          const response = await rajaOngkirProvince()
-          setProvinces(response.data)
+    const fetch_user = async () => {
+    try {
+          const response = await fetchUserDetails(user_id)
+          setDataUser(response)
         }catch (e) {
-
         }
     }
-    fetchProvince();
+    fetch_user();
   }, [])
+  
+  const data = dataUser
+  const id_province = data.province_id
+
+  // fetch province
+  useEffect(() => {
+    const fetch_province = async () => {
+      try {
+        const response = await rajaOngkirProvinceName(id_province)
+        setProvince(response.data.province)
+      }catch (e) {
+
+      }
+    }
+
+    fetch_province()
+  }, [!province])
 
   
-  const [errClientName, setErrClientName] = useState("");
-  const [errEmail, setErrEmail] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-
-  const handleName = (e) => {
-    setclientName(e.target.value);
-    setErrClientName("");
-  };
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
-    setErrEmail("");
-  };
-  const handleProvince = (e) => {
-    setProvince(e.target.value)
-  };
-  const handleCity = (e) => {
-    setCity(e.target.value);
-    setErrCity("");
-  };
-
-  // ================= Email Validation start here =============
-  const EmailValidation = (email) => {
-    return String(email)
-      .toLowerCase()
-      .match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i);
-  };
-  // ================= Email Validation End here ===============
-
-  // fetch province dari raja ongkir
-  useEffect(() => {
-    const fetchProvince = async () => {
-        try{
-          const response = await rajaOngkirProvince()
-          setProvinces(response.data)
-        }catch (e) {
-
-        }
-    }
-    fetchProvince();
-  }, [])
-
-  // fetch city dari raja ongkir
-  useEffect( () => {
-    const fetchCity = async () => {
-      const id = province
-      try {
-        const response = await rajaOngkirCity(id)
-        setCities(response.data)
-      }catch(e){
-
-      }
-    }
-    fetchCity()
-  }, [province])
-
-  const handlePost = (e) => {
-    e.preventDefault();
-    if (!clientName) {
-      setErrClientName("Enter your Name");
-    }
-    if (!email) {
-      setErrEmail("Enter your Email");
-    } else {
-      if (!EmailValidation(email)) {
-        setErrEmail("Enter a Valid Email");
-      }
-    }
-  };
 
   return (
     <div className="max-w-container mx-auto px-4">
@@ -110,56 +61,36 @@ const Profile = () => {
                 Name
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {dataUser.full_name}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Phone Number
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                089652378137
+                {dataUser.phone}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Username
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                alexa
+                {dataUser.username}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Address
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Kaliurang Street No.25 Washington
+                {dataUser.address}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             
             
@@ -168,21 +99,16 @@ const Profile = () => {
                 Email
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                alexasabrina@gmail.com
+                {dataUser.email}
               </p>
-              {errEmail && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errEmail}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Province
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Bekasi
+                {province}
               </p>
             </div>
             <div>
@@ -192,12 +118,6 @@ const Profile = () => {
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
                 .......
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
             </div>
             
             <div>
