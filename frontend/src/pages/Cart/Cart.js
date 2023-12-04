@@ -104,7 +104,6 @@ const Cart = () => {
   }, [products, city_id]);
 
   const handleResetCart = async () => {
-    if(fetchCost) window.alert('Please wait until shipping cost is calculated') 
     try {
       await deleteAllCartItems(userId);
       setProducts([]);
