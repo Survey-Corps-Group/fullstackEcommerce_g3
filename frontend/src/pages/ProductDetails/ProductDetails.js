@@ -26,8 +26,8 @@ const ProductDetails = () => {
     fetchProduct();
   }, [_id]);
 
-  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
-  const imageUrl = productInfo?.images?.[0]?.image_url ? `http://localhost:8000/${productInfo.images[0].image_url}` : notFoundImage;
+  const notFoundImage = process.env.REACT_APP_NOTFOUND_IMG
+  const imageUrl = productInfo?.images?.[0]?.image_url ? `${process.env.REACT_APP_BACKEND_URL}/${productInfo.images[0].image_url}` : notFoundImage;
 
   return (
     <div className="w-full mx-auto border-b border-gray-300">

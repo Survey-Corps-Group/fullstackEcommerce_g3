@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 const Cart = () => { 
   const [products, setProducts] = useState([]);
   const [shippingCost, setShippingCost] = useState(0);
-  const [salesorderId, setSalesorderId] = useState(null);
+  const [fetchCost, setFetchCost] = useState(false);
 
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
@@ -38,6 +38,12 @@ const Cart = () => {
   };
 
   const handleCheckout = async () => {
+    
+    if (fetchCost) {
+      window.alert('Please wait until shipping cost is calculated');
+      return;
+    }
+
     try {
       const orderDetails = products.map(product => ({
         item_id: product.item_id,
@@ -51,16 +57,7 @@ const Cart = () => {
 
       const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
       const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);
-
-      //ambil createOrder dari saleorder
-      const { createOrder } = saleorder || {};
-      //ambil salesorder_id dari createOrder
-      const { salesorder_id } = createOrder || {};
-
-      // Simpan salesorder_id di dalam state
-      setSalesorderId(salesorder_id);
-
-      dataToPass.saleorder = saleorder;
+      dataToPass.salesorder_id = saleorder?.createOrder?.salesorder_id;
 
       await deleteAllCartItems(userId);
       setProducts([]);
@@ -89,25 +86,25 @@ const Cart = () => {
   }, [userId]);
 
   useEffect(() => {
-    const calculateShippingCost = async () => {
+    const calculateShippingCost = async (userCityId) => {
       if (products.length > 0) {
-        const userCityId = city_id;
-    
         const shippingCostPromises = products.map(product => {
           const weight = product.package_weight * product.quantity * 1000;
           return fetchShippingCost(userCityId, parseInt(product.warehouse_city), weight, 'jne');
         });
-  
+        setFetchCost(true);
         const shippingCosts = await Promise.all(shippingCostPromises);
         const totalShippingCost = shippingCosts.reduce((acc, cost) => acc + cost.value, 0);
         setShippingCost(totalShippingCost);
+        setFetchCost(false);
       }
     };
   
-    calculateShippingCost();
+    calculateShippingCost(city_id);
   }, [products, city_id]);
 
   const handleResetCart = async () => {
+    if(fetchCost) window.alert('Please wait until shipping cost is calculated') 
     try {
       await deleteAllCartItems(userId);
       setProducts([]);

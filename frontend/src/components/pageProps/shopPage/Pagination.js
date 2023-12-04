@@ -36,7 +36,7 @@
 //           <div key={product._id} className="w-full">
 //             <Product
 //               _id={product.item_id}
-//               img={`http://localhost:8000/${product.images[0]}`}
+//               img={`${process.env.REACT_APP_BACKEND_URL}/${product.images[0]}`}
 //               productName={product.item_name}
 //               price={product.price.toFixed(2)}
 //               color={product.color}
@@ -108,16 +108,16 @@ const Pagination = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+  const notFoundImage = process.env.REACT_APP_NOTFOUND_IMG
 
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mdl:gap-4 lg:gap-10">
         {products.map((product) => (
-          <div key={product._id} className="w-full">
+          <div key={product.item_id} className="w-full">
             <Product
               _id={product.item_id}
-              img={product?.images[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
+              img={product?.images[0] ? `${process.env.REACT_APP_BACKEND_URL}/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}

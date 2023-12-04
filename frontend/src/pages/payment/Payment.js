@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { uploadPaymentProof } from "../../modules/fetch";
@@ -8,10 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Payment = () => {
   const location = useLocation();
-  const { cartData, products, userDetails } = location.state || { cartData: null, products: [], userDetails: {}};
-  const { saleorder } = location.state || {};
-  const { createOrder } = saleorder || {};
-  const { salesorder_id } = createOrder || {};
+  const { cartData, products, userDetails, salesorder_id } = location.state || { cartData: null, products: [], userDetails: {}, salesorder_id: null}
 
   const [file, setFile] = useState(null);
   const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
@@ -76,8 +72,11 @@ const Payment = () => {
             <p>Subtotal: ${product.price * product.quantity}</p>
           </div>
         ))}
+        <p>Shipping Cost: 
+          <span> ${cartData?.shipping}</span>
+        </p><br/>
         <p>Total Price: 
-          <span> ${cartData?.total}</span>
+          <span> ${cartData?.total + cartData?.shipping}</span>
         </p><br/>
         
         <form className="flex items-center space-x-6">

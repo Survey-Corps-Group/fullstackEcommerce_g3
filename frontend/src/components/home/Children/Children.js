@@ -10,7 +10,7 @@ import { getAllProducts } from "../../../modules/fetch/index";
 const Children = () => {
   const [products, setProducts] = useState([]);
 
-  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+  const notFoundImage = process.env.REACT_APP_NOTFOUND_IMG
 
   const settings = {
     infinite: true,
@@ -51,7 +51,6 @@ const Children = () => {
     const fetchProducts = async () => {
       try {
         const response = await getAllProducts();
-        console.log(response)
         setProducts(response.products);
       } catch (e) {
         console.log(e);
@@ -68,7 +67,7 @@ const Children = () => {
           <div className="px-2" key={product.item_id}>
             <Product
               _id={product.item_id}
-              img={product?.images?.[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
+              img={product?.images?.[0] ? `${process.env.REACT_APP_BACKEND_URL}/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}

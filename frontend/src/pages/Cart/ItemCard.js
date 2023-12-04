@@ -4,15 +4,14 @@ import useToken from '../../hooks/useToken'
 
 import { deleteCartItem, updateCartItem} from "../../modules/fetch";
 import { useDispatch } from "react-redux";
-import {deleteItem, decreaseQuantity,
-  increaseQuantity,} from "../../redux/orebiSlice";
+import {deleteItem, increaseQuantity,} from "../../redux/orebiSlice";
 
 const ItemCard = ({ item, updateQuantity, onDeleteItem  }) => {
   const dispatch = useDispatch();
   const { userId } = useToken();
   const [quantity, setQuantity] = useState(item.quantity);
-  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
-  const imageUrl = item?.image_url ? `http://localhost:8000/${item.image_url}` : notFoundImage;
+  const notFoundImage = process.env.REACT_APP_NOTFOUND_IMG
+  const imageUrl = item?.image_url ? `${process.env.REACT_APP_BACKEND_URL}/${item.image_url}` : notFoundImage;
   const maxQuantity = item.stock_item;
 
 

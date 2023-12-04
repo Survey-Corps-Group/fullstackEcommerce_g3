@@ -8,7 +8,7 @@ const BestSellers = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/products")
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/products`)
       .then((response) => response.json())
       .then((data) => {
         // Sort products by sumRating in descending order
@@ -55,7 +55,7 @@ const BestSellers = () => {
     ],
   };
 
-  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+  const notFoundImage = process.env.REACT_APP_NOTFOUND_IMG
 
   return (
     <div className="w-full pb-20">
@@ -65,7 +65,7 @@ const BestSellers = () => {
           <div className="px-2" key={product.item_id}>
             <Product
               _id={product.item_id}
-              img={ product?.images[0] ? `http://localhost:8000/${product.images[0]}` : notFoundImage}
+              img={ product?.images[0] ? `${process.env.REACT_APP_BACKEND_URL}/${product.images[0]}` : notFoundImage}
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}
