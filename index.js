@@ -4,6 +4,7 @@ const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
+const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
@@ -12,6 +13,7 @@ const axios = require("axios");
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
@@ -73,6 +75,20 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10000000 }, // 10MB limit
+});
+
+// smtp email
+const transporter = nodemailer.createTransport({
+  host: "smtp-mail.outlook.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASS
+  },
+  tls: {
+    ciphers:'SSLv3'
+  }
 });
 
 // testing route
@@ -1569,6 +1585,53 @@ app.put('/api/verified/:salesorder_id', async( req, res) => {
   }
 
 })
+
+
+// email
+app.post('/api/send_mail', authenticateTokenMiddleware, (req, res) => {
+  const { to, full_name, product } = req.body;
+  const mailOptions = {
+    from: 'surveycorps3@outlook.com',
+    to: to,
+    subject: 'Kami Ingin Mendengar Pendapat Anda Tentang Pembelian Anda di MommyMall!',
+    text: `
+    
+    Kepada ${full_name},
+
+    Terima kasih telah berbelanja di MommyMall! Kami harap Anda senang dengan pembelian ${product} Anda. Di MommyMall, kami selalu berusaha untuk memberikan produk berkualitas tinggi dan pengalaman berbelanja yang menyenangkan.
+
+    Kami sangat menghargai jika Anda bisa meluangkan waktu sejenak untuk memberikan ulasan tentang ${product} yang Anda beli. Pendapat Anda sangat berharga bagi kami dan komunitas pelanggan kami. Ulasan Anda akan membantu pelanggan lain mendapatkan informasi yang mereka butuhkan sebelum melakukan pembelian dan juga membantu kami untuk terus meningkatkan layanan kami.
+
+    Bagaimana Cara Memberikan Ulasan?
+
+    Kunjungi halaman produk ${product} di MommyMall.
+    Klik pada link "Tulis Ulasan" di bawah nama produk.
+    Berikan penilaian Anda dan ceritakan pengalaman Anda menggunakan produk tersebut.
+    Sebagai ucapan terima kasih, setiap ulasan yang Anda berikan akan membantu bagi customer kami.
+
+    Terima kasih atas dukungan Anda kepada MommyMall. Kami tidak sabar untuk membaca ulasan Anda!
+
+    Salam hangat,
+    
+    Michelle Wibowo
+    CEO MommyMall
+    
+    `
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.status(500).send({
+        success: false,
+        message: `Email sent: ${error.toString()}`,
+        });
+    }
+    res.status(200).send({
+      success: true,
+      message: `Email sent: ${info.response}`,
+      });
+  });
+});
 
 
 app.listen(8000, () => {
