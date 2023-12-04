@@ -1311,7 +1311,7 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
 
 //createcart digunakan di tombol yang sama dengan create user
 //skenarionya : jika klik tombol create user maka, masukan api ini juga utk create cart nya berdsarkan userId
-app.post("/api/createcart",  async (req, res) => {
+app.post("/api/createcart",  authenticateTokenMiddleware, async (req, res) => {
   try {
     // Get userId from the request body
     const { userId } = req.body;
@@ -1411,7 +1411,7 @@ app.post('/api/itemcart', authenticateTokenMiddleware, async (req, res) => {
 });
 
 //get isi cart berdasarkan id
-app.get('/api/cart/:userId', async (req, res) => {
+app.get('/api/cart/:userId',authenticateTokenMiddleware, async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
@@ -1469,7 +1469,7 @@ app.get('/api/cart/:userId', async (req, res) => {
   }
 });
 
-app.delete('/api/cart/:userId', async (req, res) => {
+app.delete('/api/cart/:userId', authenticateTokenMiddleware, async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
@@ -1489,7 +1489,7 @@ app.delete('/api/cart/:userId', async (req, res) => {
 });
 
 
-app.delete('/api/cartItem', async (req, res) => {
+app.delete('/api/cartItem', authenticateTokenMiddleware, async (req, res) => {
   const itemId = parseInt(req.query.itemId);
   const cartId = parseInt(req.query.cartId);
 
@@ -1511,7 +1511,7 @@ app.delete('/api/cartItem', async (req, res) => {
 });
 
 
-app.patch('/api/cartItem', async (req, res) => {
+app.patch('/api/cartItem', authenticateTokenMiddleware, async (req, res) => {
   const { userId, itemId, newQuantity } = req.body;
 
   if (newQuantity <= 0) {
@@ -1557,7 +1557,7 @@ app.patch('/api/cartItem', async (req, res) => {
 });
 
 // verified
-app.put('/api/verified/:salesorder_id', async( req, res) => {
+app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async( req, res) => {
   const salesorder_id = req.params.salesorder_id;
   try{
     const verified = await prisma.salesOrder.update({
