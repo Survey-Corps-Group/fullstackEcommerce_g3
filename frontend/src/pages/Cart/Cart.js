@@ -48,7 +48,10 @@ const Cart = () => {
       const customerName = userDetails?.full_name
   
       const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
-      await checkoutCart(customerName, shippingCost, totalCost, orderDetails);  
+      const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);  
+
+      dataToPass.saleorder = saleorder
+
       await deleteAllCartItems(userId);
       setProducts([]);
       dispatch(resetCart());

@@ -6,13 +6,15 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 const Payment = () => {
   const location = useLocation();
   console.log(location);
-  const { cartData, products, userDetails } = location.state || { cartData: null, products: [], userDetails: {}};
+  const { cartData, products, userDetails , saleorder } = location.state || { cartData: null, products: [], userDetails: {}, saleorder : {}};
 
 
   useEffect(() => {
     console.log("Cart Data:", cartData);
     console.log("Products:", products);
-  }, [cartData, products, userDetails]);
+    console.log("User Details:", userDetails);
+    console.log("Sale Order:", saleorder);
+  }, [cartData, products, userDetails, saleorder]);
   
 
   return (
