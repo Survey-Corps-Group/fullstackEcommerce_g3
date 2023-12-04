@@ -210,8 +210,25 @@ async function fetchUserDetails(userId) {
 }
 
 
+async function uploadPaymentProof (salesorderId, formData){
+  try {
+    const response = await instance.put(`/api/payment_proof/${salesorderId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 
 export { 
+  uploadPaymentProof,
   getAllProducts, 
   getProductById, 
   test, 
