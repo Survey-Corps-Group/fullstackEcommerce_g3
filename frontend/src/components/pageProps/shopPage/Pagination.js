@@ -121,6 +121,7 @@ const Pagination = () => {
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}
+              stock_item={product.stock_item}
             />
           </div>
         ))}

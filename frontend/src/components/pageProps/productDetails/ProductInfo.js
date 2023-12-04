@@ -11,6 +11,12 @@ const ProductInfo = ({ productInfo }) => {
   const { token, userId } = useToken();
 
   const handleAddToCart = async () => {
+
+    if(productInfo.stock_item <= 0) {
+      window.alert('Maaf, Stock Habis')
+      return
+    }
+
     if (token) {
       try {
         await createCart(userId, productInfo.item_id, 1);

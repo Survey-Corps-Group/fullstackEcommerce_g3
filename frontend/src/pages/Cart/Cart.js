@@ -6,7 +6,7 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
-import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart } from "../../modules/fetch";
+import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart, updateStockQuantity } from "../../modules/fetch";
 import useToken from '../../hooks/useToken';
 import useUserDetails from '../../hooks/useUserDetails';
 
@@ -57,6 +57,15 @@ const Cart = () => {
 
       const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
       const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);
+      
+      for (let product of products) {
+        try {
+          await updateStockQuantity(product.item_id, product.quantity);
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      
       dataToPass.salesorder_id = saleorder?.createOrder?.salesorder_id;
 
       await deleteAllCartItems(userId);
@@ -64,6 +73,7 @@ const Cart = () => {
       dispatch(resetCart());
 
       navigate('/paymentgateway', { state: dataToPass });
+
     } catch (error) {
       window.alert('Error during checkout process');
       console.log(error);

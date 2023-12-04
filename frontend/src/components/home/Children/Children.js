@@ -73,6 +73,7 @@ const Children = () => {
               color={product.color}
               sumRating={product.summary_rating}
               city_id = {product.city_id}
+              stock_item = {product.stock_item}
             />
           </div>
         ))}

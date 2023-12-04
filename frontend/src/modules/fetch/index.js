@@ -224,7 +224,14 @@ async function uploadPaymentProof (salesorderId, formData){
   }
 };
 
-
+async function updateStockQuantity(itemid, quantity) {
+  try {
+    const response = await instance.put(`/api/products/${itemid}/stock`, {stock_quantity : quantity});
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
 
 export { 
@@ -245,5 +252,6 @@ export {
   fetchShippingCost,
   checkoutCart,
   fetchUserDetails,
-  rajaOngkirProvinceName
+  rajaOngkirProvinceName,
+  updateStockQuantity
 };
