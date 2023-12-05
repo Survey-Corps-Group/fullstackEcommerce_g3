@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Heading from "../Products/Heading";
 import Product from "../Products/Product";
 import Slider from "react-slick";
-import SampleNextArrow from "../Children/SampleNextArrow";
+import SampleNextArrow from "../RecentProduct/SampleNextArrow";
 
 const BestSellers = () => {
   const [products, setProducts] = useState([]);

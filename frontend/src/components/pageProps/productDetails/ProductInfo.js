@@ -2,7 +2,9 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../../redux/orebiSlice";
 import { createCart } from "../../../modules/fetch";
-import useToken from '../../../hooks/useToken' 
+import { FaStar, FaUserCircle  } from "react-icons/fa";
+import { IconContext } from "react-icons";
+import useToken from '../../../hooks/useToken'; 
 
 const ProductInfo = ({ productInfo }) => {
   const dispatch = useDispatch();
@@ -33,8 +35,16 @@ const ProductInfo = ({ productInfo }) => {
   return (
     <div className="flex flex-col gap-5">
       <h2 className="text-4xl font-semibold">{productInfo?.item_name}</h2>
-      <p className="text-xl font-semibold">${productInfo?.price}</p>
-      <p className="text-base text-gray-600">{productInfo?.description}</p>
+      <div class="flex">
+          <div class="w-1/8">
+          <IconContext.Provider value={{ color: "orange", size: "20px"}}>
+            <FaStar />
+          </IconContext.Provider>
+          </div>
+          <div class="w-1/8 ml-1">4.0</div>
+        </div>
+        <p className="text-xl font-semibold">${productInfo?.price}</p>
+        <p className="text-base text-gray-600">{productInfo?.description}</p>
         {
           hasFeedbacks ? 
           productInfo.feedbacks.map(feedback => (
@@ -45,18 +55,37 @@ const ProductInfo = ({ productInfo }) => {
           <p className="text-sm">Be the first to leave a review.</p>
         }
       <p className="font-medium text-lg">
-        <span className="font-normal">Colors:</span> {productInfo?.color}
+        <span className="font-normal text-md">Colors:</span> {productInfo?.color}
       </p>
+      
       <button
         onClick={handleAddToCart}
-        className="w-full py-4 bg-primeColor hover:bg-black duration-300 text-white text-lg font-titleFont"
+        className="w-40 py-2 bg-primeColor hover:bg-black duration-300 text-white text-md font-titleFont"
       >
         Add to Cart
       </button>
-      <p className="font-normal text-sm">
-        <span className="text-base font-medium"> Categories:</span> Spring
-        collection, Streetwear, Women Tags: featured SKU: N/A
-      </p>
+      <p className="border-b-[2px] py-4 mb-2"></p>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-primeColor font-semibold text-xl">Reviews</h1>
+        <div class="flex">
+          <div class="w-1/8">
+          <IconContext.Provider value={{ color: "orange", size: "20px"}}>
+            <FaStar />
+          </IconContext.Provider>
+          </div>
+          <div class="w-1/8 ml-1">4.0</div>
+        </div>
+        <div class="flex">
+          <div class="w-1/8">
+          <IconContext.Provider value={{ size: "20px"}}>
+            <FaUserCircle />
+          </IconContext.Provider>
+          </div>
+          <div class="w-1/8 ml-1 text-primeColor font-semibold text-md">Alexa Mahendra</div>
+        </div>
+          <p>White Swater</p>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam aliquid necessitatibus, corrupti blanditiis mollitia distinctio ut iusto dignissimos at quidem dolorum enim error assumenda hic laudantium, tenetur fuga. Quis, nisi?</p><br />
+      </div>
     </div>
   );
 };

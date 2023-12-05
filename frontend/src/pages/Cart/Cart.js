@@ -180,8 +180,8 @@ const Cart = () => {
               </div>
               <div className="flex justify-end">
               <Link onClick={handleCheckout}>
-                <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
-                  Proceed to Checkout
+                <button className="w-36 h-10 bg-primeColor text-white hover:bg-black duration-300">
+                  Checkout
                 </button>
               </Link>              
               </div>

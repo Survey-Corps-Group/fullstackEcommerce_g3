@@ -20,6 +20,8 @@ import Home from "./pages/Home/Home";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Shop from "./pages/Shop/Shop";
+import Rate from "./pages/Rate/Rate.js";
+
 
 import AdminPage from "./pages/Admin/AdminPage";
 import AdminListOrder from "./pages/Admin/AdminListOrder.jsx";
@@ -31,6 +33,7 @@ import Warehouse from "./pages/Admin/Warehouse.jsx";
 import Profile from "./pages/Account/Profile";
 import EditProfile from "./pages/Account/EditProfile";
 import Logout from "./pages/Account/Logout";
+
 
 
 const Layout = () => {
@@ -61,6 +64,7 @@ const router = createBrowserRouter(
         <Route path="/cart" element={<Cart />}></Route>
         <Route path="/editProfile" element={<EditProfile />}></Route>
         <Route path="/paymentgateway" element={<Payment />}></Route>
+        <Route path="/rate" element={<Rate />}></Route>
       </Route>
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
