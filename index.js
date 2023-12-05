@@ -1099,6 +1099,7 @@ app.get("/api/province/:id", async (req, res) => {
 
 app.get("/api/city", async (req, res) => {
   const provinceId = req.query.province;
+  const id = req.query.id
   if (!provinceId) {
     return res.status(400).json({
       success: false,
@@ -1108,7 +1109,7 @@ app.get("/api/city", async (req, res) => {
 
   try {
     const response = await axios.get(`${RAJA_ONGKIR_URL}/city`, {
-      params: { province: provinceId, key: RAJA_ONGKIR_KEY },
+      params: { id: id,province: provinceId, key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
   } catch (error) {
@@ -1118,6 +1119,7 @@ app.get("/api/city", async (req, res) => {
     });
   }
 });
+
 
 app.post("/api/cost", async (req, res) => {
   const { origin, destination, weight, courier } = req.body;
