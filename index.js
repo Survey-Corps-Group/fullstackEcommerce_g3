@@ -1580,6 +1580,8 @@ app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async( req,
 
 })
 
+
+
 // update stock quantity when checkout
 app.put("/api/products/:itemId/stock", authenticateTokenMiddleware,
   async (req, res) => {
@@ -1672,6 +1674,29 @@ app.post('/api/send_mail', authenticateTokenMiddleware, (req, res) => {
       });
   });
 });
+
+//untuk get salesorder by so id
+app.get('/api/salesorder/:salesorder_id', async (req, res) => {
+  try {
+    const salesorder_id = req.params.salesorder_id;
+    const salesOrder = await prisma.salesOrder.findUnique({
+      where: {
+        salesorder_id: Number(salesorder_id),
+      },
+    });
+
+    if (!salesOrder) {
+      return res.status(404).json({ error: 'Sales order not found' });
+    }
+
+    res.json({ salesOrder });
+  } catch (error) {
+    console.error('Error getting sales order:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 app.listen(8000, () => {
