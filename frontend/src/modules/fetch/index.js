@@ -35,7 +35,18 @@ async function rajaOngkirProvince(){
 
 async function rajaOngkirProvinceName(id){
   try {
-    const response = await instance.get(`/api/province/${id}`)
+    const response = await instance.get(`/api/province?id=${id}`)
+    return response
+  }catch(e){
+
+  }
+}
+
+
+async function rajaOngkirCityName(city_id, province_id){
+  try { 
+    const response = await instance.get(`/api/city?id=${city_id}&province=${province_id}`)
+
     return response
   }catch(e){
 
@@ -277,5 +288,6 @@ export {
   checkoutCart,
   fetchUserDetails,
   rajaOngkirProvinceName,
-  updateStockQuantity
+  updateStockQuantity,
+  rajaOngkirCityName
 };

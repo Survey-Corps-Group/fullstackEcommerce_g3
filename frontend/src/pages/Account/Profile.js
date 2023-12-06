@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { rajaOngkirProvince , fetchUserDetails, rajaOngkirProvinceName} from "../../modules/fetch";
+import { rajaOngkirProvince , fetchUserDetails, rajaOngkirProvinceName, rajaOngkirCityName} from "../../modules/fetch";
 import { rajaOngkirCity } from "../../modules/fetch";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
-import useToken from '../../hooks/useToken';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
 
 
 const Profile = () => { 
@@ -11,6 +11,8 @@ const Profile = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [dataUser, setDataUser] = useState([])
   const [province, setProvince] = useState([])
+  const [city, setCity] = useState([])
+  const navigate = useNavigate()
 
   // fetch data user
   const token = localStorage.getItem("token");
@@ -30,6 +32,8 @@ const Profile = () => {
   
   const data = dataUser
   const id_province = data.province_id
+  const id_city = data.city_id
+  console.log(id_city, 'city_id')
 
   // fetch province
   useEffect(() => {
@@ -38,15 +42,27 @@ const Profile = () => {
         const response = await rajaOngkirProvinceName(id_province)
         setProvince(response.data.province)
       }catch (e) {
-
       }
     }
-
     fetch_province()
   }, [!province])
 
+// fetch city
+  useEffect(() => {
+    const fetch_city = async () => {
+      try {
+        const response = await rajaOngkirCityName(id_city, id_province)
+        console.log(response.data.city_name, 'city')
+        setCity(response.data.city_name)
+      }catch (e) {
+      }
+    }
+    fetch_city()
+  }, [!city])
   
-
+  const handleEditProfile = () =>{
+    navigate('/editProfile')
+  }
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Profile"/>
@@ -125,13 +141,13 @@ const Profile = () => {
                 City
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Cibitung
+                {city}
               </p>
             </div>
               
           </div>
           <button
-              onClick='/frontend/src/pages/Account/EditProfile.js'
+              onClick={handleEditProfile}
               className="w-44 bg-primeColor text-gray-200 h-10 font-titleFont text-base tracking-wide font-semibold hover:bg-black hover:text-white duration-200 mt-4"
             >
               Edit Profile
