@@ -1068,31 +1068,16 @@ app.delete("/api/warehouses/:id", authenticateTokenMiddleware, authorizeAdmin, a
 
 // integrasi raja ongkir
 app.get("/api/province", async (req, res) => {
+  const id = req.query.id
   try {
     const response = await axios.get(`${RAJA_ONGKIR_URL}/province`, {
-      params: { key: RAJA_ONGKIR_KEY },
+      params: {id: id, key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
   } catch (err) {
     res.status(500).json({
       success: false,
       message: `Server error: ${err.message}`,  
-    });
-  }
-});
-
-// province with name
-app.get("/api/province/:id", async (req, res) => {
-  const id = req.params.id
-  try {
-    const response = await axios.get(`${RAJA_ONGKIR_URL}/province?id=${id}`, {
-      params: { key: RAJA_ONGKIR_KEY },
-    });
-    res.json(response.data.rajaongkir.results);
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: `Server error: ${err.message}`,
     });
   }
 });
