@@ -266,6 +266,31 @@ async function deliveredOrder (salesorderId){
   }
 };
 
+async function updateProfile (id, username,
+  email,
+  password,
+  address,
+  full_name,
+  phone,
+  city_id,
+  province_id ){
+  try {
+    const response = await instance.put(`/api/users/${id}`,
+    username,
+  email,
+  password,
+  address,
+  full_name,
+  phone,
+  city_id,
+  province_id
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export { 
   deliveredOrder,
@@ -289,5 +314,6 @@ export {
   fetchUserDetails,
   rajaOngkirProvinceName,
   updateStockQuantity,
-  rajaOngkirCityName
+  rajaOngkirCityName,
+  updateProfile
 };
