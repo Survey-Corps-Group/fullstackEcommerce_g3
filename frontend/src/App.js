@@ -33,6 +33,8 @@ import Warehouse from "./pages/Admin/Warehouse.jsx";
 import Profile from "./pages/Account/Profile";
 import EditProfile from "./pages/Account/EditProfile";
 import Logout from "./pages/Account/Logout";
+import MyOrders from "./pages/Account/my-order.js";
+import OrderDetails from "./pages/Account/order-details.js";
 
 
 
@@ -69,6 +71,8 @@ const router = createBrowserRouter(
       <Route path="/signup" element={<SignUp />}></Route>
       <Route path="/signin" element={<SignIn />}></Route>
       <Route path="/logout" element={<Logout />}></Route>
+      <Route path="/my-orders" element={<MyOrders />}></Route>
+      <Route path="/my-orders/:id" element={<OrderDetails />}></Route>
       
       
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>

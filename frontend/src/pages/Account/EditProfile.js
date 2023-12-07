@@ -124,7 +124,6 @@ const EditProfile = () => {
   
   const handlePost = async (e) => {
     e.preventDefault();
-    console.log('masul')
     // if (!fullName || fullName === "") {
     //   fullName = defaultFullName
     // }

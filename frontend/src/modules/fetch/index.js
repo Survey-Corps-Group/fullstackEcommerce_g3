@@ -276,7 +276,7 @@ async function updateProfile (id, username,
   province_id ){
   try {
     const response = await instance.put(`/api/users/${id}`,
-    username,
+  {username,
   email,
   password,
   address,
@@ -284,12 +284,21 @@ async function updateProfile (id, username,
   phone,
   city_id,
   province_id
-    );
+  });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
+
+async function getuserOrders(){
+  try {
+      const response = await instance.get('/api/users/orders')
+      return response
+  } catch (error) {
+    throw error
+  }
+}
 
 
 export { 
@@ -315,5 +324,6 @@ export {
   rajaOngkirProvinceName,
   updateStockQuantity,
   rajaOngkirCityName,
-  updateProfile
+  updateProfile,
+  getuserOrders
 };
