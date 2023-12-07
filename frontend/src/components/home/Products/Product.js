@@ -47,7 +47,7 @@ return (
       <h3 className="text-lg font-semibold mb-2">{productName}</h3>
       <p className="text-gray-600 mb-2">Price: ${price}</p>
       <p className="text-gray-600 mb-2">Color: {color}</p>
-      <p className="text-gray-600 mb-2">Rating: {sumRating}</p>
+      <p className="text-gray-600 mb-2">Rating: {sumRating ? sumRating : 'Belum dirating'}</p>
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800"
         onClick={handleAddToCart}

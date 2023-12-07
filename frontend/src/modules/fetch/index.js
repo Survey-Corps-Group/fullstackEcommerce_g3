@@ -4,6 +4,9 @@ import { instance } from '../axios/index';
 //ambil data semua product
 async function getAllProducts(page, itemName, price, rating, sort) {
   try {
+
+    console.log(page, itemName, price, rating, sort)
+
     const response = await instance.get('/api/products', {
       params: { page, item_name: itemName, price, rating, sort },
     });

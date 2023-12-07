@@ -66,7 +66,7 @@ const Cart = () => {
         }
       }
       
-      dataToPass.salesorder_id = saleorder?.createOrder?.salesorder_id;
+      dataToPass.saleorder = saleorder;
 
       await deleteAllCartItems(userId);
       setProducts([]);

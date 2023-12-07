@@ -5,8 +5,13 @@ import { IconContext } from "react-icons";
 import { motion } from "framer-motion";
 
 
-const Ratings = () => {
+const Ratings = ({ setRating }) => {
   const [showBrands, setShowBrands] = useState(true);
+
+  const handleRatingClick = (rating) => {
+    setRating(rating);
+  };
+
   const brands = [
     {
       _id: 9006,
@@ -49,6 +54,7 @@ const Ratings = () => {
             {brands.map((item) => (
               <li
                 key={item._id}
+                onClick={() => handleRatingClick(parseInt(item.title))}
                 className="border-b-[1px] border-b-[#F0F0F0] pb-2 flex items-center gap-2 hover:text-primeColor hover:border-gray-400 duration-300"
               >
                 <IconContext.Provider value={{ color: "orange"}}>
