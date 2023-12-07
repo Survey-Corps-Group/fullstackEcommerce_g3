@@ -87,7 +87,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS
   },
   tls: {
-    ciphers:'SSLv3'
+    ciphers: 'SSLv3'
   }
 });
 
@@ -135,9 +135,9 @@ app.post("/api/users/register", async (req, res) => {
         address,
         full_name,
         phone,
-        role : 'customer',
-        city_id : parseInt(city_id),
-        province_id : parseInt(province_id)
+        role: 'customer',
+        city_id: parseInt(city_id),
+        province_id: parseInt(province_id)
       },
     });
 
@@ -224,7 +224,7 @@ app.get("/api/users", authenticateTokenMiddleware, authorizeAdmin, async (_, res
 });
 
 // get order user
-app.get("/api/users/orders", authenticateTokenMiddleware, async(req, res) => {
+app.get("/api/users/orders", authenticateTokenMiddleware, async (req, res) => {
   const user_id = req.userId
   try {
     const order = await prisma.salesOrder.findMany({
@@ -233,8 +233,8 @@ app.get("/api/users/orders", authenticateTokenMiddleware, async(req, res) => {
       }
     })
 
-    res.json(order) 
-  }catch (e) {
+    res.json(order)
+  } catch (e) {
     res.status(500).json({
       success: false,
       message: `Server error: ${err.message}`,
@@ -415,9 +415,9 @@ app.post("/api/users/admin/register", async (req, res) => {
         address,
         full_name,
         phone,
-        role : 'admin',
-        city_id : parseInt(city_id),
-        province_id : parseInt(province_id)
+        role: 'admin',
+        city_id: parseInt(city_id),
+        province_id: parseInt(province_id)
       },
     });
 
@@ -444,20 +444,23 @@ function calculateSummaryRating(feedbacks) {
 }
 
 app.get("/api/products", async (req, res) => {
-
   const { page, item_name, price, rating, sort } = req.query;
   const limit = 9;
   const offset = page ? (page - 1) * limit : 0;
+  const ratingThreshold = rating ? parseFloat(rating) : null;
 
   try {
-    // Langkah 1: Mengambil data produk
+    // Filter dasar untuk query
+    const whereFilter = {
+      item_name: item_name ? { contains: item_name, mode: 'insensitive' } : undefined,
+      price: price ? { equals: parseFloat(price) } : undefined,
+    };
+
+    // Mengambil data produk
     const products = await prisma.item.findMany({
       skip: offset,
       take: limit,
-      where: {
-        item_name: item_name ? { contains: item_name, mode: 'insensitive' } : undefined,
-        price: price ? { equals: parseFloat(price) } : undefined,
-      },
+      where: whereFilter,
       include: {
         images: {
           select: {
@@ -476,7 +479,7 @@ app.get("/api/products", async (req, res) => {
       },
     });
 
-    // Langkah 2: Menghitung rata-rata rating untuk setiap produk
+    // Menambahkan rata-rata rating
     for (const product of products) {
       const aggregateFeedback = await prisma.feedback.aggregate({
         where: {
@@ -486,15 +489,16 @@ app.get("/api/products", async (req, res) => {
           rating: true,
         },
       });
-      product.summary_rating = aggregateFeedback._avg.rating;
+      product.summary_rating = aggregateFeedback._avg.rating ? Math.round(aggregateFeedback._avg.rating) : null;
     }
 
+    // Filter produk berdasarkan rating jika diperlukan
     let filteredProducts = products;
     if (rating) {
       const ratingThreshold = parseFloat(rating);
       filteredProducts = products.filter(
         (product) =>
-          product.summary_rating >= ratingThreshold
+        Math.round(product.summary_rating) === ratingThreshold
       );
     }
 
@@ -511,7 +515,26 @@ app.get("/api/products", async (req, res) => {
       images: product.images.map((img) => img.image_url),
     }));
 
-    res.json({ products: result, page: parseInt(page || 1) });
+    if (ratingThreshold) {
+      totalRecords = await prisma.item.count({
+        where: {
+          ...whereFilter,
+          feedbacks: {
+            some: {
+              rating: {
+                gte: ratingThreshold
+              }
+            }
+          }
+        }
+      });
+    } else {
+      totalRecords = await prisma.item.count({
+        where: whereFilter
+      });
+    }
+
+    res.json({ products: result, page: parseInt(page || 1), total_records: totalRecords });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -683,7 +706,7 @@ app.post("/admin/products", authenticateTokenMiddleware, authorizeAdmin, upload.
 });
 //api edit product
 app.put(
-  "/admin/products/:itemId", authenticateTokenMiddleware, authorizeAdmin, 
+  "/admin/products/:itemId", authenticateTokenMiddleware, authorizeAdmin,
   upload.array("images", 5),
   async (req, res) => {
     try {
@@ -1090,13 +1113,13 @@ app.get("/api/province", async (req, res) => {
   const id = req.query.id
   try {
     const response = await axios.get(`${RAJA_ONGKIR_URL}/province`, {
-      params: {id: id, key: RAJA_ONGKIR_KEY },
+      params: { id: id, key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: `Server error: ${err.message}`,  
+      message: `Server error: ${err.message}`,
     });
   }
 });
@@ -1113,7 +1136,7 @@ app.get("/api/city", async (req, res) => {
 
   try {
     const response = await axios.get(`${RAJA_ONGKIR_URL}/city`, {
-      params: { id: id,province: provinceId, key: RAJA_ONGKIR_KEY },
+      params: { id: id, province: provinceId, key: RAJA_ONGKIR_KEY },
     });
     res.json(response.data.rajaongkir.results);
   } catch (error) {
@@ -1202,7 +1225,7 @@ app.get('/api/products/:id', async (req, res) => {
     if (productById) {
       res.json(productById);
     } else {
-      res.status(404).json({success: "false", message: 'Product not found' });
+      res.status(404).json({ success: "false", message: 'Product not found' });
     }
   } catch (error) {
     console.error(error);
@@ -1296,7 +1319,7 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
         }
       });
     }));
-    
+
     const findCartId = await prisma.cart.findFirst({
       where: {
         userId: req.userId,
@@ -1307,7 +1330,7 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
         cartId: findCartId.cartId
       }
     })
-    res.json({ createOrder, createdOrderDetails , deleteCart});
+    res.json({ createOrder, createdOrderDetails, deleteCart });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -1317,7 +1340,7 @@ app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req,
 
 //createcart digunakan di tombol yang sama dengan create user
 //skenarionya : jika klik tombol create user maka, masukan api ini juga utk create cart nya berdsarkan userId
-app.post("/api/createcart",  authenticateTokenMiddleware, async (req, res) => {
+app.post("/api/createcart", authenticateTokenMiddleware, async (req, res) => {
   try {
     // Get userId from the request body
     const { userId } = req.body;
@@ -1417,7 +1440,7 @@ app.post('/api/itemcart', authenticateTokenMiddleware, async (req, res) => {
 });
 
 //get isi cart berdasarkan id
-app.get('/api/cart/:userId',authenticateTokenMiddleware, async (req, res) => {
+app.get('/api/cart/:userId', authenticateTokenMiddleware, async (req, res) => {
   const userId = parseInt(req.params.userId);
 
   try {
@@ -1431,7 +1454,7 @@ app.get('/api/cart/:userId',authenticateTokenMiddleware, async (req, res) => {
       include: {
         item: {
           select: {
-            item_id : true,
+            item_id: true,
             package_weight: true,
             item_name: true,
             price: true,
@@ -1502,7 +1525,7 @@ app.delete('/api/cartItem', authenticateTokenMiddleware, async (req, res) => {
   try {
     await prisma.cartItem.delete({
       where: {
-        cartId_itemId: { 
+        cartId_itemId: {
           cartId: cartId,
           itemId: itemId,
         },
@@ -1563,9 +1586,9 @@ app.patch('/api/cartItem', authenticateTokenMiddleware, async (req, res) => {
 });
 
 // verified
-app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async( req, res) => {
+app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async (req, res) => {
   const salesorder_id = req.params.salesorder_id;
-  try{
+  try {
     const verified = await prisma.salesOrder.update({
       where: {
         salesorder_id: Number(salesorder_id)
@@ -1577,7 +1600,7 @@ app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async( req,
     res.json({
       verified
     })
-  }catch(error){
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -1670,12 +1693,12 @@ app.post('/api/send_mail', authenticateTokenMiddleware, (req, res) => {
       return res.status(500).send({
         success: false,
         message: `Email sent: ${error.toString()}`,
-        });
+      });
     }
     res.status(200).send({
       success: true,
       message: `Email sent: ${info.response}`,
-      });
+    });
   });
 });
 
