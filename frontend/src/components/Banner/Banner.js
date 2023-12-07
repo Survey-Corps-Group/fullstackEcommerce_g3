@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import {
   bannerImgOne,
-  bannerImgTwo,
   bannerImgThree,
 } from "../../assets/images";
 import Image from "../designLayouts/Image";
@@ -107,11 +106,7 @@ const Banner = () => {
             <Image imgSrc={bannerImgOne} />
           </div>
         </Link>
-        <Link to="/shop">
-          <div>
-            <Image imgSrc={bannerImgTwo} />
-          </div>
-        </Link>
+        
         <Link to="/shop">
           <div>
             <Image imgSrc={bannerImgThree} />

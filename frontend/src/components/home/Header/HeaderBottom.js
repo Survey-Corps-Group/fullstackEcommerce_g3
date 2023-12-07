@@ -18,7 +18,7 @@ const HeaderBottom = () => {
 
   useEffect(() => {
     document.body.addEventListener("click", (e) => {
-      if (ref.current.contains(e.target)) {
+      if (ref.current?.contains(e.target)) {
         setShow(true);
       } else {
         setShow(false);
@@ -41,10 +41,8 @@ const HeaderBottom = () => {
 
   useEffect(() => {
     const fetchProducts = async (page, itemName, price, rating, sort) => {
-      console.log(itemName)
         try {
           const response = await getAllProducts(page, itemName, price, rating, sort);
-          console.log(response)
           setFilteredProducts(response.products);
         } catch (e) {
           console.log(e);
@@ -70,7 +68,7 @@ const HeaderBottom = () => {
     fetchProducts();
   }, [userId, products]);
 
-  const notFoundImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'
+  const notFoundImage = process.env.REACT_APP_NOTFOUND_IMG
 
   return (
     <div className="w-full bg-[#F5F5F3] relative">
@@ -92,16 +90,11 @@ const HeaderBottom = () => {
                 className="absolute top-36 z-50 bg-primeColor w-auto text-[#767676] h-auto p-4 pb-6"
               >
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Best Sellers
+                  Highest Rating
                 </li>
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Women's Clothing
+                  Recent Product
                 </li>
-                <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Our Products
-                </li>
-
-
               </motion.ul>
             )}
           </div>
@@ -135,7 +128,7 @@ const HeaderBottom = () => {
                       key={item.item_id}
                       className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3"
                     >
-                      <img className="w-24" src={item?.images?.[0] ? `http://localhost:8000/${item.images[0]}` : notFoundImage} alt="productImg" />
+                      <img className="w-24" src={item?.images?.[0] ? `${process.env.REACT_APP_BACKEND_URL}/${item.images[0]}` : notFoundImage} alt="productImg" />
                       <div className="flex flex-col gap-1">
                         <p className="font-semibold text-lg">
                           {item.item_name}

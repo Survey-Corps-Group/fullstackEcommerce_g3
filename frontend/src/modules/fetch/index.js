@@ -33,8 +33,28 @@ async function rajaOngkirProvince(){
   }
 }
 
-async function rajaOngkirCity(id){
+async function rajaOngkirProvinceName(id){
   try {
+    const response = await instance.get(`/api/province?id=${id}`)
+    return response
+  }catch(e){
+
+  }
+}
+
+
+async function rajaOngkirCityName(city_id, province_id){
+  try { 
+    const response = await instance.get(`/api/city?id=${city_id}&province=${province_id}`)
+
+    return response
+  }catch(e){
+
+  }
+}
+
+async function rajaOngkirCity(id){
+  try { 
     const response = await instance.get(`/api/city?province=${id}`)
 
     return response
@@ -202,7 +222,89 @@ async function fetchUserDetails(userId) {
 
 
 
+async function updateStockQuantity(itemid, quantity) {
+  try {
+    const response = await instance.put(`/api/products/${itemid}/stock`, {stock_quantity : quantity});
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+async function uploadPaymentProof (salesorderId, formData){
+  try {
+    const response = await instance.put(`/api/payment_proof/${salesorderId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+async function getSalesOrder(salesorderId) {
+  try {
+    const response = await instance.get(`/api/salesorder/${salesorderId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching sales order:', error);
+    throw error;
+  }
+}
+
+async function deliveredOrder (salesorderId){
+  try {
+    const response = await instance.put(`/api/product/recieved/${salesorderId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+async function updateProfile (id, username,
+  email,
+  password,
+  address,
+  full_name,
+  phone,
+  city_id,
+  province_id ){
+  try {
+    const response = await instance.put(`/api/users/${id}`,
+  {username,
+  email,
+  password,
+  address,
+  full_name,
+  phone,
+  city_id,
+  province_id
+  });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+async function getuserOrders(){
+  try {
+      const response = await instance.get('/api/users/orders')
+      return response
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export { 
+  deliveredOrder,
+  getSalesOrder,
+  uploadPaymentProof,
   getAllProducts, 
   getProductById, 
   test, 
@@ -218,5 +320,10 @@ export {
   updateCartItem,
   fetchShippingCost,
   checkoutCart,
-  fetchUserDetails
+  fetchUserDetails,
+  rajaOngkirProvinceName,
+  updateStockQuantity,
+  rajaOngkirCityName,
+  updateProfile,
+  getuserOrders
 };

@@ -6,7 +6,7 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import { resetCart } from "../../redux/orebiSlice";
 import { emptyCart } from "../../assets/images/index";
 import ItemCard from "./ItemCard";
-import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart } from "../../modules/fetch";
+import { getCart, deleteAllCartItems, fetchShippingCost, checkoutCart, updateStockQuantity } from "../../modules/fetch";
 import useToken from '../../hooks/useToken';
 import useUserDetails from '../../hooks/useUserDetails';
 
@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router-dom';
 const Cart = () => { 
   const [products, setProducts] = useState([]);
   const [shippingCost, setShippingCost] = useState(0);
+  const [fetchCost, setFetchCost] = useState(false);
+
   const dispatch = useDispatch();
   const { userId, city_id } = useToken();
   const { userDetails } = useUserDetails();
@@ -36,6 +38,12 @@ const Cart = () => {
   };
 
   const handleCheckout = async () => {
+    
+    if (fetchCost) {
+      window.alert('Please wait until shipping cost is calculated');
+      return;
+    }
+
     try {
       const orderDetails = products.map(product => ({
         item_id: product.item_id,
@@ -43,12 +51,23 @@ const Cart = () => {
         quantity: product.quantity
       }));
 
-      const dataToPass = { cartData: calculateTotals, products };
-      
+      const dataToPass = { cartData: calculateTotals, products, userDetails };
+
       const customerName = userDetails?.full_name
-  
+
       const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
-      await checkoutCart(customerName, shippingCost, totalCost, orderDetails);  
+      const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);
+      
+      for (let product of products) {
+        try {
+          await updateStockQuantity(product.item_id, product.quantity);
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      
+      dataToPass.salesorder_id = saleorder?.createOrder?.salesorder_id;
+
       await deleteAllCartItems(userId);
       setProducts([]);
       dispatch(resetCart());
@@ -57,10 +76,9 @@ const Cart = () => {
 
     } catch (error) {
       window.alert('Error during checkout process');
-      console.log(error)
+      console.log(error);
     }
   };
-  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -78,22 +96,21 @@ const Cart = () => {
   }, [userId]);
 
   useEffect(() => {
-    const calculateShippingCost = async () => {
+    const calculateShippingCost = async (userCityId) => {
       if (products.length > 0) {
-        const userCityId = city_id;
-    
         const shippingCostPromises = products.map(product => {
           const weight = product.package_weight * product.quantity * 1000;
           return fetchShippingCost(userCityId, parseInt(product.warehouse_city), weight, 'jne');
         });
-  
+        setFetchCost(true);
         const shippingCosts = await Promise.all(shippingCostPromises);
         const totalShippingCost = shippingCosts.reduce((acc, cost) => acc + cost.value, 0);
         setShippingCost(totalShippingCost);
+        setFetchCost(false);
       }
     };
   
-    calculateShippingCost();
+    calculateShippingCost(city_id);
   }, [products, city_id]);
 
   const handleResetCart = async () => {
@@ -163,8 +180,8 @@ const Cart = () => {
               </div>
               <div className="flex justify-end">
               <Link onClick={handleCheckout}>
-                <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
-                  Proceed to Checkout
+                <button className="w-36 h-10 bg-primeColor text-white hover:bg-black duration-300">
+                  Checkout
                 </button>
               </Link>              
               </div>

@@ -1,44 +1,56 @@
 import React, { useEffect, useState } from "react";
-import { rajaOngkirProvince } from "../../modules/fetch";
-import { rajaOngkirCity } from "../../modules/fetch";
+import { rajaOngkirProvince , fetchUserDetails, rajaOngkirProvinceName, rajaOngkirCityName, rajaOngkirCity} from "../../modules/fetch";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
+import { useParams } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+import { updateProfile } from "../../modules/fetch";
 
 const EditProfile = () => {
 
   const [clientName, setclientName] = useState("");
-  const [email, setEmail] = useState("");
+  // const [province, setProvince] = useState("")
+  const [errCity, setErrCity] = useState("");
+  
+  // const [city, setCity] = useState("")
+  
+  const [dataUser, setDataUser] = useState([])
   const [provinces, setProvinces] = useState([])
   const [province, setProvince] = useState("")
-  const [errCity, setErrCity] = useState("");
   const [cities, setCities] = useState([])
   const [city, setCity] = useState("")
 
-  // fetch province dari raja ongkir
-  useEffect(() => {
-    const fetchProvince = async () => {
-        try{
-          const response = await rajaOngkirProvince()
-          setProvinces(response.data)
-        }catch (e) {
+  const [fullName, setFullName] = useState("")
+  const [defaultFullName, setDefaultFullName] = useState("")
+  const [userName, setUserName] = useState("")
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("")
+  const [password, setPassword] = useState("")
 
-        }
-    }
-    fetchProvince();
-  }, [])
+  const handleFullName = (e) =>{
+    setFullName(e.target.value)
+  }
 
-  
-  const [errClientName, setErrClientName] = useState("");
-  const [errEmail, setErrEmail] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+  const handleUserName = (e) =>{
+    setUserName(e.target.value)
+  }
 
-  const handleName = (e) => {
-    setclientName(e.target.value);
-    setErrClientName("");
-  };
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
-    setErrEmail("");
-  };
+  const handleEmail = (e) =>{
+    setEmail(e.target.value)
+  }
+
+  const handleAddress = (e) =>{
+    setAddress(e.target.value)
+  }
+
+  const handlePhone = (e) =>{
+    setPhone(e.target.value)
+  }
+
+  const handlePassword = (e) =>{
+    setPassword(e.target.value)
+  }
+
   const handleProvince = (e) => {
     setProvince(e.target.value)
   };
@@ -46,6 +58,13 @@ const EditProfile = () => {
     setCity(e.target.value);
     setErrCity("");
   };
+
+  
+  const [errClientName, setErrClientName] = useState("");
+  const [errEmail, setErrEmail] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+
 
   // ================= Email Validation start here =============
   const EmailValidation = (email) => {
@@ -55,6 +74,27 @@ const EditProfile = () => {
   };
   // ================= Email Validation End here ===============
 
+  const token = localStorage.getItem("token");
+  const decodedToken = jwtDecode(token);
+  const user_id = decodedToken.userId
+
+  useEffect(() => {
+    const fetch_user = async () => {
+    try {
+          const response = await fetchUserDetails(user_id)
+          setDataUser(response)
+          setFullName(response.full_name)
+          setDefaultFullName(response.full_name)
+          setUserName(response.username)
+          setEmail(response.email)
+          setAddress(response.address)
+          setPhone(response.phone)
+        }catch (e) {
+        }
+    }
+    fetch_user();
+  }, [])
+
   // fetch province dari raja ongkir
   useEffect(() => {
     const fetchProvince = async () => {
@@ -67,8 +107,7 @@ const EditProfile = () => {
     }
     fetchProvince();
   }, [])
-
-  // fetch city dari raja ongkir
+  
   useEffect( () => {
     const fetchCity = async () => {
       const id = province
@@ -82,18 +121,24 @@ const EditProfile = () => {
     fetchCity()
   }, [province])
 
-  const handlePost = (e) => {
+  
+  const handlePost = async (e) => {
     e.preventDefault();
-    if (!clientName) {
-      setErrClientName("Enter your Name");
-    }
-    if (!email) {
-      setErrEmail("Enter your Email");
-    } else {
-      if (!EmailValidation(email)) {
-        setErrEmail("Enter a Valid Email");
-      }
-    }
+    // if (!fullName || fullName === "") {
+    //   fullName = defaultFullName
+    // }
+    // if (!fullName) {
+    //   setErrClientName("Enter your Name");
+    // }
+    // if (!email) {
+    //   setErrEmail("Enter your Email");
+    // } else {
+    //   if (!EmailValidation(email)) {
+    //     setErrEmail("Enter a Valid Email");
+    //   }
+    // }
+
+    await updateProfile(user_id, userName, email,password,address,fullName,phone,city,province)
   };
 
   return (
@@ -110,8 +155,8 @@ const EditProfile = () => {
                 Name
               </p>
               <input
-                onChange={handleName}
-                value={clientName}
+                onChange={handleFullName}
+                value={fullName}
                 className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
                 type="text"
                 placeholder="Enter your name here"
@@ -128,8 +173,8 @@ const EditProfile = () => {
                 Address
               </p>
               <input
-                onChange={handleName}
-                value={clientName}
+                onChange={handleAddress}
+                value={address}
                 className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
                 type="text"
                 placeholder="Enter your username here"
@@ -146,8 +191,8 @@ const EditProfile = () => {
                 Username
               </p>
               <input
-                onChange={handleName}
-                value={clientName}
+                onChange={handleUserName}
+                value={userName}
                 className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
                 type="text"
                 placeholder="Enter your email here"
@@ -168,7 +213,7 @@ const EditProfile = () => {
                     value={province}
                     className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
                   >
-                    <option value="" disabled selected hidden>
+                    <option value=""  selected >
                       Select Province
                     </option>
                     {
@@ -185,8 +230,8 @@ const EditProfile = () => {
                 Email
               </p>
               <input
-                onChange={handleName}
-                value={clientName}
+                onChange={handleEmail}
+                value={email}
                 className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
                 type="text"
                 placeholder="Enter your password here"
@@ -224,8 +269,8 @@ const EditProfile = () => {
                 Phone Number
               </p>
               <input
-                onChange={handleName}
-                value={clientName}
+                onChange={handlePhone}
+                value={phone}
                 className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
                 type="text"
                 placeholder="Enter your province here"
@@ -239,50 +284,14 @@ const EditProfile = () => {
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
-                Country
-              </p>
-              <input
-                onChange={handleName}
-                value={clientName}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="text"
-                placeholder="Enter your City here"
-              />
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
                 Password
               </p>
               <input
-                onChange={handleEmail}
-                value={email}
+                onChange={handlePassword}
+                value={password}
                 className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
                 type="email"
                 placeholder="Enter your Country here"
-              />
-              {errEmail && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errEmail}
-                </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Zip/Postal code
-              </p>
-              <input
-                onChange={handleEmail}
-                value={email}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="email"
-                placeholder="Enter your zip/postal code here"
               />
               {errEmail && (
                 <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">

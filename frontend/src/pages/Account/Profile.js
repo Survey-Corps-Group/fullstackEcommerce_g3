@@ -1,101 +1,68 @@
 import React, { useEffect, useState } from "react";
-import { rajaOngkirProvince } from "../../modules/fetch";
+import { rajaOngkirProvince , fetchUserDetails, rajaOngkirProvinceName, rajaOngkirCityName} from "../../modules/fetch";
 import { rajaOngkirCity } from "../../modules/fetch";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
 
-const Profile = () => {
 
-  const [clientName, setclientName] = useState("");
-  const [email, setEmail] = useState("");
-  const [provinces, setProvinces] = useState([])
-  const [province, setProvince] = useState("")
-  const [errCity, setErrCity] = useState("");
-  const [cities, setCities] = useState([])
-  const [city, setCity] = useState("")
+const Profile = () => { 
 
-  // fetch province dari raja ongkir
-  useEffect(() => {
-    const fetchProvince = async () => {
-        try{
-          const response = await rajaOngkirProvince()
-          setProvinces(response.data)
-        }catch (e) {
-
-        }
-    }
-    fetchProvince();
-  }, [])
-
-  
-  const [errClientName, setErrClientName] = useState("");
-  const [errEmail, setErrEmail] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [dataUser, setDataUser] = useState([])
+  const [province, setProvince] = useState([])
+  const [city, setCity] = useState([])
+  const navigate = useNavigate()
 
-  const handleName = (e) => {
-    setclientName(e.target.value);
-    setErrClientName("");
-  };
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
-    setErrEmail("");
-  };
-  const handleProvince = (e) => {
-    setProvince(e.target.value)
-  };
-  const handleCity = (e) => {
-    setCity(e.target.value);
-    setErrCity("");
-  };
+  // fetch data user
+  const token = localStorage.getItem("token");
+  const decodedToken = jwtDecode(token);
+  const user_id = decodedToken.userId
 
-  // ================= Email Validation start here =============
-  const EmailValidation = (email) => {
-    return String(email)
-      .toLowerCase()
-      .match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i);
-  };
-  // ================= Email Validation End here ===============
-
-  // fetch province dari raja ongkir
   useEffect(() => {
-    const fetchProvince = async () => {
-        try{
-          const response = await rajaOngkirProvince()
-          setProvinces(response.data)
+    const fetch_user = async () => {
+    try {
+          const response = await fetchUserDetails(user_id)
+          setDataUser(response)
         }catch (e) {
-
         }
     }
-    fetchProvince();
+    fetch_user();
   }, [])
+  
+  const data = dataUser
+  const id_province = data.province_id
+  const id_city = data.city_id
+  console.log(id_city, 'city_id')
 
-  // fetch city dari raja ongkir
-  useEffect( () => {
-    const fetchCity = async () => {
-      const id = province
+  // fetch province
+  useEffect(() => {
+    const fetch_province = async () => {
       try {
-        const response = await rajaOngkirCity(id)
-        setCities(response.data)
-      }catch(e){
-
+        const response = await rajaOngkirProvinceName(id_province)
+        setProvince(response.data.province)
+      }catch (e) {
       }
     }
-    fetchCity()
-  }, [province])
+    fetch_province()
+  }, [!province])
 
-  const handlePost = (e) => {
-    e.preventDefault();
-    if (!clientName) {
-      setErrClientName("Enter your Name");
-    }
-    if (!email) {
-      setErrEmail("Enter your Email");
-    } else {
-      if (!EmailValidation(email)) {
-        setErrEmail("Enter a Valid Email");
+// fetch city
+  useEffect(() => {
+    const fetch_city = async () => {
+      try {
+        const response = await rajaOngkirCityName(id_city, id_province)
+        console.log(response.data.city_name, 'city')
+        setCity(response.data.city_name)
+      }catch (e) {
       }
     }
-  };
-
+    fetch_city()
+  }, [!city])
+  
+  const handleEditProfile = () =>{
+    navigate('/editProfile')
+  }
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Profile"/>
@@ -110,56 +77,36 @@ const Profile = () => {
                 Name
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {dataUser.full_name}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Phone Number
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {dataUser.phone}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Username
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {dataUser.username}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Address
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {dataUser.address}
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
+
             </div>
             
             
@@ -168,21 +115,16 @@ const Profile = () => {
                 Email
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {dataUser.email}
               </p>
-              {errEmail && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errEmail}
-                </p>
-              )}
+
             </div>
             <div>
               <p className="text-base font-titleFont font-semibold px-2">
                 Province
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {province}
               </p>
             </div>
             <div>
@@ -190,14 +132,8 @@ const Profile = () => {
                 Password
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                .......
               </p>
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
-                </p>
-              )}
             </div>
             
             <div>
@@ -205,13 +141,13 @@ const Profile = () => {
                 City
               </p>
               <p className="w-full py-1  px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none font-titleFont text-lightText">
-                Alexa Sabrina
+                {city}
               </p>
             </div>
               
           </div>
           <button
-              onClick='/frontend/src/pages/Account/EditProfile.js'
+              onClick={handleEditProfile}
               className="w-44 bg-primeColor text-gray-200 h-10 font-titleFont text-base tracking-wide font-semibold hover:bg-black hover:text-white duration-200 mt-4"
             >
               Edit Profile
