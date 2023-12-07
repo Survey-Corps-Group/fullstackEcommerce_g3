@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; 
 
 const ManageProduct = () => {
   const [productData, setProductData] = useState([]);
@@ -30,9 +31,13 @@ const ManageProduct = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center sm:flex-row">
+      
+    <div className="bg-gray-300 min-h-screen flex flex-col items-center justify-center sm:flex-row">
       <div className="bg-white p-8 rounded shadow-md max-w-md w-full sm:mr-4 mb-4 sm:mb-0">
-        <h2 className="text-2xl font-semibold mb-4">Manage Product</h2>
+        <h2 className="text-3xl font-semibold mb-4">Manage Product</h2>
+
+        {/* Tambahkan tulisan "You're @ Admin Manage Product Page" di sini */}
+        <p className="text-lg text-center font-semibold mb-2">You're @ Admin Manage Product Page</p>
 
         <form>
           <div className="mb-4">
@@ -120,6 +125,8 @@ const ManageProduct = () => {
         </form>
       </div>
 
+      
+
       {/* Display product data */}
       {productData.length > 0 && (
         <div className="bg-white p-4 rounded shadow-md w-full sm:w-auto">
@@ -144,9 +151,16 @@ const ManageProduct = () => {
                   <td className="py-2 px-4 border-b text-center sm:w-1/4">{product.province}</td>
                 </tr>
               ))}
+          {/* Tombol "Back to AdminPage" */}
+        <Link to="/AdminPage" className="flex justify-center mb-2">
+          <button className="bg-green-600 text-white px-1 py-2 mt-6 rounded-md hover:bg-black">
+            Back to Admin Page
+          </button>
+        </Link>
             </tbody>
           </table>
         </div>
+        
       )}
     </div>
   );

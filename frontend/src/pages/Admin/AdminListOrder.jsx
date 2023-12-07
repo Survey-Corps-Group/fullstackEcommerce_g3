@@ -3,15 +3,24 @@ import React, { useState, useEffect } from "react";
 
 const AdminListOrder = () => {
   const [orders, setOrders] = useState([]);
+  const [error, setError] = useState(null);
 
   // Misalnya, gunakan useEffect untuk mendapatkan data pesanan dari server
   useEffect(() => {
     // Gantilah bagian berikut dengan logika pengambilan data pesanan dari server
     // Contoh menggunakan fetch untuk mendapatkan data dari endpoint API
-    fetch("https://www.postman.com/planetary-equinox-145045/workspace/test/request/27335461-add42818-962f-4382-bb0d-ffef559f6523")
-      .then((response) => response.json())
+    fetch("http://localhost:8000/admin/listorder")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => setOrders(data))
-      .catch((error) => console.error("Error fetching orders:", error));
+      .catch((error) => {
+        console.error("Error fetching orders:", error);
+        setError("Error fetching orders. Please try again later.");
+      });
   }, []);
 
   const handleVerify = (orderId) => {
@@ -28,7 +37,9 @@ const AdminListOrder = () => {
     <div className="max-w-3xl mx-auto mt-8">
       <h2 className="text-3xl font-semibold mb-4 text-gray-800">List of Orders</h2>
       <div className="bg-white overflow-hidden shadow-sm rounded-md">
-        {orders.length === 0 ? (
+        {error ? (
+          <p className="p-4 text-red-600">{error}</p>
+        ) : orders.length === 0 ? (
           <p className="p-4 text-gray-600">No orders available.</p>
         ) : (
           <table className="min-w-full bg-white border border-gray-300">
@@ -37,12 +48,9 @@ const AdminListOrder = () => {
                 <th className="py-2 px-4 border-r">Order</th>
                 <th className="py-2 px-4 border-r">Customer Name</th>
                 <th className="py-2 px-4 border-r">Address</th>
-                {/* <th className="py-2 px-4 border-r">Product Name</th> */}
-                {/* <th className="py-2 px-4 border-r">Quantity</th> */}
                 <th className="py-2 px-4 border-r">Shipping Price</th>
                 <th className="py-2 px-4 border-r">Total Amount</th>
                 <th className="py-2 px-4">Status</th>
-                {/* <th className="py-2 px-4 border-r">Verify</th> */}
               </tr>
             </thead>
             <tbody>
@@ -51,8 +59,6 @@ const AdminListOrder = () => {
                   <td className="py-2 px-4 border-r">{order.id}</td>
                   <td className="py-2 px-4 border-r">{order.customerName}</td>
                   <td className="py-2 px-4 border-r">{order.address}</td>
-                  {/* <td className="py-2 px-4 border-r">{order.productName}</td>
-                  <td className="py-2 px-4 border-r">{order.quantity}</td> */}
                   <td className="py-2 px-4 border-r">{order.shippingPrice}</td>
                   <td className="py-2 px-4 border-r">{order.totalAmount}</td>
                   <td className="py-2 px-4">{order.status}</td>

@@ -1,29 +1,27 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logoLight } from "../../assets/images";
 
 const SignInAdmin = () => {
-  // ============= Initial State Start here =============
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // ============= Initial State End here ===============
-  // ============= Error Msg Start here =================
   const [errEmail, setErrEmail] = useState("");
   const [errPassword, setErrPassword] = useState("");
-
-  // ============= Error Msg End here ===================
   const [successMsg, setSuccessMsg] = useState("");
-  // ============= Event Handler Start here =============
+
   const handleEmail = (e) => {
     setEmail(e.target.value);
     setErrEmail("");
   };
+
   const handlePassword = (e) => {
     setPassword(e.target.value);
     setErrPassword("");
   };
-  // ============= Event Handler End here ===============
-  const handleSignUp = (e) => {
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     if (!email) {
@@ -33,15 +31,38 @@ const SignInAdmin = () => {
     if (!password) {
       setErrPassword("Create a password");
     }
-    // ============== Getting the value ==============
+
     if (email && password) {
-      setSuccessMsg(
-        `Hello dear, Thank you for your attempt. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
-      );
+      try {
+        // Mengirim permintaan fetch ke endpoint login
+        const response = await fetch("http://localhost:8000/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setSuccessMsg(data.message);
+
+          // Mengarahkan ke halaman AdminPage setelah login sukses
+          navigate("/AdminPage");
+        } else {
+          const errorData = await response.json();
+          setSuccessMsg(errorData.message);
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
+        setSuccessMsg("An error occurred during login.");
+      }
+
       setEmail("");
       setPassword("");
     }
   };
+
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-1/2 hidden lgl:inline-flex h-full text-white">
@@ -55,7 +76,6 @@ const SignInAdmin = () => {
             </h1>
             <p className="text-base">When you sign in, you are with us!</p>
           </div>
-          
         </div>
       </div>
       <div className="w-full lgl:w-1/2 h-full">
@@ -90,7 +110,6 @@ const SignInAdmin = () => {
                     value={email}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
                     type="email"
-                    
                   />
                   {errEmail && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
@@ -110,7 +129,6 @@ const SignInAdmin = () => {
                     value={password}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
                     type="password"
-                    
                   />
                   {errPassword && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
@@ -119,14 +137,12 @@ const SignInAdmin = () => {
                     </p>
                   )}
                 </div>
-                <Link to="/AdminPage">
                 <button
                   onClick={handleSignUp}
                   className="bg-primeColor hover:bg-black text-gray-200 hover:text-white cursor-pointer w-full text-base font-medium h-10 rounded-md  duration-300"
                 >
                   Login
                 </button>
-                </Link>
               </div>
             </div>
           </form>
