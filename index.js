@@ -223,6 +223,25 @@ app.get("/api/users", authenticateTokenMiddleware, authorizeAdmin, async (_, res
   }
 });
 
+// get order user
+app.get("/api/users/orders", authenticateTokenMiddleware, async(req, res) => {
+  const user_id = req.userId
+  try {
+    const order = await prisma.salesOrder.findMany({
+      where: {
+        user_id: user_id
+      }
+    })
+
+    res.json(order) 
+  }catch (e) {
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+})
+
 // Get User By Id
 app.get("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
   const userId = parseInt(req.params.id);
