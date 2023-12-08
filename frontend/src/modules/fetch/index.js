@@ -5,8 +5,6 @@ import { instance } from '../axios/index';
 async function getAllProducts(page, itemName, price, rating, sort) {
   try {
 
-    console.log(page, itemName, price, rating, sort)
-
     const response = await instance.get('/api/products', {
       params: { page, item_name: itemName, price, rating, sort },
     });
@@ -303,6 +301,52 @@ async function getuserOrders(){
   }
 }
 
+ async function createWarehouse (warehouseData) {
+  try {
+    const response = await instance.post('/api/warehouses', warehouseData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating warehouse:', error);
+    throw error;
+  }
+};
+
+async function getAllWarehouse() {
+  try {
+
+    const response = await instance.get('/api/warehouses')
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function updatedWarehouse(editingWarehouseId, sendData) {
+  try {
+
+    const response = await instance.put(`/api/warehouses/${editingWarehouseId}`, {
+      city : sendData.city, 
+      province : sendData.province, 
+      city_id : sendData.city_id, 
+      province_id : sendData.province_id,
+      
+    })
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function deletedWarehouse(id) {
+  try {
+
+    const response = await instance.delete(`/api/warehouses/${id}`)
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
 
 export { 
   deliveredOrder,
@@ -328,5 +372,9 @@ export {
   updateStockQuantity,
   rajaOngkirCityName,
   updateProfile,
-  getuserOrders
+  getuserOrders,
+  createWarehouse,
+  getAllWarehouse,
+  updatedWarehouse,
+  deletedWarehouse
 };
