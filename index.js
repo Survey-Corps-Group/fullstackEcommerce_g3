@@ -452,6 +452,17 @@ app.get("/api/products", async (req, res) => {
   const offset = page ? (page - 1) * limit : 0;
   const ratingThreshold = rating ? parseFloat(rating) : null;
 
+  let orderBy = {};
+  if (sort === 'lowest') {
+    orderBy = {
+      price: 'asc',
+    };
+  } else if (sort === 'highest') {
+    orderBy = {
+      price: 'desc',
+    };
+  }
+
   try {
     // Filter dasar untuk query
     const whereFilter = {
@@ -464,6 +475,7 @@ app.get("/api/products", async (req, res) => {
       skip: offset,
       take: limit,
       where: whereFilter,
+      orderBy: orderBy,
       include: {
         images: {
           select: {
