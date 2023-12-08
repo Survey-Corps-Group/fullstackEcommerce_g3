@@ -7,26 +7,15 @@ const Price = ({ setPriceRange }) => {
   const handlePriceClick = (priceRange) => {
     setPriceRange(priceRange)
   };
+
   const price = [
     {
       _id: 950,
-      priceOne: 0.0,
-      priceTwo: 49.99,
-    },
-    {
+      sort: 'lowest',
+    },{
       _id: 951,
       priceOne: 50.0,
-      priceTwo: 99.99,
-    },
-    {
-      _id: 952,
-      priceOne: 100.0,
-      priceTwo: 199.99,
-    },
-    {
-      _id: 953,
-      priceOne: 200.0,
-      priceTwo: 399.99,
+      sort: 'highest',
     },
   ];
   return (
@@ -48,10 +37,10 @@ const Price = ({ setPriceRange }) => {
           {price.map((item) => (
             <li
               key={item._id}
-              onClick={() => handlePriceClick(item.priceTwo)}
+              onClick={() => handlePriceClick(item.sort)}
               className="border-b-[1px] border-b-[#F0F0F0] pb-2 flex items-center gap-2 hover:text-primeColor hover:border-gray-400 duration-300"
             >
-              ${item.priceOne.toFixed(2)} - ${item.priceTwo.toFixed(2)}
+              {item.sort.toUpperCase()}
             </li>
           ))}
         </ul>

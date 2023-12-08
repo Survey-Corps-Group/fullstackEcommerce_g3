@@ -13,7 +13,7 @@ const Pagination = ({ price, rating }) => {
   const fetchProducts = async (page, price, rating) => {
     try {
       console.log(currentPage, price, rating)
-      const response = await getAllProducts(page, null, price, rating, null);
+      const response = await getAllProducts(page, null, null, rating, price);
       setProducts(response.products);
     } catch (error) {
       console.error("Error fetching products:", error);

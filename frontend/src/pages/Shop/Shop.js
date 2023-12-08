@@ -22,7 +22,7 @@ const Shop = () => {
         </div>
         <div className="w-full mdl:w-[80%] lgl:w-[75%] h-full flex flex-col gap-10">
           <ProductBanner itemsPerPageFromBanner={itemsPerPageFromBanner} />
-          <Pagination itemsPerPage={itemsPerPage} rating={selectedRating} priceRange={selectedPriceRange} />
+          <Pagination itemsPerPage={itemsPerPage} rating={selectedRating} price={selectedPriceRange} />
         </div>
       </div>
       {/* ================= Products End here ===================== */}
