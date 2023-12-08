@@ -58,6 +58,7 @@ model Warehouse {
   city_id       Int
   province_id   Int
   WarehouseItem WarehouseItem[]
+  @@id([city_id, province_id])
 }
 
 model Item {

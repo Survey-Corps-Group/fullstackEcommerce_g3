@@ -445,6 +445,9 @@ function calculateSummaryRating(feedbacks) {
 
 app.get("/api/products", async (req, res) => {
   const { page, item_name, price, rating, sort } = req.query;
+
+  console.log(page, item_name, price, rating, sort)
+  
   const limit = 9;
   const offset = page ? (page - 1) * limit : 0;
   const ratingThreshold = rating ? parseFloat(rating) : null;
@@ -973,6 +976,8 @@ app.get("/api/warehouses", authenticateTokenMiddleware, authorizeAdmin, async (_
         warehouse_id: true,
         city: true,
         province: true,
+        city_id: true,
+        province_id: true
       },
     });
 
