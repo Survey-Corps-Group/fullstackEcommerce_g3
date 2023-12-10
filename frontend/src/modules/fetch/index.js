@@ -357,6 +357,16 @@ async function deletedWarehouse(id) {
   }
 }
 
+async function adminGetAllSalesOrder() {
+  try {
+    const response = await instance.get('/admin/listorder')
+    console.log(response.data)
+    return response.data
+  }catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
 
 export { 
   deliveredOrder,
@@ -387,5 +397,6 @@ export {
   getAllWarehouse,
   updatedWarehouse,
   deletedWarehouse,
-  getUserOrdersDetail
+  getUserOrdersDetail,
+  adminGetAllSalesOrder
 };

@@ -59,7 +59,8 @@ const SignInAdmin = () => {
       //   setSuccessMsg("An error occurred during login.");
       // }
 
-      await login(email, password)
+      const token = await login(email, password)
+      window.localStorage.setItem("token", token.token);
       navigate("/AdminPage");
       setEmail("");
       setPassword("");
