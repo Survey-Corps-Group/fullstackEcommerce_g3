@@ -292,6 +292,16 @@ async function updateProfile (id, username,
   }
 };
 
+async function getUserOrdersDetail(id){
+  try {
+      const response = await instance.get(`/api/users/orders/${id}`)
+      console.log(response)
+      return response
+  } catch (error) {
+    throw error
+  }
+}
+
 async function getuserOrders(){
   try {
       const response = await instance.get('/api/users/orders')
@@ -376,5 +386,6 @@ export {
   createWarehouse,
   getAllWarehouse,
   updatedWarehouse,
-  deletedWarehouse
+  deletedWarehouse,
+  getUserOrdersDetail
 };
