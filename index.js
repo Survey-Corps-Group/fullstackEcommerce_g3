@@ -242,6 +242,62 @@ app.get("/api/users/orders", authenticateTokenMiddleware, async (req, res) => {
   }
 })
 
+// get order user by salesorder id
+app.get("/api/users/orders/:id", authenticateTokenMiddleware, async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    const orderDetails = await prisma.salesOrder.findUnique({
+      where: {
+        salesorder_id: orderId,
+      },
+      include: {
+        details: {
+          select: {
+            quantity: true,
+            item: {
+              select: {
+                item_name: true,
+                price: true,
+                item_id: true
+              },
+            },
+          },
+        },
+        user: {
+          select: {
+            full_name: true,
+            address: true,
+          },
+        },
+      },
+    });
+
+    if (!orderDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Include selected fields in the response
+    const response = {
+      success: true,
+      orderDetails: {
+        ...orderDetails,
+      },
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
+  }
+});
+
 // Get User By Id
 app.get("/api/users/:id", authenticateTokenMiddleware, async (req, res) => {
   const userId = parseInt(req.params.id);
