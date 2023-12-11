@@ -28,12 +28,12 @@ const AdminPage = () => {
           </span>
           <p className="text-sm text-gray-300">Manage warehouse inventory</p>
         </Link>
-        <Link to="/VerifyPayAdmin" className="admin-option bg-purple-900 hover:bg-purple-600 text-white p-6 rounded-md transition duration-300 shadow-md">
+        {/* <Link to="/VerifyPayAdmin" className="admin-option bg-purple-900 hover:bg-purple-600 text-white p-6 rounded-md transition duration-300 shadow-md">
           <span className="text-xl font-semibold block mb-2">
             <FaCheckSquare className="inline-block mr-2" /> Verify
           </span>
           <p className="text-sm text-gray-300">Verify orders or users</p>
-        </Link>
+        </Link> */}
         {/* Add more admin options based on your requirements */}
       </div>
 

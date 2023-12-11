@@ -45,18 +45,15 @@ const ProductInfo = ({ productInfo }) => {
         </div>
         <p className="text-xl font-semibold">${productInfo?.price}</p>
         <p className="text-base text-gray-600">{productInfo?.description}</p>
-        {
-          hasFeedbacks ? 
-          productInfo.feedbacks.map(feedback => (
-            <div key={feedback.feedback_id} className="feedback">
-              <p className="text-sm">{feedback.description}</p>
-            </div>
-          )) : 
-          <p className="text-sm">Be the first to leave a review.</p>
-        }
       <p className="font-medium text-lg">
         <span className="font-normal text-md">Colors:</span> {productInfo?.color}
       </p>
+
+      <p className="font-medium text-lg">
+      <span className="font-normal text-md">Stock:</span> {productInfo?.stock_item}
+      </p>
+
+      
       
       <button
         onClick={handleAddToCart}
@@ -67,24 +64,27 @@ const ProductInfo = ({ productInfo }) => {
       <p className="border-b-[2px] py-4 mb-2"></p>
       <div className="flex flex-col gap-4">
         <h1 className="text-primeColor font-semibold text-xl">Reviews</h1>
-        <div class="flex">
-          <div class="w-1/8">
-          <IconContext.Provider value={{ color: "orange", size: "20px"}}>
-            <FaStar />
-          </IconContext.Provider>
-          </div>
-          <div class="w-1/8 ml-1">4.0</div>
+        
+        {
+  hasFeedbacks ? 
+  productInfo.feedbacks.map(feedback => (
+    <>
+    <div className="feedback flex items-center" key={feedback.feedback_id}>
+      <IconContext.Provider value={{ color: "orange", size: "20px" }}>
+        <div className="flex items-center">
+          <FaStar />
+          <span className="ml-1">{feedback.rating}</span>
         </div>
-        <div class="flex">
-          <div class="w-1/8">
-          <IconContext.Provider value={{ size: "20px"}}>
-            <FaUserCircle />
-          </IconContext.Provider>
-          </div>
-          <div class="w-1/8 ml-1 text-primeColor font-semibold text-md">Alexa Mahendra</div>
-        </div>
-          <p>White Swater</p>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam aliquid necessitatibus, corrupti blanditiis mollitia distinctio ut iusto dignissimos at quidem dolorum enim error assumenda hic laudantium, tenetur fuga. Quis, nisi?</p><br />
+      </IconContext.Provider>
+    </div>
+    <p className="text-sm ml-2">{feedback.description}</p>
+    </>
+  )) : 
+  <p className="text-sm">Be the first to leave a review.</p>
+}
+
+
+
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ const BestSellers = () => {
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}
-              sumRating={product.summary_rating}
+              sumRating={product.summary_rating ? product.summary_rating : 'Belum ada rating'}
               stock_item={product.stock_item}
             />
           </div>

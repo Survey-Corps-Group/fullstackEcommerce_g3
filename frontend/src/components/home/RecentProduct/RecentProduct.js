@@ -71,7 +71,7 @@ const RecentProduct = () => {
               productName={product.item_name}
               price={product.price.toFixed(2)}
               color={product.color}
-              sumRating={product.summary_rating}
+              sumRating={product.summary_rating ? product.summary_rating : 'Belum ada rating'}
               city_id = {product.city_id}
               stock_item = {product.stock_item}
             />

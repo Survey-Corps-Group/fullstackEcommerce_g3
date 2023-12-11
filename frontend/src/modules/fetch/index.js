@@ -4,6 +4,7 @@ import { instance } from '../axios/index';
 //ambil data semua product
 async function getAllProducts(page, itemName, price, rating, sort) {
   try {
+
     const response = await instance.get('/api/products', {
       params: { page, item_name: itemName, price, rating, sort },
     });
@@ -291,12 +292,78 @@ async function updateProfile (id, username,
   }
 };
 
+async function getUserOrdersDetail(id){
+  try {
+      const response = await instance.get(`/api/users/orders/${id}`)
+      console.log(response)
+      return response
+  } catch (error) {
+    throw error
+  }
+}
+
 async function getuserOrders(){
   try {
       const response = await instance.get('/api/users/orders')
       return response
   } catch (error) {
     throw error
+  }
+}
+
+ async function createWarehouse (warehouseData) {
+  try {
+    const response = await instance.post('/api/warehouses', warehouseData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating warehouse:', error);
+    throw error;
+  }
+};
+
+async function getAllWarehouse() {
+  try {
+
+    const response = await instance.get('/api/warehouses')
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function updatedWarehouse(editingWarehouseId, sendData) {
+  try {
+
+    const response = await instance.put(`/api/warehouses/${editingWarehouseId}`, {
+      city : sendData.city, 
+      province : sendData.province, 
+      city_id : sendData.city_id, 
+      province_id : sendData.province_id,
+      
+    })
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function deletedWarehouse(id) {
+  try {
+
+    const response = await instance.delete(`/api/warehouses/${id}`)
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function adminGetAllSalesOrder() {
+  try {
+    const response = await instance.get('/admin/listorder')
+    console.log(response.data)
+    return response.data
+  }catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
   }
 }
 
@@ -325,5 +392,11 @@ export {
   updateStockQuantity,
   rajaOngkirCityName,
   updateProfile,
-  getuserOrders
+  getuserOrders,
+  createWarehouse,
+  getAllWarehouse,
+  updatedWarehouse,
+  deletedWarehouse,
+  getUserOrdersDetail,
+  adminGetAllSalesOrder
 };

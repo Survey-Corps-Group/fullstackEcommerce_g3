@@ -28,6 +28,7 @@ import AdminListOrder from "./pages/Admin/AdminListOrder.jsx";
 import ManageProduct from "./pages/ProductDetails/ManageProduct.jsx";
 import VerifyPayAdmin from "./pages/payment/VerifyPayAdmin.jsx";
 import Warehouse from "./pages/Admin/Warehouse.jsx";
+import AdminListOrderDetail from "./pages/Admin/admin-list-order-detail.jsx";
 
 
 import Profile from "./pages/Account/Profile";
@@ -78,6 +79,7 @@ const router = createBrowserRouter(
       <Route path="/signinAdmin" element={<SignInAdmin />}></Route>
       <Route path="/AdminPage" element={<AdminPage /> }></Route>
       <Route path="/AdminListOrder" element={<AdminListOrder />}></Route>
+      <Route path="/AdminListOrder/:id" element={<AdminListOrderDetail />}></Route>
       <Route path="/VerifyPayAdmin" element={<VerifyPayAdmin />}></Route>
       <Route path="/ProductDetails" element={<ProductDetails />}></Route>
       <Route path="/ManageProduct" element={<ManageProduct />}></Route>

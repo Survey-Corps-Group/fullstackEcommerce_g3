@@ -26,6 +26,9 @@ const EditProfile = () => {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
+  const [openSuccess, setOpenSuccess] = useState(false)
+  const [openError, setOpenError] = useState(false)
+  const [message, setMessage] = useState("")
 
   const handleFullName = (e) =>{
     setFullName(e.target.value)
@@ -121,24 +124,10 @@ const EditProfile = () => {
     fetchCity()
   }, [province])
 
-  
   const handlePost = async (e) => {
     e.preventDefault();
-    // if (!fullName || fullName === "") {
-    //   fullName = defaultFullName
-    // }
-    // if (!fullName) {
-    //   setErrClientName("Enter your Name");
-    // }
-    // if (!email) {
-    //   setErrEmail("Enter your Email");
-    // } else {
-    //   if (!EmailValidation(email)) {
-    //     setErrEmail("Enter a Valid Email");
-    //   }
-    // }
-
-    await updateProfile(user_id, userName, email,password,address,fullName,phone,city,province)
+      await updateProfile(user_id, userName, email,password,address,fullName,phone,city,province)
+      setOpenSuccess(true)
   };
 
   return (
@@ -147,169 +136,158 @@ const EditProfile = () => {
       {successMsg ? (
         <p className="pb-20 w-96 font-medium text-green-500">{successMsg}</p>
       ) : (
-        <form className="pb-20 ">
-          
-          <div className="max-w-container h-auto py-6 flex flex-col grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Name
-              </p>
-              <input
-                onChange={handleFullName}
-                value={fullName}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="text"
-                placeholder="Enter your name here"
-              />
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
+        <><form className="pb-20 ">
+
+            <div className="max-w-container h-auto py-6 flex flex-col grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Name
                 </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Address
-              </p>
-              <input
-                onChange={handleAddress}
-                value={address}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="text"
-                placeholder="Enter your username here"
-              />
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
+                <input
+                  onChange={handleFullName}
+                  value={fullName}
+                  className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                  type="text"
+                  placeholder="Enter your name here" />
+                {errClientName && (
+                  <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                    <span className="text-sm italic font-bold">!</span>
+                    {errClientName}
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Address
                 </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Username
-              </p>
-              <input
-                onChange={handleUserName}
-                value={userName}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="text"
-                placeholder="Enter your email here"
-              />
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
+                <input
+                  onChange={handleAddress}
+                  value={address}
+                  className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                  type="text"
+                  placeholder="Enter your username here" />
+                {errClientName && (
+                  <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                    <span className="text-sm italic font-bold">!</span>
+                    {errClientName}
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Username
                 </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Province
-              </p>
-              <select
-                    onChange={handleProvince}
-                    value={province}
-                    className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
-                  >
-                    <option value=""  selected >
-                      Select Province
+                <input
+                  onChange={handleUserName}
+                  value={userName}
+                  className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                  type="text"
+                  placeholder="Enter your email here" />
+                {errClientName && (
+                  <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                    <span className="text-sm italic font-bold">!</span>
+                    {errClientName}
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Province
+                </p>
+                <select
+                  onChange={handleProvince}
+                  value={province}
+                  className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
+                >
+                  <option value="" selected>
+                    Select Province
+                  </option>
+                  {provinces.map((provincesOption) => (
+                    <option key={provincesOption.province_id} value={provincesOption.province_id}>
+                      {provincesOption.province}
                     </option>
-                    {
-                      provinces.map((provincesOption) => (
-                        <option key={provincesOption.province_id} value={provincesOption.province_id}> 
-                          {provincesOption.province}
-                        </option>
-                      ))
-                    }
-                  </select>
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Email
-              </p>
-              <input
-                onChange={handleEmail}
-                value={email}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="text"
-                placeholder="Enter your password here"
-              />
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Email
                 </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                City
-              </p>
-              <select
-                    onChange={handleCity}
-                    value={city}
-                    className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
-                  >
-                    <option value="" disabled selected hidden>
-                      Select City
+                <input
+                  onChange={handleEmail}
+                  value={email}
+                  className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                  type="text"
+                  placeholder="Enter your password here" />
+                {errClientName && (
+                  <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                    <span className="text-sm italic font-bold">!</span>
+                    {errClientName}
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  City
+                </p>
+                <select
+                  onChange={handleCity}
+                  value={city}
+                  className="w-full h-8 px-4 text-base font-medium rounded-md border-[1px] border-gray-400 outline-none"
+                >
+                  <option value="" disabled selected hidden>
+                    Select City
+                  </option>
+                  {cities.map((citiesOption) => (
+                    <option key={citiesOption.city_id} value={citiesOption.city_id}>
+                      {citiesOption.city_name}
                     </option>
-                    {
-                      cities.map((citiesOption) => (
-                        <option key={citiesOption.city_id} value={citiesOption.city_id}> 
-                          {citiesOption.city_name}
-                        </option>
-                      ))
-                    }
-                  </select>
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Phone Number
-              </p>
-              <input
-                onChange={handlePhone}
-                value={phone}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="text"
-                placeholder="Enter your province here"
-              />
-              {errClientName && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errClientName}
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Phone Number
                 </p>
-              )}
-            </div>
-            <div>
-              <p className="text-base font-titleFont font-semibold px-2">
-                Password
-              </p>
-              <input
-                onChange={handlePassword}
-                value={password}
-                className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
-                type="email"
-                placeholder="Enter your Country here"
-              />
-              {errEmail && (
-                <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
-                  <span className="text-sm italic font-bold">!</span>
-                  {errEmail}
+                <input
+                  onChange={handlePhone}
+                  value={phone}
+                  className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                  type="text"
+                  placeholder="Enter your province here" />
+                {errClientName && (
+                  <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                    <span className="text-sm italic font-bold">!</span>
+                    {errClientName}
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-base font-titleFont font-semibold px-2">
+                  Password
                 </p>
-              )}
+                <input
+                  onChange={handlePassword}
+                  value={password}
+                  className="w-full py-1 border-b-2 px-2 text-base font-medium placeholder:font-normal placeholder:text-sm outline-none focus-within:border-primeColor"
+                  type="email"
+                  placeholder="Enter your Country here" />
+                {errEmail && (
+                  <p className="text-red-500 text-sm font-titleFont font-semibold mt-1 px-2 flex items-center gap-1">
+                    <span className="text-sm italic font-bold">!</span>
+                    {errEmail}
+                  </p>
+                )}
+              </div>
             </div>
-        
-            
-          </div>
-          <button
+            <button
               onClick={handlePost}
               className="w-44 bg-primeColor text-gray-200 h-10 font-titleFont text-base tracking-wide font-semibold hover:bg-black hover:text-white duration-200 mt-4"
             >
               Save changes
             </button>
-        </form>
+          </form>
+            </>
       )}
     </div>
   );

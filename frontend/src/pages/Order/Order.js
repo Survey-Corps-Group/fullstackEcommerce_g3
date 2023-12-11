@@ -68,7 +68,7 @@ const Order = () => {
         <p>{userDetails?.phone}</p>
         <p>{userDetails?.address}</p>
         <br />
-        {products.map((product, index) => (
+        {products?.map((product, index) => (
           <div key={index} className="border-b-[2px] py-4 mb-2">
             <h2 className="text-primeColor font-semibold text-lg">{product.item_name}</h2>
             <p>Quantity: {product.quantity}</p>
