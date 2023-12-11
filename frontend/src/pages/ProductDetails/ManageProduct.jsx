@@ -1,169 +1,162 @@
+// ProductList.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
 
-const ManageProduct = () => {
-  const [productData, setProductData] = useState([]);
+const productsData = [
+  { id: 1, name: 'Product 1', description: 'Description 1', price: 10 },
+  { id: 2, name: 'Product 2', description: 'Description 2', price: 20 },
+  { id: 3, name: 'Product 3', description: 'Description 3', price: 30 },
+];
+
+const ProductItem = ({ product, onEdit, onDelete }) => (
+  <tr>
+    <td className="py-2 px-4 sm:px-6 md:px-8">{product.name}</td>
+    <td className="py-2 px-4 sm:px-6 md:px-8">{product.description}</td>
+    <td className="py-2 px-4 sm:px-6 md:px-8">{product.price}</td>
+    <td className="py-2 px-4 sm:px-6 md:px-8">
+      <button
+        className="bg-blue-500 text-white py-1 px-2 rounded mr-2 hover:bg-blue-600"
+        onClick={() => onEdit(product.id)}
+      >
+        Edit
+      </button>
+      <button
+        className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+        onClick={() => onDelete(product.id)}
+      >
+        Delete
+      </button>
+    </td>
+  </tr>
+);
+
+const ProductList = () => {
+  const [products, setProducts] = useState(productsData);
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    productName: '',
-    quantity: '',
+    name: '',
     warehouse: '',
-    province: '',
-    city: '',
+    description: '',
+    image: '',
+    price: '', // Menambahkan kolom price
   });
 
-  const handleChange = (e) => {
+  const [editProductId, setEditProductId] = useState(null);
+
+  const handleEdit = (productId) => {
+    const productToEdit = products.find((product) => product.id === productId);
+    setFormData(productToEdit);
+    setEditProductId(productId);
+    setShowForm(true);
+  };
+
+  const handleDelete = (productId) => {
+    const updatedProducts = products.filter((product) => product.id !== productId);
+    setProducts(updatedProducts);
+  };
+
+  const handleAdd = () => {
+    setEditProductId(null);
+    setShowForm(true);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+
+    if (editProductId !== null) {
+      // Jika editProductId tidak null, maka kita sedang melakukan edit
+      const updatedProducts = products.map((product) =>
+        product.id === editProductId ? { ...formData, id: editProductId } : product
+      );
+      setProducts(updatedProducts);
+      setEditProductId(null);
+    } else {
+      // Jika editProductId null, maka kita sedang menambahkan produk baru
+      const newProduct = {
+        id: products.length + 1,
+        ...formData,
+      };
+      setProducts([...products, newProduct]);
+    }
+
+    setShowForm(false);
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+      name: '',
+      warehouse: '',
+      description: '',
+      image: '',
+      price: '', // Reset kolom price setelah submit
     });
   };
 
-  const handleSubmit = () => {
-    const newProductData = [...productData, formData];
-    setProductData(newProductData);
-    setFormData({
-      productName: '',
-      quantity: '',
-      warehouse: '',
-      province: '',
-      city: '',
-    });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   return (
-      
-    <div className="bg-gray-300 min-h-screen flex flex-col items-center justify-center sm:flex-row">
-      <div className="bg-white p-8 rounded shadow-md max-w-md w-full sm:mr-4 mb-4 sm:mb-0">
-        <h2 className="text-3xl font-semibold mb-4">Manage Product</h2>
+    <div className="container mx-auto p-4">
+      <h2 className="text-3xl font-semibold mb-4 text-indigo-700">Product List</h2>
 
-        {/* Tambahkan tulisan "You're @ Admin Manage Product Page" di sini */}
-        <p className="text-lg text-center font-semibold mb-2">You're @ Admin Manage Product Page</p>
-
-        <form>
-          <div className="mb-4">
-            <label htmlFor="productName" className="block text-gray-700 text-sm font-bold mb-2">
-              Product Name:
-            </label>
-            <input
-              type="text"
-              id="productName"
-              name="productName"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter product name"
-              value={formData.productName}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="quantity" className="block text-gray-700 text-sm font-bold mb-2">
-              Quantity:
-            </label>
-            <input
-              type="text"
-              id="quantity"
-              name="quantity"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="warehouse" className="block text-gray-700 text-sm font-bold mb-2">
-              Warehouse:
-            </label>
-            <input
-              type="text"
-              id="warehouse"
-              name="warehouse"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter warehouse"
-              value={formData.warehouse}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="province" className="block text-gray-700 text-sm font-bold mb-2">
-              Province:
-            </label>
-            <input
-              type="text"
-              id="province"
-              name="province"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter province"
-              value={formData.province}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2">
-              City:
-            </label>
-            <input
-              type="text"
-              id="city"
-              name="city"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter city"
-              value={formData.city}
-              onChange={handleChange}
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full"
-          >
-            Add Product
-          </button>
-        </form>
+      <div className="overflow-x-auto mb-8">
+        <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <thead className="bg-indigo-500 text-white">
+            <tr>
+              <th className="py-2 px-4 sm:px-6 md:px-8">Product Name</th>
+              <th className="py-2 px-4 sm:px-6 md:px-8">Description</th>
+              <th className="py-2 px-4 sm:px-6 md:px-8">Price</th>
+              <th className="py-2 px-4 sm:px-6 md:px-8">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+          onClick={handleAdd}
+        >
+          Add
+        </button>
+      </div>
 
-      {/* Display product data */}
-      {productData.length > 0 && (
-        <div className="bg-white p-4 rounded shadow-md w-full sm:w-auto">
-          <h3 className="text-lg font-semibold mb-2">Product List:</h3>
-          <table className="min-w-full border rounded-md overflow-hidden">
-            <thead className="bg-orange-200">
-              <tr>
-                <th className="py-2 px-4 border-b sm:w-1/4 text-center">Product Name</th>
-                <th className="py-2 px-4 border-b sm:w-1/4 text-center">Quantity</th>
-                <th className="py-2 px-4 border-b sm:w-1/4 text-center">Warehouse</th>
-                <th className="py-2 px-4 border-b sm:w-1/4 text-center">City</th>
-                <th className="py-2 px-4 border-b sm:w-1/4 text-center">Province</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productData.map((product, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-blue-100'}>
-                  <td className="py-2 px-4 border-b text-center sm:w-1/4">{product.productName}</td>
-                  <td className="py-2 px-4 border-b text-center sm:w-1/4">{product.quantity}</td>
-                  <td className="py-2 px-4 border-b text-center sm:w-1/4">{product.warehouse}</td>
-                  <td className="py-2 px-4 border-b text-center sm:w-1/4">{product.city}</td>
-                  <td className="py-2 px-4 border-b text-center sm:w-1/4">{product.province}</td>
-                </tr>
-              ))}
-          {/* Tombol "Back to AdminPage" */}
-        <Link to="/AdminPage" className="flex justify-center mb-2">
-          <button className="bg-green-600 text-white px-1 py-2 mt-6 rounded-md hover:bg-black">
-            Back to Admin Page
+      {showForm && (
+        <form onSubmit={handleFormSubmit} className="max-w-md mx-auto bg-white p-8 rounded shadow-md mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-indigo-700">
+            {editProductId !== null ? 'Edit Product' : 'Add Product'}
+          </h2>
+          {['Product Name', 'Warehouse', 'Description', 'Image URL', 'Price'].map((field) => (
+            <div key={field} className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">{field}:</label>
+              <input
+                type={field === 'Image URL' ? 'url' : 'text'}
+                name={field.toLowerCase()}
+                value={formData[field.toLowerCase()]}
+                onChange={handleChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+          ))}
+          <button
+            type="submit"
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
+            {editProductId !== null ? 'Save Changes' : 'Add Product'}
           </button>
-        </Link>
-            </tbody>
-          </table>
-        </div>
-        
+        </form>
       )}
     </div>
   );
 };
 
-export default ManageProduct;
+export default ProductList;

@@ -82,6 +82,8 @@ const router = createBrowserRouter(
       <Route path="/ProductDetails" element={<ProductDetails />}></Route>
       <Route path="/ManageProduct" element={<ManageProduct />}></Route>
       <Route path="/Warehouse" element={<Warehouse/>}></Route>
+      <Route path="/admin/cart/:id" component={ProductDetails} />
+      <Route path="/admin/cart" component={ManageProduct} />
       
     </Route>
   )
