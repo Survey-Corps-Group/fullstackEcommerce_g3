@@ -13,7 +13,7 @@ export const navBarList = [
   {
     _id: 1003,
     title: "Order",
-    link: "/order",
+    link: "/my-orders",
   },
   
 ];

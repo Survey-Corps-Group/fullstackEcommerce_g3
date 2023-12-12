@@ -5,6 +5,7 @@ import { logoLight } from "../../assets/images";
 import { rajaOngkirProvince } from "../../modules/fetch";
 import { rajaOngkirCity } from "../../modules/fetch";
 import { register } from "../../modules/fetch";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   // ============= Initial State Start here =============
@@ -29,6 +30,8 @@ const SignUp = () => {
   const [errPassword, setErrPassword] = useState("");
   const [errAddress, setErrAddress] = useState("");
   const [errCity, setErrCity] = useState("");
+
+  const navigate = useNavigate();
   
   // ============= Error Msg End here ===================
   const [successMsg, setSuccessMsg] = useState("");
@@ -145,6 +148,9 @@ const SignUp = () => {
         country &&
         zip
       ) {
+
+        await register( username, email, password, address, fullName, phone, province, city)
+
         setSuccessMsg(
           `Hello ${fullName}, Your account has been successfully created!`
         );
@@ -156,7 +162,6 @@ const SignUp = () => {
         setCity("");
         
       }
-      await register( username, email, password, address, fullName, phone, province, city)
     }
   };
   return (

@@ -72,7 +72,9 @@ const ProductInfo = ({ productInfo }) => {
     <div className="feedback flex items-center" key={feedback.feedback_id}>
       <IconContext.Provider value={{ color: "orange", size: "20px" }}>
         <div className="flex items-center">
-          <FaStar />
+          {Array.from({ length: feedback.rating }, (_, index) => (
+              <FaStar key={index} />
+            ))}
           <span className="ml-1">{feedback.rating}</span>
         </div>
       </IconContext.Provider>

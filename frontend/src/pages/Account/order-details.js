@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getUserOrdersDetail, getuserOrders } from "../../modules/fetch";
+import { useParams, useNavigate } from "react-router-dom";
+import { getUserOrdersDetail, getuserOrders, deliveredOrder } from "../../modules/fetch";
 
 
 const OrderDetails = () => {
+  const navigate = useNavigate();
   const { id } = useParams(); // Destructure the id property from the object
   const [salesOrderData, setSalesOrderData] = useState([])
   const [items, setItems] = useState([])
   const [open, setOpen] = useState(false)
-  const [openConfirmation, setOpenConfirmation] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
 
   useEffect(() => {
@@ -19,12 +20,35 @@ const OrderDetails = () => {
       setItems(response.data.orderDetails.details)
     }
     fetch_order_details()
-  },[]) 
+  },[id]) 
 
  
 
   const handleReceived = () => {
-    // setOpenConfirmation(true)
+    setShowConfirmationModal(true);
+  }
+
+  const handleConfirmation = async (accepted) => {
+    if (accepted) {
+      try {
+        // Show confirmation modal
+        setShowConfirmationModal(true);
+  
+        // Mark order as received when accepted
+        await deliveredOrder(salesOrderData.orderDetails?.salesorder_id);
+        // console.log();
+        window.alert('Sukses');
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        // Handle error as needed
+      }
+    }
+  setShowConfirmationModal(false);
+  };
+
+  const handleReviewed = () => {
+    const dataToPass = salesOrderData.orderDetails;
+    navigate('/rate', { state: dataToPass });
   }
 
   // button payment
@@ -64,6 +88,35 @@ const OrderDetails = () => {
     }
   }
 
+  const buttonReviewed = () => {
+    if(salesOrderData.orderDetails?.order_status === "recieved") {
+    return(
+      <button 
+      onClick={handleReviewed}
+      className="bg-teal-500 text-white py-2 px-4 rounded"
+      >
+      Berikan penilaian!
+    </button>
+    )
+    } else {
+      return(
+      <p></p>
+      )
+    }
+  }
+
+  const buttonOnly = () => {
+    if(salesOrderData.orderDetails?.order_status === "reviewed") {
+    return(
+      <button 
+      className="bg-yellow-500 text-white py-2 px-4 rounded"
+      >
+      Terimakasih atas penilaiannya!
+    </button>
+    )
+  }
+}
+
   console.log(open, 'open')
   return (
     <div className="container mx-auto mt-8">
@@ -89,9 +142,31 @@ const OrderDetails = () => {
         </div>
         {buttonPayment()}
         {buttonReceived()}
-        {/* {open === true && (
-          modalConfirmation("testing")
-        )} */}
+        {buttonReviewed()}
+        {buttonOnly()}
+        {/* Confirmation Modal */}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-md">
+            <p className="text-lg font-semibold">Apakah yakin sudah menerima barang?</p>
+            <div style={{ height: "20px" }}></div>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => handleConfirmation(true)}
+                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 duration-300"
+              >
+                YA
+              </button>
+              <button
+                onClick={() => handleConfirmation(false)}
+                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 duration-300"
+              >
+                TIDAK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         
       </div>
     </div>

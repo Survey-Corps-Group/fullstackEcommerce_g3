@@ -267,6 +267,15 @@ async function deliveredOrder (salesorderId){
   }
 };
 
+async function reviewedOrder (salesorderId){
+  try {
+    const response = await instance.put(`/api/product/reviewed/${salesorderId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 async function updateProfile (id, username,
   email,
   password,
@@ -367,6 +376,16 @@ async function adminGetAllSalesOrder() {
   }
 }
 
+async function createFeedback(item_id, rating, description) {
+  try {
+    const response = await instance.post(`/api/products/${item_id}/feedback`, {rating: rating, description:description})
+    console.log(response.data)
+    return response.data
+  }catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
 
 export { 
   deliveredOrder,
@@ -398,5 +417,7 @@ export {
   updatedWarehouse,
   deletedWarehouse,
   getUserOrdersDetail,
-  adminGetAllSalesOrder
+  adminGetAllSalesOrder,
+  reviewedOrder,
+  createFeedback
 };
