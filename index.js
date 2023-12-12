@@ -255,6 +255,7 @@ app.get("/api/users/orders/:id", authenticateTokenMiddleware, async (req, res) =
         details: {
           select: {
             quantity: true,
+            salesorder_detail_id:true,
             item: {
               select: {
                 item_name: true,
