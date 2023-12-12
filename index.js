@@ -711,156 +711,7 @@ app.get("/admin/products", authenticateTokenMiddleware, authorizeAdmin, async (r
     });
   }
 });
-//api admin add product
-app.post("/admin/products", authenticateTokenMiddleware, authorizeAdmin, upload.array("images", 5), async (req, res) => {
-  try {
-    const {
-      item_name,
-      price,
-      description,
-      color,
-      package_weight,
-      stock_item,
-    } = req.body;
 
-    // Check if the product with the same name already exists
-    const existingProduct = await prisma.item.findFirst({
-      where: {
-        item_name: item_name,
-      },
-    });
-
-    if (existingProduct) {
-      return res.status(409).json({
-        success: false,
-        message: "Product with the same name already exists",
-      });
-    }
-
-    // Create the new product
-    const newProduct = await prisma.item.create({
-      data: {
-        item_name,
-        price: parseFloat(price),
-        description,
-        color,
-        package_weight: parseInt(package_weight),
-        stock_item: parseInt(stock_item),
-      },
-    });
-
-    // If there are image files uploaded, save their information
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const image_url = file.path.replace("\\", "/"); // Fix path for Windows
-        await prisma.itemImage.create({
-          data: {
-            item_id: newProduct.item_id,
-            image_url,
-          },
-        });
-      }
-    }
-
-    res.status(201).json({
-      success: true,
-      message: "Product created successfully",
-      product: newProduct,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      success: false,
-      message: `Server error: ${err.message}`,
-    });
-  }
-});
-//api edit product
-app.put(
-  "/admin/products/:itemId", authenticateTokenMiddleware, authorizeAdmin,
-  upload.array("images", 5),
-  async (req, res) => {
-    try {
-      const itemId = parseInt(req.params.itemId);
-      const {
-        item_name,
-        price,
-        description,
-        color,
-        package_weight,
-        stock_item,
-      } = req.body;
-
-      // Check if the product with the given ID exists
-      const existingProduct = await prisma.item.findUnique({
-        where: {
-          item_id: itemId,
-        },
-        include: {
-          images: {
-            select: {
-              item_image_id: true,
-            },
-          },
-        },
-      });
-
-      if (!existingProduct) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
-
-      // Delete existing images associated with the product
-      await prisma.itemImage.deleteMany({
-        where: {
-          item_id: itemId,
-        },
-      });
-
-      // Update the product information
-      const updatedProduct = await prisma.item.update({
-        where: {
-          item_id: itemId,
-        },
-        data: {
-          item_name,
-          price: parseFloat(price),
-          description,
-          color,
-          package_weight: parseInt(package_weight),
-          stock_item: parseInt(stock_item),
-          // You can include other fields as needed
-        },
-      });
-
-      // If new images are uploaded, save the image information
-      if (req.files) {
-        const images = req.files.map((file) => ({
-          item_id: itemId,
-          image_url: file.path.replace("\\", "/"), // Fix path for Windows
-        }));
-
-        await prisma.itemImage.createMany({
-          data: images,
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Product updated successfully",
-        product: updatedProduct,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({
-        success: false,
-        message: `Server error: ${err.message}`,
-      });
-    }
-  }
-);
 //api admin delete product by id
 app.delete("/admin/products/:id", authenticateTokenMiddleware, authorizeAdmin, async (req, res) => {
   try {
@@ -1811,6 +1662,192 @@ app.get('/api/salesorder/:salesorder_id', async (req, res) => {
   }
 });
 
+
+//after 11 december
+//admin delete warehouseitem by id
+app.delete('/admin/warehouseitem/:itemId', async (req, res) => {
+  try {
+    const itemId = parseInt(req.params.itemId);
+
+    // Hapus warehouseitem berdasarkan item_id
+    await prisma.warehouseItem.deleteMany({
+      where: {
+        item_id: itemId,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'WarehouseItem deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting warehouseItem:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+  }
+});
+
+//admin add product checked
+app.post("/admin/products", authenticateTokenMiddleware, authorizeAdmin, upload.array("images", 5), async (req, res) => {
+  try {
+    const { item_name, price, description, color, package_weight, stock_item, warehouse_id } = req.body;
+
+    const createdProduct = await prisma.item.create({
+      data: {
+        item_name,
+        price: parseFloat(price),
+        description,
+        color,
+        package_weight: parseInt(package_weight),
+        stock_item: parseInt(stock_item),
+        WarehouseItem: {
+          create: {
+            warehouse_id: parseInt(warehouse_id),
+          },
+        },
+        images: {
+          create: req.files.map((file) => ({
+            image_url: file.path,
+          })),
+        },
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      product: createdProduct,
+    });
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+// API untuk mengedit produk berdasarkan itemId
+app.put("/admin/products/edit/:itemId", authenticateTokenMiddleware, authorizeAdmin, upload.array("images", 5), async (req, res) => {
+  try {
+    const itemId = parseInt(req.params.itemId);
+
+    // Ambil produk dan informasi gudang terkait
+    const existingProduct = await prisma.item.findFirst({
+      where: {
+        item_id: itemId,
+      },
+      include: {
+        WarehouseItem: {
+          select: {
+            warehouse_id: true,
+          },
+        },
+      },
+    });
+    console.log('tes1', existingProduct);
+    
+    // Destructure array WarehouseItem untuk mendapatkan warehouse_id
+    const [warehouseInfo] = existingProduct.WarehouseItem || [];
+    const existingWarehouseId = warehouseInfo?.warehouse_id;
+    
+    console.log('tes2', existingWarehouseId);
+    
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+    // Dapatkan warehouse_id dari hasil query
+    const { item_name, price, description, color, package_weight, stock_item, warehouse_id } = req.body;
+
+const updatedProduct = await prisma.item.update({
+  where: {
+    item_id: itemId,
+  },
+  data: {
+    item_name,
+    price: parseFloat(price),
+    description,
+    color,
+    package_weight: parseInt(package_weight),
+    stock_item: parseInt(stock_item),
+    WarehouseItem: {
+      update: {
+        where: {
+          warehouse_id_item_id: {
+            warehouse_id: existingWarehouseId,
+            item_id: itemId,
+          },
+        },
+        data: {
+          warehouse_id: parseInt(warehouse_id),
+        },
+      },
+    },
+    images: {
+      deleteMany: {
+        item_id: itemId,
+      },
+      create: req.files.map((file) => ({
+        image_url: file.path,
+      })),
+    },
+  },
+});
+
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+//mencari itemId berdasarkan Item _name
+app.get("/api/itemId/:itemName", async (req, res) => {
+  try {
+    const itemName = req.params.itemName;
+console.log('tes', itemName);
+    const item = await prisma.item.findFirst({
+      where: {
+        item_name: itemName,
+      },
+      select: {
+        item_id: true,
+      },
+    });
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: "Item not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      item_id: item.item_id,
+    });
+  } catch (error) {
+    console.error("Error fetching item:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
 
 
 
