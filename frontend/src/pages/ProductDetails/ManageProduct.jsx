@@ -1,162 +1,181 @@
-// ProductList.jsx
-import React, { useState } from 'react';
 
-const productsData = [
-  { id: 1, name: 'Product 1', description: 'Description 1', price: 10 },
-  { id: 2, name: 'Product 2', description: 'Description 2', price: 20 },
-  { id: 3, name: 'Product 3', description: 'Description 3', price: 30 },
-];
 
-const ProductItem = ({ product, onEdit, onDelete }) => (
-  <tr>
-    <td className="py-2 px-4 sm:px-6 md:px-8">{product.name}</td>
-    <td className="py-2 px-4 sm:px-6 md:px-8">{product.description}</td>
-    <td className="py-2 px-4 sm:px-6 md:px-8">{product.price}</td>
-    <td className="py-2 px-4 sm:px-6 md:px-8">
-      <button
-        className="bg-blue-500 text-white py-1 px-2 rounded mr-2 hover:bg-blue-600"
-        onClick={() => onEdit(product.id)}
-      >
-        Edit
-      </button>
-      <button
-        className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
-        onClick={() => onDelete(product.id)}
-      >
-        Delete
-      </button>
-    </td>
-  </tr>
-);
+// Import statements
+import React, { useEffect, useState } from 'react';
+import { getAdminProducts, getItemIdByName, deleteProduct, deleteWarehouseItem } from '../../modules/fetch/index';
+import { Link, useNavigate } from 'react-router-dom';
 
-const ProductList = () => {
-  const [products, setProducts] = useState(productsData);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    warehouse: '',
-    description: '',
-    image: '',
-    price: '', // Menambahkan kolom price
-  });
+// Functional component for ManageProduct
+const ManageProduct = () => {
+  const [products, setProducts] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteItemName, setDeleteItemName] = useState('');
+  const navigate = useNavigate();
 
-  const [editProductId, setEditProductId] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const adminProducts = await getAdminProducts();
+        const sortedProducts = adminProducts.products.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setProducts(sortedProducts);
+      } catch (error) {
+        console.error('Error fetching admin products:', error);
+      }
+    };
 
-  const handleEdit = (productId) => {
-    const productToEdit = products.find((product) => product.id === productId);
-    setFormData(productToEdit);
-    setEditProductId(productId);
-    setShowForm(true);
-  };
+    fetchData();
+  }, []);
 
-  const handleDelete = (productId) => {
-    const updatedProducts = products.filter((product) => product.id !== productId);
-    setProducts(updatedProducts);
-  };
+  async function handleEditClick(item_name) {
+    const res = await getItemIdByName(item_name);
+    const itemId = res.item_id;
+    navigate(`/EditProduct/${itemId}`);
+  }
 
-  const handleAdd = () => {
-    setEditProductId(null);
-    setShowForm(true);
-  };
+  async function handleDeleteClick(item_name) {
+    // Menampilkan modal konfirmasi
+    setShowDeleteModal(true);
+    setDeleteItemName(item_name);
+  }
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
+  async function handleConfirmDelete() {
+    try {
+      // Panggil fungsi deleteProduct dan deleteWarehouseItem untuk menghapus produk dan warehouse item
+      const res = await getItemIdByName(deleteItemName);
+      console.log("tes",res);
+      const itemId = res.item_id;
+      console.log("tes",itemId);
+      await deleteWarehouseItem(itemId);
+      await deleteProduct(itemId);
 
-    if (editProductId !== null) {
-      // Jika editProductId tidak null, maka kita sedang melakukan edit
-      const updatedProducts = products.map((product) =>
-        product.id === editProductId ? { ...formData, id: editProductId } : product
+      // Produk berhasil dihapus, refresh data produk
+      console.log(`Product with ID ${itemId} deleted successfully`);
+
+      // Refresh data produk
+      const adminProducts = await getAdminProducts();
+      const sortedProducts = adminProducts.products.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
-      setProducts(updatedProducts);
-      setEditProductId(null);
-    } else {
-      // Jika editProductId null, maka kita sedang menambahkan produk baru
-      const newProduct = {
-        id: products.length + 1,
-        ...formData,
-      };
-      setProducts([...products, newProduct]);
+      setProducts(sortedProducts);
+
+      // Tutup modal setelah penghapusan
+      setShowDeleteModal(false);
+    } catch (error) {
+      // Handle error jika diperlukan
+      console.error('Error deleting product:', error);
     }
-
-    setShowForm(false);
-    setFormData({
-      name: '',
-      warehouse: '',
-      description: '',
-      image: '',
-      price: '', // Reset kolom price setelah submit
-    });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-3xl font-semibold mb-4 text-indigo-700">Product List</h2>
-
-      <div className="overflow-x-auto mb-8">
-        <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
-          <thead className="bg-indigo-500 text-white">
-            <tr>
-              <th className="py-2 px-4 sm:px-6 md:px-8">Product Name</th>
-              <th className="py-2 px-4 sm:px-6 md:px-8">Description</th>
-              <th className="py-2 px-4 sm:px-6 md:px-8">Price</th>
-              <th className="py-2 px-4 sm:px-6 md:px-8">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex justify-end mb-4">
+    <div className="max-w-container mx-auto px-4">
+      <div className="mb-4" style={{ height: '20px' }}></div>
+      <div className="flex items-center justify-between mb-4">
         <button
-          className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-          onClick={handleAdd}
+          onClick={() => navigate('/AdminPage')}
+          className="bg-blue-500 text-white px-4 py-2 ml-4 rounded-md hover:bg-blue-700 duration-300"
         >
-          Add
+          Back
         </button>
+        <h1 className="text-primeColor font-semibold text-lg">Manage Products</h1>
+        <Link to="/addproduct" className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 duration-300">
+          Add Product
+        </Link>
       </div>
-
-      {showForm && (
-        <form onSubmit={handleFormSubmit} className="max-w-md mx-auto bg-white p-8 rounded shadow-md mb-8">
-          <h2 className="text-2xl font-semibold mb-4 text-indigo-700">
-            {editProductId !== null ? 'Edit Product' : 'Add Product'}
-          </h2>
-          {['Product Name', 'Warehouse', 'Description', 'Image URL', 'Price'].map((field) => (
-            <div key={field} className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">{field}:</label>
-              <input
-                type={field === 'Image URL' ? 'url' : 'text'}
-                name={field.toLowerCase()}
-                value={formData[field.toLowerCase()]}
-                onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
+      <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <thead className="bg-indigo-500 text-white">
+          <tr>
+            <th className="py-2 px-4 sm:px-5 md:px-8">No</th>
+            <th className="py-2 px-4 sm:px-5 md:px-8">Product Name</th>
+            <th className="py-2 px-4 sm:px-5 md:px-8">Price</th>
+            <th className="py-2 px-4 sm:px-5 md:px-8">Stock</th>
+            <th className="py-2 px-4 sm:px-5 md:px-8">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product, index) => (
+            <tr key={product.item_id}>
+              <td className="py-2 px-4 sm:px-5 md:px-8">{index + 1}</td>
+              <td className="py-2 px-4 sm:px-5 md:px-8">{product.item_name}</td>
+              <td className="py-2 px-4 sm:px-5 md:px-8">${product.price}</td>
+              <td className="py-2 px-4 sm:px-5 md:px-8">{product.stock_item}</td>
+              <td className="py-2 px-4 sm:px-5 md:px-8">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded-md mr-2"
+                  onClick={() => handleEditClick(product.item_name)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded-md"
+                  onClick={() => handleDeleteClick(product.item_name)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
           ))}
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        </tbody>
+      </table>
+
+      {/* Modal Konfirmasi Delete */}
+      {showDeleteModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '5px',
+              textAlign: 'center',
+            }}
           >
-            {editProductId !== null ? 'Save Changes' : 'Add Product'}
-          </button>
-        </form>
+            <h1>Apakah yakin akan menghapus produk ini?</h1>
+            <div style={{ height: '20px' }}></div>
+            <div>
+              <button
+                onClick={handleConfirmDelete}
+                style={{
+                  backgroundColor: '#FF0000',
+                  color: 'white',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  marginRight: '10px',
+                }}
+              >
+                Hapus
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                style={{
+                  backgroundColor: '#808080',
+                  color: 'white',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                }}
+              >
+                Tidak
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
-export default ProductList;
+export default ManageProduct;
