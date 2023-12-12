@@ -26,6 +26,8 @@ import Rate from "./pages/Rate/Rate.js";
 import AdminPage from "./pages/Admin/AdminPage";
 import AdminListOrder from "./pages/Admin/AdminListOrder.jsx";
 import ManageProduct from "./pages/ProductDetails/ManageProduct.jsx";
+import AddProduct from "./pages/ProductDetails/AddProduct.jsx";
+import EditProduct from "./pages/ProductDetails/EditProduct.jsx";
 import VerifyPayAdmin from "./pages/payment/VerifyPayAdmin.jsx";
 import Warehouse from "./pages/Admin/Warehouse.jsx";
 import AdminListOrderDetail from "./pages/Admin/admin-list-order-detail.jsx";
@@ -86,6 +88,9 @@ const router = createBrowserRouter(
       <Route path="/Warehouse" element={<Warehouse/>}></Route>
       <Route path="/admin/cart/:id" component={ProductDetails} />
       <Route path="/admin/cart" component={ManageProduct} />
+
+      <Route path="/addproduct" element={<AddProduct/>}></Route>
+      <Route path="/EditProduct/:itemId" element={<EditProduct/>}></Route>
       
     </Route>
   )
