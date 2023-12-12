@@ -1363,6 +1363,21 @@ app.put('/api/product/recieved/:salesorder_id', async (req, res) => {
   res.json({ recievedProduct })
 })
 
+app.put('/api/product/reviewed/:salesorder_id', async (req, res) => {
+  const salesorder_id = req.params.salesorder_id
+
+  const saleOrder = await prisma.salesOrder.update({
+    where:
+    {
+      salesorder_id: Number(salesorder_id)
+    }, data: {
+      order_status: 'reviewed'
+    }
+  })
+
+  res.json({ saleOrder })
+})
+
 // create order
 app.post('/api/products/cart/checkout', authenticateTokenMiddleware, async (req, res) => {
   const { salesorder_no, order_status, customer_name, shipping_cost, sub_total } = req.body
