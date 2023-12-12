@@ -386,8 +386,73 @@ async function createFeedback(item_id, rating, description) {
   }
 }
 
+//after 11 december
+async function getAdminProducts() {
+  try {
+    const response = await instance.get('/admin/products');
+    console.log(response)
+    console.log(response.data)
+    return response.data
+  } catch (error) {
+    console.error('Error in getAdminProducts:', error);
+    throw error;
+  }
+}
+
+
+async function createProduct(formData) {
+  try {
+    const response = await instance.post('/admin/products', formData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function editProduct(itemId, formData) {
+  try {
+    const response = await instance.put(`/admin/products/edit/${itemId}`, formData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function getItemIdByName(itemName) {
+  try {
+    const response = await instance.get(`/api/itemId/${itemName}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
+async function deleteProduct(itemId){
+  try {
+    const response = await instance.delete(`/admin/products/${itemId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+async function deleteWarehouseItem (itemId) {
+  try {
+    const response = await instance.delete(`/admin/warehouseitem/${itemId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting warehouseItem:', error);
+    throw error;
+  }
+};
 
 export { 
+deleteWarehouseItem,
+deleteProduct,
+getItemIdByName,
+editProduct,
+getAdminProducts,
+createProduct,
   deliveredOrder,
   getSalesOrder,
   uploadPaymentProof,
