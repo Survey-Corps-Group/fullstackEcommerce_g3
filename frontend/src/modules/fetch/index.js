@@ -446,6 +446,29 @@ async function deleteWarehouseItem (itemId) {
   }
 };
 
+
+async function verified (id) {
+  try {
+    const response = await instance.put(`/api/verified/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting warehouseItem:', error);
+    throw error;
+  }
+};
+
+async function declined (id) {
+  try {
+    const response = await instance.put(`/api/declined/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting warehouseItem:', error);
+    throw error;
+  }
+};
+
+
+
 export { 
 deleteWarehouseItem,
 deleteProduct,
@@ -484,5 +507,7 @@ createProduct,
   getUserOrdersDetail,
   adminGetAllSalesOrder,
   reviewedOrder,
-  createFeedback
+  createFeedback,
+  verified,
+  declined
 };
