@@ -1547,6 +1547,27 @@ app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async (req,
 
 })
 
+app.put('/api/declined/:salesorder_id', authenticateTokenMiddleware, async (req, res) => {
+  const salesorder_id = req.params.salesorder_id;
+  try {
+    const declined = await prisma.salesOrder.update({
+      where: {
+        salesorder_id: Number(salesorder_id)
+      },
+      data: {
+        order_status: "cancel"
+      }
+    })
+    res.json({
+      declined
+    })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+
+})
+
 
 
 // update stock quantity when checkout
