@@ -35,13 +35,13 @@ const ProductInfo = ({ productInfo }) => {
   return (
     <div className="flex flex-col gap-5">
       <h2 className="text-4xl font-semibold">{productInfo?.item_name}</h2>
-      <div class="flex">
-          <div class="w-1/8">
+      <div className="flex">
+          <div className="w-1/8">
           <IconContext.Provider value={{ color: "orange", size: "20px"}}>
             <FaStar />
           </IconContext.Provider>
           </div>
-          <div class="w-1/8 ml-1">4.0</div>
+          <div className="w-1/8 ml-1">4.0</div>
         </div>
         <p className="text-xl font-semibold">${productInfo?.price}</p>
         <p className="text-base text-gray-600">{productInfo?.description}</p>

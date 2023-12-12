@@ -8,10 +8,10 @@ import { useNavigate } from 'react-router-dom';
 
 const Payment = () => {
   const location = useLocation();
-  const { cartData, products, userDetails } = location.state || { cartData: null, products: [], userDetails: {}};
-  const { saleorder } = location.state || {};
-  const { createOrder } = saleorder || {};
-  const { salesorder_id } = createOrder || {};
+
+  console.log(location.state)
+
+  const { cartData, products, userDetails, saleorder_id } = location.state || { cartData: null, products: [], userDetails: {}, saleorder_id : null};
 
   const [file, setFile] = useState(null);
   const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
@@ -20,8 +20,8 @@ const Payment = () => {
     console.log("Cart Data:", cartData);
     console.log("Products:", products);
     console.log("User Details:", userDetails);
-    console.log("Sales Order ID:", salesorder_id);
-  }, [cartData, products, userDetails, salesorder_id]);
+    console.log("Sales Order ID:", saleorder_id);
+  }, [cartData, products, userDetails, saleorder_id]);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -39,7 +39,7 @@ const Payment = () => {
       formData.append('image', file);
 
       // Assuming uploadPaymentProof returns a success response
-      const response = await uploadPaymentProof(salesorder_id, formData);
+      const response = await uploadPaymentProof(saleorder_id, formData);
 
       console.log('Response:', response);
 
@@ -65,7 +65,7 @@ const Payment = () => {
         cartData,
         products,
         userDetails,
-        saleorder
+        saleorder_id
       }
     });
   };
@@ -77,7 +77,7 @@ const Payment = () => {
         <h1 className="text-primeColor font-semibold text-lg">{userDetails?.full_name}</h1>
         <p>{userDetails?.phone}</p>
         <p>{userDetails?.address}</p><br />
-        {products.map((product, index) => (
+        {products?.map((product, index) => (
           <div key={index} className="border-b-[2px] py-4 mb-2">
             <h2 className="text-primeColor font-semibold text-lg">{product.item_name}</h2>
             <p>Quantity: {product.quantity}</p><br />
@@ -85,7 +85,7 @@ const Payment = () => {
           </div>
         ))}
         <p>Total Price: 
-          <span> ${cartData?.total}</span>
+          <span> ${cartData.shipping ? (cartData?.total + cartData?.shipping) : cartData?.total}</span>
         </p><br/>
         
         <form className="flex items-center space-x-6">
@@ -109,7 +109,7 @@ const Payment = () => {
           Submit
         </button>
 
-        <p>Sales Order ID: {salesorder_id}</p>
+        <p>Sales Order ID: {saleorder_id}</p>
 
         {/* Success Modal */}
         {isSuccessModalOpen && (

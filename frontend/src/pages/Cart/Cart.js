@@ -55,8 +55,11 @@ const Cart = () => {
 
       const customerName = userDetails?.full_name
 
-      const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
-      const saleorder = await checkoutCart(customerName, shippingCost, totalCost, orderDetails);
+      // const totalCost = products.reduce((acc, product) => acc + product.price * product.quantity, 0);
+
+      const subTotal = calculateTotals.total + calculateTotals.shipping
+      
+      const saleorder = await checkoutCart(customerName, shippingCost, subTotal, orderDetails);
       
       for (let product of products) {
         try {
@@ -66,7 +69,7 @@ const Cart = () => {
         }
       }
       
-      dataToPass.saleorder = saleorder;
+      dataToPass.saleorder_id = saleorder?.createOrder?.salesorder_id;
 
       await deleteAllCartItems(userId);
       setProducts([]);

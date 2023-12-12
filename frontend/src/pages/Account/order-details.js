@@ -51,6 +51,15 @@ const OrderDetails = () => {
     navigate('/rate', { state: dataToPass });
   }
 
+  const handlePayment = () => {
+    const dataToPass = {
+      saleorder_id : id,
+      cartData: { total: salesOrderData.orderDetails.sub_total },
+      userDetails: salesOrderData.orderDetails.user_id
+    };
+    navigate('/paymentgateway', { state: dataToPass });
+  }
+
   // button payment
   const buttonPayment = () => {
     if(salesOrderData.orderDetails?.image_payment) {
@@ -60,7 +69,7 @@ const OrderDetails = () => {
     } else {
       return(
         <button 
-        // onClick={handlePayment}
+        onClick={handlePayment}
         className="bg-blue-500 text-white py-2 px-4 rounded"
         >
         Tambahkan Gambar Pembayaran
@@ -120,8 +129,6 @@ const OrderDetails = () => {
   console.log(open, 'open')
   return (
     <div className="container mx-auto mt-8">
-      <p>halaman order details untuk sales order id {id}</p>
-
       <div className="container mx-auto mt-8">
       <div className="bg-white overflow-hidden shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold mb-6">No Pesanan: {salesOrderData.orderDetails?.salesorder_no}</h1>
@@ -134,10 +141,11 @@ const OrderDetails = () => {
               <h2 className="text-xl font-bold mb-2">{item.item.item_name}</h2>
               <p className="text-gray-600 text-sm mb-2">Jumlah: {item.quantity} </p>
               <p className="text-gray-600 text-sm mb-2">Harga: {item.item.price}</p>
-              <p className="text-gray-600 text-sm mb-2">total: {item.item.price * item.quantity}</p>
+              <p className="text-gray-600 text-sm mb-2">Total: {item.item.price * item.quantity}</p>
             </div>
         ))}
         <div className="border-t border-gray-300 pt-4">
+          <p className="text-gray-600 text-sm mb-2">Shipping Cost: {salesOrderData.orderDetails?.shipping_cost}</p>
           <p className="text-xl font-bold mb-2">Total: {salesOrderData.orderDetails?.sub_total}</p>
         </div>
         {buttonPayment()}
