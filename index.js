@@ -502,8 +502,6 @@ function calculateSummaryRating(feedbacks) {
 
 app.get("/api/products", async (req, res) => {
   const { page, item_name, price, rating, sort } = req.query;
-
-  console.log(page, item_name, price, rating, sort)
   
   const limit = 9;
   const offset = page ? (page - 1) * limit : 0;
@@ -870,6 +868,7 @@ app.put("/admin/orders/:id", authenticateTokenMiddleware, authorizeAdmin, async 
       },
       data: {
         is_verified: true,
+        order_status: 'process'
       },
     });
 
@@ -1534,7 +1533,8 @@ app.put('/api/verified/:salesorder_id', authenticateTokenMiddleware, async (req,
         salesorder_id: Number(salesorder_id)
       },
       data: {
-        is_verified: true
+        is_verified: true,
+        order_status: "process"
       }
     })
     res.json({
@@ -1575,6 +1575,7 @@ app.put("/api/products/:itemId/stock", authenticateTokenMiddleware,
   async (req, res) => {
     try {
       const itemId = parseInt(req.params.itemId);
+      console.log(itemId)
       const { stock_quantity } = req.body;
 
       // Check if the product with the given ID exists
