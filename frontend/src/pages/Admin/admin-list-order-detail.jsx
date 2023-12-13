@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUserOrdersDetail, verified, declined } from "../../modules/fetch";
+import { getUserOrdersDetail, verified, declined, updateStockQuantity } from "../../modules/fetch";
 
 const AdminListOrderDetail = () => {
   const { id } = useParams();
@@ -30,6 +30,16 @@ const AdminListOrderDetail = () => {
 
   const handleDeclined = async () => {
     await declined(id);
+
+    for (let detail of orderDetail) {
+      try {
+        await updateStockQuantity(detail.item.item_id, -detail.quantity);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    
+
     window.location.reload();
   };
 

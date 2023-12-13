@@ -8,7 +8,6 @@ const OrderDetails = () => {
   const { id } = useParams(); // Destructure the id property from the object
   const [salesOrderData, setSalesOrderData] = useState([])
   const [items, setItems] = useState([])
-  const [open, setOpen] = useState(false)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
 
@@ -38,6 +37,7 @@ const OrderDetails = () => {
         await deliveredOrder(salesOrderData.orderDetails?.salesorder_id);
         // console.log();
         window.alert('Sukses');
+        
       } catch (error) {
         console.error("Error updating order status:", error);
         // Handle error as needed
@@ -117,7 +117,8 @@ const OrderDetails = () => {
   const buttonOnly = () => {
     if(salesOrderData.orderDetails?.order_status === "reviewed") {
     return(
-      <button 
+      <button
+      onClick={() => navigate('/')}
       className="bg-yellow-500 text-white py-2 px-4 rounded"
       >
       Terimakasih atas penilaiannya!
@@ -126,7 +127,6 @@ const OrderDetails = () => {
   }
 }
 
-  console.log(open, 'open')
   return (
     <div className="container mx-auto mt-8">
       <div className="container mx-auto mt-8">
