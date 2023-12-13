@@ -503,6 +503,7 @@ function calculateSummaryRating(feedbacks) {
 app.get("/api/products", async (req, res) => {
   const { page, item_name, price, rating, sort } = req.query;
   
+  
   const limit = 9;
   const offset = page ? (page - 1) * limit : 0;
   const ratingThreshold = rating ? parseFloat(rating) : null;
@@ -1574,6 +1575,7 @@ app.put("/api/products/:itemId/stock", authenticateTokenMiddleware,
   async (req, res) => {
     try {
       const itemId = parseInt(req.params.itemId);
+      console.log(itemId)
       const { stock_quantity } = req.body;
 
       // Check if the product with the given ID exists
