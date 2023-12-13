@@ -1,4 +1,3 @@
-// components/admin/AdminListOrder.js
 import React, { useState, useEffect } from "react";
 import { adminGetAllSalesOrder } from "../../modules/fetch";
 import { Link } from "react-router-dom";
@@ -7,14 +6,19 @@ const AdminListOrder = () => {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
 
-   useEffect(() => {
-    const fetch_list_order = async () => {
-      const response = await adminGetAllSalesOrder()
-      // console.log(response.orders, 'response')
-      setOrders(response.orders)
-    }
-    fetch_list_order()
-   }, [])
+  useEffect(() => {
+    const fetchListOrder = async () => {
+      try {
+        const response = await adminGetAllSalesOrder();
+        // Sort the orders by salesorder_id in ascending order
+        const sortedOrders = response.orders.sort((a, b) => a.salesorder_id - b.salesorder_id);
+        setOrders(sortedOrders);
+      } catch (error) {
+        setError("Error fetching orders");
+      }
+    };
+    fetchListOrder();
+  }, []);
 
   return (
     <div className="max-w-3xl mx-auto mt-8">
@@ -29,10 +33,10 @@ const AdminListOrder = () => {
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="py-2 px-4 border-r">No</th>
+                <th className="py-2 px-4 border-r">Order ID</th>
                 <th className="py-2 px-4 border-r">No Order</th>
                 <th className="py-2 px-4 border-r">Total Pembayaran</th>
-                {/* <th className="py-2 px-4 border-r">Shipping Price</th>
-                <th className="py-2 px-4 border-r">Total Amount</th> */}
+                <th className="py-2 px-4 border-r">Detail</th>
                 <th className="py-2 px-4">Status</th>
               </tr>
             </thead>
@@ -40,15 +44,24 @@ const AdminListOrder = () => {
               {orders.map((order, index) => (
                 <tr key={order.salesorder_id} className="border-b">
                   <td className="py-2 px-4 border-r">{index + 1}</td>
+                  <td className="py-2 px-4 border-r">{order.salesorder_id}</td>
                   <td className="py-2 px-4 border-r">{order.salesorder_no}</td>
                   <td className="py-2 px-4 border-r">{order.sub_total}</td>
-                  {/* <td className="py-2 px-4 border-r">{order.shippingPrice}</td>
-                  <td className="py-2 px-4 border-r">{order.totalAmount}</td>
-                  <td className="py-2 px-4">{order.status}</td> */}
                   <td className="py-2 px-4 border-r">
                     <Link to={`/AdminListOrder/${order.salesorder_id}`} className="text-blue-500 hover:underline">
-                      Detail
+                      Detail 
                     </Link>
+                  </td>
+                  <td className="py-2 px-4">
+                    {order.is_verified ? (
+                      <div className="bg-green-100 text-green-800 py-1 px-2 rounded">
+                        <h1 className="font-bold">ACC</h1>
+                      </div>
+                    ) : (
+                      <div className="bg-yellow-100 text-yellow-800 py-1 px-2 rounded">
+                        <h1 className="font-bold">PEND</h1>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
