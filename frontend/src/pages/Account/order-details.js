@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUserOrdersDetail, getuserOrders, deliveredOrder } from "../../modules/fetch";
-
+import { getUserOrdersDetail, getuserOrders, deliveredOrder, send_email } from "../../modules/fetch";
+import useUserDetails from '../../hooks/useUserDetails';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ const OrderDetails = () => {
   const [salesOrderData, setSalesOrderData] = useState([])
   const [items, setItems] = useState([])
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-
+  const { userDetails } = useUserDetails();
 
   useEffect(() => {
     const fetch_order_details = async () => {
@@ -21,7 +21,8 @@ const OrderDetails = () => {
     fetch_order_details()
   },[id]) 
 
- 
+  const productNames = items.map(detail => detail.item.item_name);
+  const concatenatedProductNames = productNames.join(", ");
 
   const handleReceived = () => {
     setShowConfirmationModal(true);
@@ -36,7 +37,10 @@ const OrderDetails = () => {
         // Mark order as received when accepted
         await deliveredOrder(salesOrderData.orderDetails?.salesorder_id);
         // console.log();
+        
         window.alert('Sukses');
+        window.location.reload();
+        await send_email(userDetails?.email, userDetails?.full_name, concatenatedProductNames);
         
       } catch (error) {
         console.error("Error updating order status:", error);

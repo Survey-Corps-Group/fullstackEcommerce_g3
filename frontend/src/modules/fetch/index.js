@@ -467,6 +467,17 @@ async function declined (id) {
   }
 };
 
+async function send_email(to, full_name, product){
+  try {
+    const response = await instance.post('/api/send_mail', {
+      to : to, full_name: full_name, product : product
+    })
+    return response.data
+  }catch (error) {
+    throw new Error(error.response.data.message || 'Something went wrong');
+  }
+}
+
 
 
 export { 
@@ -509,5 +520,6 @@ createProduct,
   reviewedOrder,
   createFeedback,
   verified,
-  declined
+  declined,
+  send_email
 };
