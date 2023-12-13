@@ -12,6 +12,9 @@ const Header = () => {
   const [showMenu, setShowMenu] = useState(true);
   const [sidenav, setSidenav] = useState(false);
   const location = useLocation();
+  const [showUser, setShowUser] = useState(false);
+
+
   useEffect(() => {
     let ResponsiveMenu = () => {
       if (window.innerWidth < 667) {
@@ -22,6 +25,11 @@ const Header = () => {
     };
     ResponsiveMenu();
     window.addEventListener("resize", ResponsiveMenu);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setShowUser(!!token);
   }, []);
 
   return (
@@ -42,7 +50,9 @@ const Header = () => {
                 className="flex items-center w-auto z-50 p-0 gap-2"
               >
                 <>
-                  {navBarList.map(({ _id, title, link }) => (
+                {
+                navBarList.map(({ _id, title, link }) => (
+                  (showUser || title !== 'Order') && (
                     <NavLink
                       key={_id}
                       className="flex font-normal hover:font-bold w-20 h-6 justify-center items-center px-12 text-base text-[#767676] hover:underline underline-offset-[4px] decoration-[1px] hover:text-[#262626] md:border-r-[2px] border-r-gray-300 hoverEffect last:border-r-0"
@@ -51,7 +61,10 @@ const Header = () => {
                     >
                       <li>{title}</li>
                     </NavLink>
-                  ))}
+                  )
+                ))
+              }
+
                 </>
               </motion.ul>
             )}
