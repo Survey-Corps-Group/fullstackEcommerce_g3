@@ -765,6 +765,7 @@ app.get("/admin/listorder", authenticateTokenMiddleware, authorizeAdmin, async (
         salesorder_no: true,
         sub_total: true,
         is_verified: true,
+        order_status:true
       },
     });
 
