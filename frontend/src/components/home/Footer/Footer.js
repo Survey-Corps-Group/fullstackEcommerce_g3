@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 
 
 const Footer = () => {
-  
-  
   return (
     <div className="w-full bg-[#F5F5F3] py-20">
       <div className="max-w-container mx-auto grid grid-cols-1 md:grid-cols-2  xl:grid-cols-6 px-4 gap-10">
@@ -16,6 +14,15 @@ const Footer = () => {
             <span className="text-primeColor font-semibold text-lg">MomMeMall</span>{" "}
             is one of the main destination for the needs of loving mothers and children. At MomMeMall, we understand how important the journey of motherhood and childhood is. That's why we are committed to providing a collection of high-quality products designed to meet all your family's needs.
             </p>
+
+            <Link to={`/signinAdmin`} className="text-white bg-black hover:bg-gray-800 rounded-full py-2 px-4" style={{ width: '16%' }}>
+  <button>
+    LOGIN ADMIN
+  </button>
+</Link>
+
+
+
             <ul className="flex items-center gap-2">
               <a
                 href="https://github.com/Survey-Corps-Group/fullstackEcommerce_g3"
