@@ -1,0 +1,117 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model SalesOrder {
+  salesorder_id Int                @id @default(autoincrement())
+  salesorder_no String
+  user_id       Int
+  order_status  String
+  customer_name String
+  shipping_cost Float
+  sub_total     Float
+  is_verified   Boolean
+  image_payment String
+  user          User               @relation(fields: [user_id], references: [user_id])
+  details       SalesOrderDetail[]
+}
+
+model SalesOrderDetail {
+  salesorder_detail_id Int        @id @default(autoincrement())
+  salesorder_id        Int
+  item_id              Int
+  item_price           Float
+  quantity             Int
+  salesOrder           SalesOrder @relation(fields: [salesorder_id], references: [salesorder_id])
+  item                 Item       @relation(fields: [item_id], references: [item_id])
+}
+
+model User {
+  user_id   Int          @id @default(autoincrement())
+  username  String      @unique
+  email     String
+  password  String
+  full_name String
+  phone     String
+  role  Role    @default(customer)
+  address   String
+  city_id       Int
+  province_id   Int
+  orders    SalesOrder[]
+  Cart      Cart[]
+}
+
+enum Role {
+  customer
+  admin
+}
+
+model Warehouse {
+  warehouse_id  Int             @id @default(autoincrement())
+  city          String
+  province      String
+  city_id       Int
+  province_id   Int
+  WarehouseItem WarehouseItem[]
+}
+
+model Item {
+  item_id        Int                @id @default(autoincrement())
+  item_name      String
+  price          Float
+  description    String
+  color          String
+  package_weight Int
+  stock_item     Int
+  feedbacks      Feedback[]
+  images         ItemImage[]
+  orderDetails   SalesOrderDetail[]
+  WarehouseItem  WarehouseItem[]
+  CartItem       CartItem[]
+}
+
+model Feedback {
+  feedback_id Int    @id @default(autoincrement())
+  item_id     Int
+  rating      Int
+  description String
+  item        Item   @relation(fields: [item_id], references: [item_id])
+}
+
+model ItemImage {
+  item_image_id Int    @id @default(autoincrement())
+  item_id       Int
+  image_url     String
+  item          Item   @relation(fields: [item_id], references: [item_id])
+}
+
+model WarehouseItem {
+  warehouse_id Int
+  item_id      Int
+  warehouse    Warehouse @relation(fields: [warehouse_id], references: [warehouse_id])
+  item         Item      @relation(fields: [item_id], references: [item_id])
+
+  @@id([warehouse_id, item_id])
+}
+
+model Cart {
+  cartId Int        @id @default(autoincrement())
+  userId Int
+  user   User       @relation(fields: [userId], references: [user_id])
+  items  CartItem[]
+}
+
+model CartItem {
+  cartId Int
+  itemId Int
+  quantity Int
+  cart   Cart @relation(fields: [cartId], references: [cartId])
+  item   Item @relation(fields: [itemId], references: [item_id])
+
+  @@id([cartId, itemId])
+}
