@@ -106,19 +106,21 @@ const AdminListOrderDetail = () => {
               </div>
             ) : (
               <>
+              {order.image_payment && (
+                <>
                 <button
-                  onClick={handleVerified}
-                  className="bg-green-500 text-white py-2 px-4 rounded w-24"
-                >
-                  Accept
-                </button>
-
-                <button
-                  onClick={handleDeclined}
-                  className="bg-red-500 text-white ml-5 py-2 px-4 rounded w-24"
-                >
-                  Decline
-                </button>
+                        onClick={handleVerified}
+                        className="bg-green-500 text-white py-2 px-4 rounded w-24"
+                      >
+                        Accept
+                      </button><button
+                        onClick={handleDeclined}
+                        className="bg-red-500 text-white ml-5 py-2 px-4 rounded w-24"
+                      >
+                          Decline
+                        </button>
+                        </>
+              )} 
               </>
             )}
           </div>

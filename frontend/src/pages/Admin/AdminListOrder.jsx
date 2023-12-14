@@ -53,15 +53,20 @@ const AdminListOrder = () => {
                     </Link>
                   </td>
                   <td className="py-2 px-4">
-                    {order.is_verified ? (
+                    {order.order_status === 'cancel' ? (
+                      <div className="bg-red-100 text-yellow-800 py-1 px-2 rounded">
+                      <h1 className="font-bold">CANCEL</h1>
+                    </div>
+                    ) : order.is_verified ? (
                       <div className="bg-green-100 text-green-800 py-1 px-2 rounded">
-                        <h1 className="font-bold">ACC</h1>
-                      </div>
+                      <h1 className="font-bold">ACC</h1>
+                    </div>
                     ) : (
                       <div className="bg-yellow-100 text-yellow-800 py-1 px-2 rounded">
                         <h1 className="font-bold">PEND</h1>
                       </div>
-                    )}
+                    )
+                  }
                   </td>
                 </tr>
               ))}
