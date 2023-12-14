@@ -24,46 +24,25 @@ const SignInAdmin = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    try{
+      if (!email) {
+        setErrEmail("Enter your username");
+      }
 
-    if (!email) {
-      setErrEmail("Enter your username");
-    }
+      if (!password) {
+        setErrPassword("Create a password");
+      }
 
-    if (!password) {
-      setErrPassword("Create a password");
-    }
+      if (email && password) {
 
-    if (email && password) {
-      // try {
-      //   // Mengirim permintaan fetch ke endpoint login
-      //   const response = await fetch("http://localhost:8000/api/users/login", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({ email, password }),
-      //   });
-
-      //   if (response.ok) {
-      //     const data = await response.json();
-      //     setSuccessMsg(data.message);
-
-      //     // Mengarahkan ke halaman AdminPage setelah login sukses
-      //     navigate("/AdminPage");
-      //   } else {
-      //     const errorData = await response.json();
-      //     setSuccessMsg(errorData.message);
-      //   }
-      // } catch (error) {
-      //   console.error("Error during login:", error);
-      //   setSuccessMsg("An error occurred during login.");
-      // }
-
-      const token = await login(email, password)
-      window.localStorage.setItem("token", token.token);
-      navigate("/AdminPage");
-      setEmail("");
-      setPassword("");
+        const token = await login(email, password)
+        window.localStorage.setItem("token", token.token);
+        navigate("/AdminPage");
+        setEmail("");
+        setPassword("");
+      }
+    }catch (error) {
+      window.alert(error)
     }
   };
 
