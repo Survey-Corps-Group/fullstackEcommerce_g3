@@ -1067,7 +1067,7 @@ app.get("/api/city", async (req, res) => {
   } catch (error) {
     res.status(404).json({
       success: false,
-      message: `Server error: ${err.message}`,
+      message: `Server error: ${error.message}`,
     });
   }
 });
@@ -1097,6 +1097,7 @@ app.post("/api/cost", async (req, res) => {
         headers: { key: RAJA_ONGKIR_KEY },
       }
     );
+
     res.json(response.data.rajaongkir.results);
   } catch (error) {
     res.status(404).json({
