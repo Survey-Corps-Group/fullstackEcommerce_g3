@@ -15,7 +15,6 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState("");
   const [country, setCountry] = useState("");
-  const [zip, setZip] = useState("");
   const [checked, setChecked] = useState(false);
   const [username, setUsername] = useState("");
   const [provinces, setProvinces] = useState([])
@@ -32,6 +31,7 @@ const SignUp = () => {
   const [errCity, setErrCity] = useState("");
 
   const navigate = useNavigate();
+  
   
   // ============= Error Msg End here ===================
   const [successMsg, setSuccessMsg] = useState("");
@@ -75,7 +75,7 @@ const SignUp = () => {
     return String(email)
       .toLowerCase()
       .match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i);
-  };
+  };  
   // ================= Email Validation End here ===============
 
 
@@ -135,7 +135,10 @@ const SignUp = () => {
       if (!city) {
         setErrCity("Enter your city name");
       }
-      
+      if (!province) {
+        setErrCity("Enter your province name");
+      }
+
       // ============== Getting the value ==============
       if (
         fullName &&
@@ -145,22 +148,30 @@ const SignUp = () => {
         password.length >= 6 &&
         address &&
         city &&
-        country &&
-        zip
+        province
       ) {
 
-        await register( username, email, password, address, fullName, phone, province, city)
+        const regis = await register(username, email, password, address, fullName, phone, province, city)
+        console.log(regis)
 
         setSuccessMsg(
           `Hello ${fullName}, Your account has been successfully created!`
         );
+
+
         setFullName("");
         setEmail("");
         setPhone("");
         setPassword("");
         setAddress("");
         setCity("");
+
+        setTimeout(function() {
+          navigate('/')
+      }, 2000);
         
+      } else {
+        window.alert('Terjadi kesalahan di dalam server!')
       }
     }
   };
@@ -419,7 +430,7 @@ const SignUp = () => {
                     type="checkbox"
                   />
                   <p className="text-sm text-primeColor">
-                    I agree to the OREBI{" "}
+                    I agree to the MomMeMall{" "}
                     <span className="text-blue-500">Terms of Service </span>and{" "}
                     <span className="text-blue-500">Privacy Policy</span>.
                   </p>

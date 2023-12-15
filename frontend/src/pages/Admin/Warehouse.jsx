@@ -83,14 +83,18 @@ const Profile = () => {
       city_id: cityId,
     };
 
-    const hasil = await createWarehouse(sendData);
+    try{
+      const hasil = await createWarehouse(sendData);
 
-    if (hasil.success === true) {
-      setIsAdd(!isAdd);
-      window.alert("Warehouse berhasil ditambahkan");
-      clearData()
-    } else {
-      window.alert("Terjadi kesalahan di dalam server");
+      if (hasil.success === true) {
+        setIsAdd(!isAdd);
+        window.alert("Warehouse berhasil ditambahkan");
+        clearData()
+      } else {
+        window.alert("Terjadi kesalahan di dalam server");
+      }
+    }catch(e){
+      alert('Terjadi kesalahan di dalam server')
     }
   };
 

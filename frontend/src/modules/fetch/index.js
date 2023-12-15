@@ -14,57 +14,58 @@ async function getAllProducts(page, itemName, price, rating, sort) {
   }
 }
 
-async function test(){
+async function test() {
   try {
     const response = await instance.get('/')
 
     return response
-  }catch(e){
+  } catch (e) {
 
   }
 }
 
-async function rajaOngkirProvince(){
+async function rajaOngkirProvince() {
   try {
     const response = await instance.get('/api/province')
 
     return response
-  }catch(e){
+  } catch (e) {
 
   }
 }
 
-async function rajaOngkirProvinceName(id){
+async function rajaOngkirProvinceName(id) {
   try {
     const response = await instance.get(`/api/province?id=${id}`)
     return response
-  }catch(e){
+  } catch (e) {
 
   }
 }
 
 
-async function rajaOngkirCityName(city_id, province_id){
-  try { 
+async function rajaOngkirCityName(city_id, province_id) {
+  try {
     const response = await instance.get(`/api/city?id=${city_id}&province=${province_id}`)
 
     return response
-  }catch(e){
+  } catch (e) {
 
   }
 }
 
-async function rajaOngkirCity(id){
-  try { 
+async function rajaOngkirCity(id) {
+  try {
     const response = await instance.get(`/api/city?province=${id}`)
 
     return response
-  }catch(e){
+  } catch (e) {
 
   }
 }
 
 async function fetchShippingCost(origin, destination, weight, courier) {
+  console.log(origin, destination, weight, courier)
   try {
     const response = await instance.post('/api/cost', {
       origin,
@@ -72,7 +73,9 @@ async function fetchShippingCost(origin, destination, weight, courier) {
       weight,
       courier
     });
-    
+
+    console.log('isi response', response)
+
     const payload = response.data;
 
     let cheapestOption = null;
@@ -132,8 +135,8 @@ async function getProductById(id) {
 
 async function createCart(userId, itemId, quantity) {
   try {
-  const response = await instance.post('/api/itemcart', { userId: parseInt(userId), items: [{ itemId, quantity }] });
-  return response.data;
+    const response = await instance.post('/api/itemcart', { userId: parseInt(userId), items: [{ itemId, quantity }] });
+    return response.data;
   } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
   }
@@ -225,7 +228,7 @@ async function fetchUserDetails(userId) {
 
 async function updateStockQuantity(itemid, quantity) {
   try {
-    const response = await instance.put(`/api/products/${itemid}/stock`, {stock_quantity : quantity});
+    const response = await instance.put(`/api/products/${itemid}/stock`, { stock_quantity: quantity });
     return response.data;
   } catch (error) {
     throw error;
@@ -233,7 +236,7 @@ async function updateStockQuantity(itemid, quantity) {
 }
 
 
-async function uploadPaymentProof (salesorderId, formData){
+async function uploadPaymentProof(salesorderId, formData) {
   try {
     const response = await instance.put(`/api/payment_proof/${salesorderId}`, formData, {
       headers: {
@@ -258,7 +261,7 @@ async function getSalesOrder(salesorderId) {
   }
 }
 
-async function deliveredOrder (salesorderId){
+async function deliveredOrder(salesorderId) {
   try {
     const response = await instance.put(`/api/product/recieved/${salesorderId}`);
     return response.data;
@@ -267,7 +270,7 @@ async function deliveredOrder (salesorderId){
   }
 };
 
-async function reviewedOrder (salesorderId){
+async function reviewedOrder(salesorderId) {
   try {
     const response = await instance.put(`/api/product/reviewed/${salesorderId}`);
     return response.data;
@@ -276,51 +279,52 @@ async function reviewedOrder (salesorderId){
   }
 };
 
-async function updateProfile (id, username,
+async function updateProfile(id, username,
   email,
   password,
   address,
   full_name,
   phone,
   city_id,
-  province_id ){
+  province_id) {
   try {
     const response = await instance.put(`/api/users/${id}`,
-  {username,
-  email,
-  password,
-  address,
-  full_name,
-  phone,
-  city_id,
-  province_id
-  });
+      {
+        username,
+        email,
+        password,
+        address,
+        full_name,
+        phone,
+        city_id,
+        province_id
+      });
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-async function getUserOrdersDetail(id){
+async function getUserOrdersDetail(id) {
   try {
-      const response = await instance.get(`/api/users/orders/${id}`)
-      console.log(response)
-      return response
+    const response = await instance.get(`/api/users/orders/${id}`)
+    console.log(response)
+    return response
   } catch (error) {
     throw error
   }
 }
 
-async function getuserOrders(){
+async function getuserOrders() {
   try {
-      const response = await instance.get('/api/users/orders')
-      return response
+    const response = await instance.get('/api/users/orders')
+    return response
   } catch (error) {
     throw error
   }
 }
 
- async function createWarehouse (warehouseData) {
+async function createWarehouse(warehouseData) {
   try {
     const response = await instance.post('/api/warehouses', warehouseData);
     return response.data;
@@ -344,11 +348,11 @@ async function updatedWarehouse(editingWarehouseId, sendData) {
   try {
 
     const response = await instance.put(`/api/warehouses/${editingWarehouseId}`, {
-      city : sendData.city, 
-      province : sendData.province, 
-      city_id : sendData.city_id, 
-      province_id : sendData.province_id,
-      
+      city: sendData.city,
+      province: sendData.province,
+      city_id: sendData.city_id,
+      province_id: sendData.province_id,
+
     })
     return response.data;
   } catch (error) {
@@ -371,17 +375,17 @@ async function adminGetAllSalesOrder() {
     const response = await instance.get('/admin/listorder')
     console.log(response.data)
     return response.data
-  }catch (error) {
+  } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
   }
 }
 
 async function createFeedback(item_id, rating, description) {
   try {
-    const response = await instance.post(`/api/products/${item_id}/feedback`, {rating: rating, description:description})
+    const response = await instance.post(`/api/products/${item_id}/feedback`, { rating: rating, description: description })
     console.log(response.data)
     return response.data
-  }catch (error) {
+  } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
   }
 }
@@ -427,7 +431,7 @@ async function getItemIdByName(itemName) {
   }
 }
 
-async function deleteProduct(itemId){
+async function deleteProduct(itemId) {
   try {
     const response = await instance.delete(`/admin/products/${itemId}`);
     return response.data;
@@ -436,7 +440,7 @@ async function deleteProduct(itemId){
   }
 };
 
-async function deleteWarehouseItem (itemId) {
+async function deleteWarehouseItem(itemId) {
   try {
     const response = await instance.delete(`/admin/warehouseitem/${itemId}`);
     return response.data;
@@ -447,7 +451,7 @@ async function deleteWarehouseItem (itemId) {
 };
 
 
-async function verified (id) {
+async function verified(id) {
   try {
     const response = await instance.put(`/api/verified/${id}`);
     return response.data;
@@ -457,7 +461,7 @@ async function verified (id) {
   }
 };
 
-async function declined (id) {
+async function declined(id) {
   try {
     const response = await instance.put(`/api/declined/${id}`);
     return response.data;
@@ -467,40 +471,40 @@ async function declined (id) {
   }
 };
 
-async function send_email(to, full_name, product){
+async function send_email(to, full_name, product) {
   try {
     const response = await instance.post('/api/send_mail', {
-      to : to, full_name: full_name, product : product
+      to: to, full_name: full_name, product: product
     })
     return response.data
-  }catch (error) {
+  } catch (error) {
     throw new Error(error.response.data.message || 'Something went wrong');
   }
 }
 
 
 
-export { 
-deleteWarehouseItem,
-deleteProduct,
-getItemIdByName,
-editProduct,
-getAdminProducts,
-createProduct,
+export {
+  deleteWarehouseItem,
+  deleteProduct,
+  getItemIdByName,
+  editProduct,
+  getAdminProducts,
+  createProduct,
   deliveredOrder,
   getSalesOrder,
   uploadPaymentProof,
-  getAllProducts, 
-  getProductById, 
-  test, 
-  login, 
-  register, 
-  rajaOngkirProvince, 
-  rajaOngkirCity, 
-  createCart, 
-  getCart, 
-  deleteCartItem, 
-  countCartItems, 
+  getAllProducts,
+  getProductById,
+  test,
+  login,
+  register,
+  rajaOngkirProvince,
+  rajaOngkirCity,
+  createCart,
+  getCart,
+  deleteCartItem,
+  countCartItems,
   deleteAllCartItems,
   updateCartItem,
   fetchShippingCost,

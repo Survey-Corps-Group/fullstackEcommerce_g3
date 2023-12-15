@@ -102,7 +102,7 @@ const Cart = () => {
     const calculateShippingCost = async (userCityId) => {
       if (products.length > 0) {
         const shippingCostPromises = products.map(product => {
-          const weight = product.package_weight * product.quantity * 1000;
+          const weight = product.package_weight * product.quantity;
           return fetchShippingCost(userCityId, parseInt(product.warehouse_city), weight, 'jne');
         });
         setFetchCost(true);
