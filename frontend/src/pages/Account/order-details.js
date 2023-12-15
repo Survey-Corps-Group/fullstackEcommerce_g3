@@ -137,17 +137,17 @@ const OrderDetails = () => {
       <div className="bg-white overflow-hidden shadow-md rounded-lg p-8">
         <h1 className="text-3xl font-bold mb-6">No Pesanan: {salesOrderData.orderDetails?.salesorder_no}</h1>
         <div className="flex items-center mb-4">
-          <p className="text-gray-600 text-sm">Status: {salesOrderData.orderDetails?.order_status}</p>
+          {salesOrderData.orderDetails?.order_status === "" && salesOrderData.orderDetails?.image_payment ? (
+          <p className="text-gray-600 text-sm">Status: Menunggu Verifikasi</p>
+          ) : salesOrderData.orderDetails?.order_status === ""  ?(
+            <p className="text-gray-600 text-sm">Status: Menunggu Pembayaran</p>
+          ) : (
+            <p className="text-gray-600 text-sm">Status: {salesOrderData.orderDetails?.order_status}</p>
+          )}
           {salesOrderData.orderDetails?.order_status === 'cancel' &&(
             <div className="bg-red-500 bg-opacity-50 text-white rounded-full p-2 ml-4">
               Verifiikasi Pembayaran Gagal
             </div>
-          )}
-          {!salesOrderData.orderDetails?.is_verified && salesOrderData.orderDetails?.image_payment && 
-          salesOrderData.orderDetails?.order_status === 'precess' && (
-          <div className="bg-yellow-500 bg-opacity-50 text-white rounded-full p-2 ml-4">
-            Menunggu Verifikasi
-          </div>
           )}
           {salesOrderData.orderDetails?.is_verified && salesOrderData.orderDetails?.order_status === 'recieved' && (
           <div className="bg-green-500 bg-opacity-50 text-white rounded-full p-2 ml-4">

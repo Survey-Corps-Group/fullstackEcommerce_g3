@@ -29,7 +29,13 @@ const MyOrders = () => {
                   <div className="p-4">
                     <h2 className="text-xl font-bold mb-2">{order.salesorder_no}</h2>
                     <p className="text-gray-600 text-sm mb-2">Jumlah: {order.sub_total}</p>
-                    <p className="text-gray-600 text-sm">Status: {order.order_status}</p>
+                    {order.order_status === "" && order.image_payment ? (
+                      <p className="text-gray-600 text-sm">Status: Menunggu Verifikasi</p>
+                    ) : order.order_status === "" ?  (
+                      <p className="text-gray-600 text-sm">Status: Menunggu pembayaran</p>
+                      ) : (
+                      <p className="text-gray-600 text-sm">Status: {order.order_status}</p>
+                    )}
                   </div>
                 </Link>
               </li>
