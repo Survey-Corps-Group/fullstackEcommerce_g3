@@ -6,3 +6,6 @@ Contributor :
 5. Novan Yogantara.   : Frontend, ui
 
 System Design & Erd:
+![Screenshot (978)](https://github.com/Survey-Corps-Group/fullstackEcommerce_g3/assets/135799527/079ff731-34ae-4f7a-a208-b4c75b97de39)
+
+
